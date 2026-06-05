@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🎂 曾语婕 · 诗意与物理的生日宇宙</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html { -webkit-font-smoothing: antialiased; }
+        body {
+            min-height: 100vh; min-height: 100dvh; overflow: hidden;
+            font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+            background: radial-gradient(ellipse at 40% 50%, #1a2a1a, #0a1a0f);
+            position: relative; transform: translateZ(0); backface-visibility: hidden; touch-action: manipulation;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background:
+                radial-gradient(circle at 25% 30%, rgba(255, 182, 193, 0.13) 0%, transparent 50%),
+                radial-gradient(circle at 70% 55%, rgba(144, 238, 144, 0.10) 0%, transparent 48%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 0%, transparent 70%),
+                radial-gradient(circle at 60% 20%, rgba(255, 105, 180, 0.08) 0%, transparent 42%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .star-layer { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        .star { position: absolute; border-radius: 50%; background: white; pointer-events: none; }
+        .star.big {
+            width: 3px; height: 3px;
+            box-shadow: 0 0 8px 2px rgba(255,220,150,0.7), 0 0 16px 4px rgba(255,200,140,0.35);
+            animation: twinkleBig 4s ease-in-out infinite;
+        }
+        .star.small {
+            width: 2px; height: 2px;
+            box-shadow: 0 0 4px 1px rgba(255,255,255,0.5);
+            animation: twinkleSmall 2.8s ease-in-out infinite;
+        }
+        @keyframes twinkleBig {
+            0%,100%{opacity:0.5;transform:scale(1);} 35%{opacity:1;transform:scale(1.6);} 70%{opacity:0.55;transform:scale(0.85);}
+        }
+        @keyframes twinkleSmall {
+            0%,100%{opacity:0.4;} 40%{opacity:1;} 75%{opacity:0.35;}
+        }
+        .meteor {
+            position: absolute; width: 2.5px; height: 2.5px; border-radius: 50%; background: #ffe9c4;
+            box-shadow: 0 0 6px 3px rgba(255,220,150,0.8); pointer-events: none; z-index: 2;
+            animation: meteorShoot linear forwards;
+        }
+        .meteor::after {
+            content: ''; position: absolute; top: 50%; right: 100%; width: 70px; height: 1.5px;
+            background: linear-gradient(to left, rgba(255,220,150,0.9), rgba(255,200,130,0.35), transparent);
+            transform: translateY(-50%);
+        }
+        @keyframes meteorShoot {
+            0%{transform:translate(0,0) scale(1);opacity:1;} 70%{opacity:0.7;} 100%{transform:translate(-380px,220px) scale(0.3);opacity:0;}
+        }
+
+        .home-page {
+            position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 100;
+            backdrop-filter: blur(12px); background: rgba(10,25,15,0.55);
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+        .home-page.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .open-btn {
+            padding: 18px 56px; font-size: 1.5rem; font-weight: 600; color: #fff9f0;
+            background: linear-gradient(135deg, #c49a7c, #e8b896); border: none; border-radius: 80px; cursor: pointer;
+            box-shadow: 0 18px 38px rgba(0,0,0,0.55), 0 0 32px rgba(255,182,193,0.5);
+            letter-spacing: 6px; transition: transform 0.35s cubic-bezier(0.2,0.9,0.4,1.1), box-shadow 0.35s;
+        }
+        .open-btn:hover { transform: scale(1.06); box-shadow: 0 22px 48px rgba(0,0,0,0.65), 0 0 55px #ffb6c1; }
+
+        /* 信封层 */
+        .envelope-layer {
+            position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0);
+            width: min(360px, 82vw); aspect-ratio: 360/250; opacity: 0; visibility: hidden;
+            transition: transform 0.8s cubic-bezier(0.34,1.2,0.64,1), opacity 0.55s;
+            filter: drop-shadow(0 0 14px rgba(255,182,193,0.5)) drop-shadow(0 22px 32px rgba(0,0,0,0.45));
+            z-index: 10; perspective: 800px;
+        }
+        .envelope-layer.show { transform: translate(-50%, -50%) scale(1); opacity: 1; visibility: visible; }
+        .envelope-layer:hover {
+            transform: translate(-50%, -50%) scale(1.04);
+            filter: drop-shadow(0 0 30px rgba(255,182,193,0.7)) drop-shadow(0 26px 38px rgba(0,0,0,0.55));
+            transition: transform 0.3s ease, filter 0.3s;
+        }
+        .envelope-container { position: relative; width: 100%; height: 100%; }
+        .envelope-body {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 80%;
+            background: linear-gradient(175deg, #fef5e8, #fce9d9, #f8dfc8);
+            border-radius: 0 0 28px 28px; box-shadow: inset 0 -8px 0 #d4b896, 0 20px 38px rgba(0,0,0,0.4); z-index: 3;
+        }
+        .envelope-flap {
+            position: absolute; top: 0; left: 0; width: 100%; height: 55%;
+            background: linear-gradient(175deg, #fffef9, #fdf2e4, #f5e0ca);
+            clip-path: polygon(0% 0%, 50% 100%, 100% 0%); z-index: 5;
+            transform-origin: top center; transition: transform 1.45s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.32);
+        }
+        .envelope-flap.open { transform: rotateX(180deg); box-shadow: 0 -10px 20px rgba(0,0,0,0.25); }
+        .envelope-liner {
+            position: absolute; top: 8%; left: 6%; width: 88%; height: 62%;
+            background: #fffaf3; border-radius: 8px; z-index: 2;
+            opacity: 0; transition: opacity 0.7s ease 0.9s;
+            display: flex; align-items: center; justify-content: center; text-align: center; pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(180,150,120,0.2);
+        }
+        .envelope-liner.visible { opacity: 1; }
+        .envelope-liner p {
+            color: #aa7a55; font-size: clamp(0.8rem, 3vw, 0.95rem);
+            text-shadow: 0 0 6px rgba(255,220,150,0.4); line-height: 1.7; padding: 10px;
+        }
+        .envelope-seal {
+            position: absolute; bottom: 28%; left: 50%; transform: translate(-50%, 0);
+            width: 14%; aspect-ratio: 1; max-width: 54px; border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, #f5e6c4, #e8cf9e, #d4a870);
+            z-index: 10; cursor: pointer;
+            box-shadow: 0 7px 16px rgba(0,0,0,0.52), inset 0 -3px 7px rgba(0,0,0,0.28), inset 0 3px 9px rgba(255,255,240,0.85);
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(14px, 4vw, 20px); color: #fbe8a5;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: box-shadow 0.3s, filter 0.3s;
+        }
+        .envelope-seal:hover {
+            box-shadow: 0 7px 20px rgba(0,0,0,0.55), 0 0 22px rgba(255,182,193,0.6),
+                        inset 0 -3px 7px rgba(0,0,0,0.28), inset 0 3px 9px rgba(255,255,240,0.9);
+        }
+        .envelope-seal.bouncing { animation: sealBounce 0.4s ease; }
+        .envelope-seal.vanishing { animation: sealVanish 0.55s ease forwards; }
+        @keyframes sealBounce {
+            0%{transform:translate(-50%,0) scale(1);} 35%{transform:translate(-50%,0) scale(1.18);}
+            65%{transform:translate(-50%,0) scale(0.92);} 100%{transform:translate(-50%,0) scale(1);}
+        }
+        @keyframes sealVanish {
+            0%{transform:translate(-50%,0) scale(1) rotate(0); opacity:1;}
+            100%{transform:translate(-50%,0) scale(0.05) rotate(360deg); opacity:0;}
+        }
+
+        /* 信纸 */
+        .letter-paper {
+            position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.82);
+            width: min(320px, 78vw); aspect-ratio: 320/240;
+            background: linear-gradient(175deg, #fffef8, #fdf5ec, #f9ebdb);
+            border-radius: 6px; box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+            display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            opacity: 0; z-index: 12; pointer-events: none; filter: blur(1.5px);
+        }
+        .letter-paper.rising {
+            display: flex;
+            animation: letterRise 3.4s cubic-bezier(0.22,0.9,0.32,1.15) forwards;
+        }
+        @keyframes letterRise {
+            0%{opacity:0;transform:translate(-50%,-50%) scale(0.82) translateY(20px);filter:blur(1.5px);}
+            18%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0);filter:blur(0);}
+            55%{opacity:1;transform:translate(-50%,-50%) scale(1.01) translateY(-15px) rotate(-0.5deg);}
+            80%{opacity:0.8;transform:translate(-50%,-50%) scale(1.02) translateY(-40px) rotate(-1.4deg);}
+            100%{opacity:0;transform:translate(-50%,-50%) scale(1.03) translateY(-70px) rotate(-1.8deg);filter:blur(1px);}
+        }
+        .letter-paper p { color: #aa7a55; font-size: clamp(0.9rem, 3.8vw, 1.05rem); line-height: 1.9; }
+
+        /* 祝福文字层 */
+        .message-layer {
+            position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            z-index: 16; display: flex; flex-direction: column; align-items: center; gap: 20px;
+            opacity: 0; pointer-events: none; transition: opacity 0.8s;
+        }
+        .message-layer.visible { opacity: 1; pointer-events: auto; }
+        .blessing-title {
+            font-size: clamp(1.8rem, 8vw, 4rem); color: #fff3e8;
+            animation: titleGlow 2.6s ease-in-out infinite;
+            text-shadow: 0 0 12px rgba(255,200,140,0.7), 0 0 28px rgba(255,160,100,0.5);
+        }
+        @keyframes titleGlow {
+            0%,100%{text-shadow:0 0 12px rgba(255,200,140,0.7),0 0 28px rgba(255,160,100,0.5);}
+            50%{text-shadow:0 0 20px rgba(255,220,160,0.9),0 0 40px rgba(255,180,120,0.65),0 0 65px rgba(255,150,90,0.5);}
+        }
+        .blessing-card {
+            background: rgba(255,250,240,0.15); backdrop-filter: blur(10px); border-radius: 40px;
+            padding: 18px 32px; color: #ffe8d6; font-size: clamp(0.85rem, 3vw, 1rem); line-height: 1.8;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .claim-btn {
+            padding: 14px 44px; font-size: clamp(1rem, 3.5vw, 1.2rem); color: #fff;
+            background: linear-gradient(135deg, #c47b9b, #e89f6e); border: none; border-radius: 60px;
+            cursor: pointer; letter-spacing: 0.07em;
+            box-shadow: 0 6px 22px rgba(180,100,80,0.45), 0 0 30px rgba(255,182,193,0.35);
+            transition: all 0.35s cubic-bezier(0.34,1.2,0.64,1);
+        }
+        .claim-btn:hover { transform: scale(1.07); box-shadow: 0 10px 30px rgba(180,100,80,0.6), 0 0 50px rgba(255,182,193,0.55); }
+        .claim-btn:disabled { background: #888; cursor: not-allowed; transform: scale(0.96); opacity: 0.6; }
+
+        /* Canvas */
+        #particleCanvas { position: fixed; inset: 0; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+        #particleCanvas.active { opacity: 1; }
+
+        /* 过渡蛋糕 */
+        .cake-morph-layer {
+            position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 21;
+            display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+        }
+        .cake-morph-layer.visible { opacity: 1; }
+        .trans-tier { border: 2px solid #55ffaa; background: rgba(100,255,150,0.2); box-shadow: 0 0 20px rgba(80,255,160,0.5); }
+        .trans-tier.t1 { width: min(260px, 65vw); height: 52px; border-radius: 8px 8px 22px 22px; }
+        .trans-tier.t2 { width: min(200px, 50vw); height: 42px; border-radius: 6px 6px 18px 18px; }
+        .trans-tier.t3 { width: min(145px, 36vw); height: 34px; border-radius: 5px 5px 14px 14px; }
+        .trans-candle { width: 10px; height: 40px; background: rgba(180,255,200,0.5); border: 1.5px solid #55ffaa; border-radius: 3px; }
+        .trans-flame-dot { width: 8px; height: 8px; border-radius: 50%; background: #aaffcc; box-shadow: 0 0 18px 6px rgba(150,255,200,0.7); margin-top: -2px; }
+        .cake-morph-layer.morphing { animation: morphShrink 1.05s ease forwards; }
+        @keyframes morphShrink {
+            0%{transform:translate(-50%,-50%) scale(1);opacity:1;filter:brightness(1) hue-rotate(0deg);}
+            100%{transform:translate(-50%,-50%) scale(0.68);opacity:0;filter:brightness(1.6) hue-rotate(30deg);}
+        }
+
+        /* 真实蛋糕 */
+        .cake-layer {
+            position: fixed; left: 50%; top: 48%; transform: translate(-50%, -50%) scale(0.5); z-index: 22;
+            display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none;
+        }
+        .cake-layer.visible {
+            opacity: 1; pointer-events: auto;
+            animation: cakePopIn 0.7s cubic-bezier(0.34,1.2,0.64,1) forwards;
+        }
+        @keyframes cakePopIn {
+            0%{transform:translate(-50%,-50%) scale(0.5);opacity:0;}
+            60%{transform:translate(-50%,-50%) scale(1.04);opacity:1;}
+            100%{transform:translate(-50%,-50%) scale(1);opacity:1;}
+        }
+        .cake-tier { border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,0.35); position: relative; }
+        .tier1 { width: min(280px, 70vw); height: 56px; background: linear-gradient(180deg, #ff8c5a, #e3602e); border-bottom: 6px solid #b23b10; border-radius: 10px 10px 34px 34px; }
+        .tier2 { width: min(220px, 55vw); height: 46px; background: linear-gradient(180deg, #ffe4a5, #f7c56e); border-bottom: 5px solid #c8993a; border-radius: 8px 8px 26px 26px; margin-top: -4px; }
+        .tier3 { width: min(158px, 40vw); height: 38px; background: linear-gradient(180deg, #ffc8e4, #f290b8); border-bottom: 4px solid #c06080; border-radius: 6px 6px 20px 20px; margin-top: -3px; }
+        .cream-dot { width: 14px; height: 10px; background: #fffae9; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); position: absolute; }
+        .candle-stick { width: 12px; height: 48px; background: linear-gradient(180deg, #ff7790, #e8436e); border-radius: 3px; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+        .flame {
+            width: 16px; height: 20px; border-radius: 50% 50% 35% 35%;
+            background: radial-gradient(circle at 50% 40%, #fffef0, #ffeaa0, #ffb840, #ff6a20);
+            margin-top: -6px; box-shadow: 0 0 28px #ffae55, 0 0 50px rgba(255,150,60,0.55);
+            animation: flicker 0.14s ease-in-out infinite alternate;
+        }
+        @keyframes flicker {
+            0%{transform:scale(1,1) rotate(-1deg);} 33%{transform:scale(1.06,0.92) rotate(1.5deg);}
+            66%{transform:scale(0.94,1.05) rotate(-0.8deg);} 100%{transform:scale(1.03,0.96) rotate(0.5deg);}
+        }
+        .cake-name {
+            font-size: clamp(1rem, 4vw, 1.4rem); color: #fff8e8;
+            animation: nameGlow 2s ease-in-out infinite; text-shadow: 0 0 10px rgba(255,200,130,0.8);
+            margin-bottom: 8px; text-align: center;
+        }
+        @keyframes nameGlow {
+            0%,100%{text-shadow:0 0 10px rgba(255,200,130,0.8);}
+            50%{text-shadow:0 0 18px rgba(255,220,150,1),0 0 38px rgba(255,180,120,0.7);}
+        }
+
+        .birthday-cheer {
+            position: fixed; left: 50%; top: 12%; transform: translate(-50%, 0); z-index: 35;
+            font-size: clamp(1.8rem, 7vw, 3.8rem); color: #fff; opacity: 0; pointer-events: none; text-align: center;
+        }
+        .birthday-cheer.show { opacity: 1; animation: cheerPulse 1.5s ease-in-out infinite; }
+        @keyframes cheerPulse {
+            0%,100%{transform:translate(-50%,0) scale(0.97); text-shadow:0 0 16px rgba(255,200,150,0.9),0 0 35px rgba(255,160,110,0.6);}
+            50%{transform:translate(-50%,0) scale(1.06); text-shadow:0 0 24px rgba(255,220,170,1),0 0 50px rgba(255,180,130,0.75);}
+        }
+
+        .signature {
+            position: fixed; bottom: 22px; right: 28px; z-index: 50; font-style: italic;
+            color: rgba(255,240,220,0.7); font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+            text-shadow: 0 0 8px rgba(255,200,140,0.35); background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(6px); padding: 8px 16px; border-radius: 20px;
+        }
+
+        @keyframes confettiFall {
+            0%{transform:translateY(-20px) rotate(0deg) scale(1);opacity:0;} 8%{opacity:1;}
+            75%{opacity:0.9;} 100%{transform:translateY(105vh) rotate(720deg) scale(0.4);opacity:0;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="star-layer" id="starLayer"></div>
+
+    <div class="home-page" id="homePage">
+        <button class="open-btn" id="openBtn">✨ 开启生日贺卡 ✨</button>
+    </div>
+
+    <div class="envelope-layer" id="envelopeLayer">
+        <div class="envelope-container">
+            <div class="envelope-flap" id="envelopeFlap"></div>
+            <div class="envelope-liner" id="envelopeLiner">
+                <p>✨ 愿所有美好如约而至 ✨<br>生日快乐，曾语婕<br><span style="font-size:0.9em;">—— 给语文课代表 & 物理小天才</span></p>
+            </div>
+            <div class="envelope-body"></div>
+            <div class="envelope-seal" id="envelopeSeal">★</div>
+        </div>
+    </div>
+
+    <div class="letter-paper" id="letterPaper">
+        <p>🎂 曾语婕，生辰喜乐 🎂</p>
+        <p>愿你以文字为舟，渡星河万里</p>
+        <p>以物理为翼，探宇宙无垠</p>
+        <p>所有的美好与真理，都将如约绽放</p>
+    </div>
+
+    <div class="message-layer" id="messageLayer">
+        <div class="blessing-title">生日快乐 曾语婕</div>
+        <div class="blessing-card">
+            🌠 愿历遍山河 人间值得 🌠<br>
+            岁岁常欢愉，年年皆胜意<br>
+            永远赤诚，永远自由
+        </div>
+        <button class="claim-btn" id="claimBtn">🎁 领取魔法蛋糕 🎁</button>
+    </div>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="cake-morph-layer" id="transitionCake">
+        <div class="trans-tier t1"></div>
+        <div class="trans-tier t2"></div>
+        <div class="trans-tier t3"></div>
+        <div class="trans-candle"></div>
+        <div class="trans-flame-dot"></div>
+    </div>
+
+    <div class="cake-layer" id="realCake">
+        <div class="cake-name">🎂 祝曾语婕 🎂<br>生日快乐！</div>
+        <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+            <div style="display:flex; flex-direction:column; align-items:center; z-index:5;">
+                <div class="flame"></div>
+                <div class="candle-stick"></div>
+            </div>
+            <div class="cake-tier tier3" style="position:relative; margin-top:-2px;">
+                <div class="cream-dot" style="top:-8px; left:20%;"></div>
+                <div class="cream-dot" style="top:-8px; left:50%; transform:translateX(-50%);"></div>
+                <div class="cream-dot" style="top:-8px; right:20%;"></div>
+            </div>
+            <div class="cake-tier tier2" style="position:relative; margin-top:-4px;">
+                <div class="cream-dot" style="top:-8px; left:22%;"></div>
+                <div class="cream-dot" style="top:-8px; left:50%; transform:translateX(-50%);"></div>
+                <div class="cream-dot" style="top:-8px; right:22%;"></div>
+            </div>
+            <div class="cake-tier tier1" style="position:relative; margin-top:-4px;">
+                <div class="cream-dot" style="top:-8px; left:25%;"></div>
+                <div class="cream-dot" style="top:-8px; left:50%; transform:translateX(-50%);"></div>
+                <div class="cream-dot" style="top:-8px; right:25%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="birthday-cheer" id="cheerText">🎉 曾语婕，生日快乐！ 🎉</div>
+    <div class="signature">— 杜彦德 敬赠 💝</div>
+
+    <script>
+        (function() {
+            // 星星生成
+            const starLayer = document.getElementById('starLayer');
+            for (let i = 0; i < 28; i++) {
+                const s = document.createElement('div'); s.className = 'star big';
+                s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+                s.style.animationDelay = Math.random() * 4 + 's'; starLayer.appendChild(s);
+            }
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div'); s.className = 'star small';
+                s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+                s.style.animationDelay = Math.random() * 2.8 + 's'; starLayer.appendChild(s);
+            }
+
+            function spawnMeteor() {
+                const meteor = document.createElement('div'); meteor.className = 'meteor';
+                meteor.style.left = (60 + Math.random() * 40) + '%'; meteor.style.top = Math.random() * 30 + '%';
+                meteor.style.animationDuration = (0.9 + Math.random() * 0.7) + 's';
+                starLayer.appendChild(meteor); setTimeout(() => meteor.remove(), 1500);
+            }
+            let meteorTimer;
+            function startMeteors() { spawnMeteor(); meteorTimer = setInterval(spawnMeteor, 2800); }
+
+            // DOM
+            const homePage = document.getElementById('homePage');
+            const openBtn = document.getElementById('openBtn');
+            const envelopeLayer = document.getElementById('envelopeLayer');
+            const envelopeFlap = document.getElementById('envelopeFlap');
+            const envelopeLiner = document.getElementById('envelopeLiner');
+            const envelopeSeal = document.getElementById('envelopeSeal');
+            const letterPaper = document.getElementById('letterPaper');
+            const messageLayer = document.getElementById('messageLayer');
+            const claimBtn = document.getElementById('claimBtn');
+            const particleCanvas = document.getElementById('particleCanvas');
+            const ctx = particleCanvas.getContext('2d');
+            const transitionCake = document.getElementById('transitionCake');
+            const realCake = document.getElementById('realCake');
+            const cheerText = document.getElementById('cheerText');
+
+            let isOpened = false;
+
+            openBtn.addEventListener('click', () => {
+                homePage.classList.add('hidden');
+                setTimeout(() => { envelopeLayer.classList.add('show'); startMeteors(); }, 300);
+            });
+
+            envelopeSeal.addEventListener('click', (e) => {
+                if (isOpened) return; isOpened = true; e.stopPropagation();
+                envelopeSeal.classList.add('bouncing');
+                setTimeout(() => { envelopeSeal.classList.remove('bouncing'); envelopeSeal.classList.add('vanishing'); }, 420);
+                setTimeout(() => { envelopeFlap.classList.add('open'); envelopeLiner.classList.add('visible'); }, 600);
+                setTimeout(() => envelopeSeal.style.display = 'none', 1150);
+                setTimeout(() => letterPaper.classList.add('rising'), 1400);
+                setTimeout(() => { envelopeLayer.style.opacity = '0'; envelopeLayer.style.pointerEvents = 'none'; }, 2200);
+                // 关键调整：信纸动画结束(4800ms)后，再显示祝福层，保证用户看清
+                setTimeout(() => { letterPaper.style.display = 'none'; messageLayer.classList.add('visible'); }, 5000);
+            });
+
+            claimBtn.addEventListener('click', () => {
+                claimBtn.disabled = true; claimBtn.textContent = '✨ 魔法酝酿中... ✨';
+                setTimeout(() => { messageLayer.style.opacity = '0'; messageLayer.style.pointerEvents = 'none'; }, 600);
+                setTimeout(startParticleAnimation, 800);
+            });
+
+            /* ================= 粒子系统：不重叠 ================= */
+            const snippets = {
+                tier1: ['F=ma', 'E=hν', 'p=mv', '“星河”', '“万里”', 'ΔxΔp≥ℏ/2', '“吹灭读书灯”', 'v=λf'],
+                tier2: ['E=mc²', '“一身都是月”', '“且将新茶”', 'class Wisdom{}', '“诗酒趁年华”', 'F=-kx', '“此心安处”'],
+                tier3: ['🍰', '🎂', '∫dx', '“星河”', '“万里”', '∑∞'],
+                candle: ['✨', '∫', '♥', '{', '★'],
+                flame: ['{', '♥', '⋅', '∗']
+            };
+            function getSnippet(t) { return snippets[t][Math.floor(Math.random() * snippets[t].length)]; }
+            let particles = [], phase = 'idle', phaseStart = 0;
+            const FLY = 2200, HOLD = 1500, DISSOLVE = 800;
+
+            function getCakeBounds() {
+                const w = window.innerWidth, h = window.innerHeight, scale = Math.min(w/420, h/650, 1);
+                const cx = w/2, cy = h/2 + 10*scale;
+                return {
+                    cx,cy,scale,
+                    tiers:[
+                        {width:280*scale,height:56*scale,bottom:cy+30*scale,name:'tier1'},
+                        {width:220*scale,height:46*scale,bottom:cy+30*scale-56*scale+4*scale,name:'tier2'},
+                        {width:158*scale,height:38*scale,bottom:cy+30*scale-56*scale-46*scale+7*scale,name:'tier3'}
+                    ],
+                    candle:{width:12*scale,height:48*scale,bottom:cy+30*scale-56*scale-46*scale-38*scale-2*scale},
+                    flame:{cx:cx,cy:cy+30*scale-56*scale-46*scale-38*scale-48*scale-10*scale,radius:10*scale}
+                };
+            }
+
+            function generateUniformPoints(bounds) {
+                const pts = []; const gap = 15;
+                bounds.tiers.forEach(t => {
+                    const l = bounds.cx - t.width/2, top = t.bottom - t.height;
+                    const hc = Math.max(2, Math.floor(t.width/gap)), vc = Math.max(2, Math.floor(t.height/gap));
+                    for(let i=0;i<=hc;i++){ const x = l + (t.width*i)/hc; pts.push({x,y:top,tier:t.name}); pts.push({x,y:t.bottom,tier:t.name}); }
+                    for(let i=0;i<=vc;i++){ const y = top + (t.height*i)/vc; pts.push({x:l,y,tier:t.name}); pts.push({x:l+t.width,y,tier:t.name}); }
+                });
+                const c = bounds.candle, cl = bounds.cx - c.width/2, ct = c.bottom - c.height;
+                for(let i=0;i<=3;i++){ const x = cl+(c.width*i)/3; pts.push({x,y:ct,tier:'candle'}); pts.push({x,y:c.bottom,tier:'candle'}); }
+                for(let i=0;i<=5;i++){ const y = ct+(c.height*i)/5; pts.push({x:cl,y,tier:'candle'}); pts.push({x:cl+c.width,y,tier:'candle'}); }
+                const fl = bounds.flame;
+                for(let i=0;i<12;i++){ const a = (i/12)*Math.PI*2, r = fl.radius*0.7; pts.push({x:fl.cx+Math.cos(a)*r, y:fl.cy+Math.sin(a)*r*0.7, tier:'flame'}); }
+                const uniq=[]; const tol=1.8;
+                pts.forEach(p=>{ if(!uniq.some(u=>Math.abs(u.x-p.x)<tol&&Math.abs(u.y-p.y)<tol)) uniq.push(p); });
+                return uniq;
+            }
+
+            function createParticles() {
+                const all = generateUniformPoints(getCakeBounds());
+                const max = innerWidth<480?45:innerWidth<768?65:85, cnt = Math.min(all.length,max);
+                for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
+                const sel = all.slice(0,cnt);
+                particles = sel.map(p => {
+                    const s = randomEdge(), fz = p.tier==='tier1'?9:(p.tier==='tier2'?10:11);
+                    return {tier:p.tier,sx:s.x,sy:s.y,tx:p.x,ty:p.y,text:getSnippet(p.tier),fontSize:fz,
+                        startTime:performance.now()+Math.random()*600, duration:FLY-200+Math.random()*400,
+                        color:p.tier==='flame'?'#ffeaa0':p.tier==='candle'?'#ffddaa':p.tier==='tier3'?'#ffc8e4':p.tier==='tier2'?'#ffe4a5':'#ffccaa'};
+                });
+                particles.sort((a,b)=>a.startTime-b.startTime);
+            }
+
+            function randomEdge() {
+                const w=innerWidth,h=innerHeight,r=Math.floor(Math.random()*4);
+                if(r===0)return{x:Math.random()*w,y:-20}; if(r===1)return{x:w+20,y:Math.random()*h};
+                if(r===2)return{x:Math.random()*w,y:h+20}; return{x:-20,y:Math.random()*h};
+            }
+
+            function startParticleAnimation() {
+                createParticles(); phase='flying'; phaseStart=performance.now();
+                particleCanvas.classList.add('active'); resizeCanvas(); requestAnimationFrame(animateParticles);
+            }
+            function resizeCanvas() {
+                const dpr = Math.min(devicePixelRatio||1,2);
+                particleCanvas.width = innerWidth*dpr; particleCanvas.height = innerHeight*dpr;
+                particleCanvas.style.width = innerWidth+'px'; particleCanvas.style.height = innerHeight+'px';
+                ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr,dpr);
+            }
+            function animateParticles(ts) {
+                if(phase==='flying'&&ts-phaseStart>FLY+600){phase='holding';phaseStart=ts;}
+                if(phase==='holding'&&ts-phaseStart>HOLD){phase='dissolving';phaseStart=ts;}
+                if(phase==='dissolving'&&ts-phaseStart>DISSOLVE){ctx.clearRect(0,0,innerWidth,innerHeight);particleCanvas.classList.remove('active');showTransitionCake();return;}
+                ctx.clearRect(0,0,innerWidth,innerHeight);
+                particles.forEach(p=>{
+                    if(ts<p.startTime&&phase==='flying')return; const t=ts-p.startTime;
+                    if(phase==='flying'){
+                        const pr=Math.min(t/p.duration,1), e=pr<0.5?2*pr*pr:-1+(4-2*pr)*pr;
+                        drawP(p.sx+(p.tx-p.sx)*e, p.sy+(p.ty-p.sy)*e, p.text, Math.min(pr*1.3,0.85), 1.2-pr*0.2, 0.5+pr*0.5, p.color, p.fontSize);
+                    }else if(phase==='holding'){
+                        drawP(p.tx,p.ty,p.text,0.85,1,1,p.color,p.fontSize);
+                    }else{
+                        const dp=Math.min(t/DISSOLVE,1);
+                        drawP(p.tx,p.ty,p.text,0.85*(1-dp),1+dp*0.7,1+dp*1.4,lerpColor(p.color,'#ffe8b0',dp),p.fontSize);
+                    }
+                });
+                requestAnimationFrame(animateParticles);
+            }
+            function drawP(x,y,txt,a,s,g,c,fs){if(a<=0.01)return;ctx.save();ctx.globalAlpha=a;ctx.font=`${Math.round(fs*s)}px "Courier New", monospace`;ctx.fillStyle=c;ctx.shadowColor=c;ctx.shadowBlur=8*g;ctx.fillText(txt,x,y);ctx.restore();}
+            function lerpColor(c1,c2,t){const r1=parseInt(c1.slice(1,3),16),g1=parseInt(c1.slice(3,5),16),b1=parseInt(c1.slice(5,7),16),r2=parseInt(c2.slice(1,3),16),g2=parseInt(c2.slice(3,5),16),b2=parseInt(c2.slice(5,7),16);return '#'+[Math.round(r1+(r2-r1)*t),Math.round(g1+(g2-g1)*t),Math.round(b1+(b2-b1)*t)].map(v=>Math.min(255,Math.max(0,v)).toString(16).padStart(2,'0')).join('');}
+
+            function showTransitionCake(){ transitionCake.classList.add('visible'); setTimeout(()=>transitionCake.classList.add('morphing'),400); setTimeout(()=>{transitionCake.classList.remove('visible','morphing');showRealCake();},1500); }
+            function showRealCake(){
+                realCake.classList.add('visible');
+                for(let i=0;i<30;i++){ const c=document.createElement('div'); c.style.cssText=`position:fixed;z-index:30;width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;background:${['#ffb6c1','#98fb98','#ffe4a5','#ffc8e4','#ffdd99'][Math.floor(Math.random()*5)]};left:${Math.random()*100}%;top:-20px;border-radius:${Math.random()>0.5?'50%':'2px'};animation:confettiFall ${2.9+Math.random()*1.5}s linear forwards;animation-delay:${Math.random()*1.8}s;pointer-events:none;`; document.body.appendChild(c); setTimeout(()=>c.remove(),5000); }
+                setTimeout(()=>cheerText.classList.add('show'),500);
+                setTimeout(()=>{ try{ const ac=new(window.AudioContext||window.webkitAudioContext)(),notes={G4:392,A4:440,B4:493.88,C5:523.25,D4:293.66,E4:329.63,F4:349.23},mel=['G4','G4','A4','G4','C5','B4','G4','G4','A4','G4','D4','C5','G4','G4','G4','E4','C5','B4','A4','F4','F4','E4','C5','D4','C5'],dur=[0.4,0.4,0.4,0.4,0.4,0.8,0.4,0.4,0.4,0.4,0.4,0.8,0.4,0.4,0.4,0.4,0.4,0.4,0.8,0.4,0.4,0.4,0.4,0.4,0.9]; let t=ac.currentTime; mel.forEach((n,i)=>{ const o=ac.createOscillator(),g=ac.createGain(); o.type='triangle';o.frequency.setValueAtTime(notes[n],t);g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur[i]-0.04);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur[i]);t+=dur[i]; }); }catch(e){} },600);
+                setTimeout(()=>cheerText.classList.remove('show'),7000);
+            }
+        })();
+    </script>
+</body>
+</html>
