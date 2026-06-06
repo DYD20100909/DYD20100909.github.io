@@ -7,6 +7,7 @@
     <meta name="keywords" content="心理陪伴,情绪舒缓,接地练习,自我关怀,呼吸引导">
     <title>避风港 · 陪伴小站</title>
     <style>
+        /* ===== 全局变量与主题 ===== */
         :root {
             --bg: #1E1E1E;
             --card-bg: #2B2520;
@@ -219,7 +220,7 @@
             <p class="subtitle">你不需要一次性变好。<br>你只需要在难受的时候，有一个地方可以来。</p>
         </div>
 
-        <!-- 情绪记录（增加通用输入框） -->
+        <!-- 模块：刚才发生了什么 · 只记事实 (增加通用输入框) -->
         <div class="card">
             <div class="card-title">📋 刚才发生了什么 · 只记事实</div>
             <div class="btn-group">
@@ -267,7 +268,7 @@
             <div id="groundingMsg" class="feedback-text" role="status"></div>
         </div>
 
-        <!-- 当时的我 -->
+        <!-- 当时的我…… -->
         <div class="card">
             <div class="card-title">🕰️ 当时的我……</div>
             <div class="dialog-dual">
@@ -301,7 +302,7 @@
             <button id="resetStepsBtn" class="btn" style="font-size:0.65rem; padding:4px 12px; margin-top:5px;">重置小步记录</button>
         </div>
 
-        <!-- 情绪温度 + 崩溃 + 导出 + 极简接地 -->
+        <!-- 情绪温度 + 崩溃急救 + 导出 + 极简接地 -->
         <div class="card">
             <div class="card-title">📊 此刻的情绪温度</div>
             <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
@@ -323,20 +324,20 @@
             <div id="simpleGroundHint" aria-live="polite" style="margin-top:8px;"></div>
         </div>
 
-        <!-- 发泄 -->
+        <!-- 发泄窗口 -->
         <div class="card">
             <div class="card-title">💢 如果憋得慌，可以在这里喊出来</div>
             <button id="ventBtn" class="btn btn-primary">打开发泄窗口</button>
         </div>
 
-        <!-- 呼吸 -->
+        <!-- 呼吸引导 -->
         <div class="card">
             <div class="card-title">🌀 跟着呼吸，回到当下</div>
             <div class="breathe-circle" id="breatheCircle">4-7-8</div>
             <button id="startBreathe" class="btn btn-primary">开始呼吸引导</button>
         </div>
 
-        <!-- 休息 -->
+        <!-- 休息倒计时 -->
         <div class="card">
             <div class="card-title">⏳ 让自己休息一下</div>
             <div style="display:flex; gap:10px; align-items:center;">
@@ -358,7 +359,7 @@
             <div id="stoneMsg" class="feedback-text" style="min-height:1.5em;"></div>
         </div>
 
-        <!-- 危机热线（底部） -->
+        <!-- 危机热线（移至底部） -->
         <div class="card" style="border-left:4px solid #C44; background:var(--card-bg);">
             <div class="card-title" style="border-left-color:#C44;">🆘 如果你现在非常痛苦</div>
             <p style="font-size:0.9rem;">请立即拨打这些电话，有人愿意倾听：</p>
@@ -377,7 +378,7 @@
     <div class="usage-counter" id="usageCounter">使用次数：1</div>
     <div class="author-signature">作者 DYD</div>
 
-    <!-- 遮罩等 -->
+    <!-- 遮罩层等 -->
     <div id="sootheOverlay" class="soothe-overlay" role="dialog" aria-modal="true">
         <div style="text-align:center;"><span class="soothe-glow">💛</span><p class="soothe-text">这句话，正在心里慢慢暖起来……</p></div>
     </div>
@@ -398,7 +399,7 @@
         </div>
     </div>
 
-    <!-- AI 聊天 -->
+    <!-- AI 陪伴悬浮窗 -->
     <div class="ai-chatbot">
         <button class="chat-toggle" id="chatToggle" aria-label="打开AI陪伴对话">💬</button>
         <div class="chat-window" id="chatWindow" role="dialog" aria-label="AI陪伴对话">
@@ -412,7 +413,7 @@
     </div>
     <div id="chatLiveRegion" aria-live="polite" class="sr-only"></div>
 
-    <!-- 颜色设置 -->
+    <!-- 颜色与主题设置 -->
     <button class="color-picker-btn" id="colorBtn" aria-label="打开颜色与主题设置">🎨</button>
     <div class="color-panel" id="colorPanel" role="dialog" aria-label="颜色设置">
         <div><label for="bgPicker">背景</label><input type="color" id="bgPicker" value="#1E1E1E"></div>
@@ -425,18 +426,18 @@
 
     <script>
         (function() {
+            // ==================== 初始化变量与工具函数 ====================
             const html = document.documentElement;
             const $ = (id) => document.getElementById(id);
             const KEYS = {
                 VISIT: 'haven-visit', BG: 'haven-bg', CARD: 'haven-card', TEXT: 'haven-text',
                 THEME: 'haven-theme', NICK: 'haven-nick', STEPS: 'haven-steps', MOOD: 'haven-mood-log',
                 SEEDS: 'haven-seeds', SILENT: 'haven-silent', CHAT_HISTORY: 'haven-chat-history',
-                JOURNAL_NOTES: 'haven-journal-notes', PAST_MEMORIES: 'haven-past-memories',
-                GROUNDING_ITEMS: 'haven-grounding-items'
+                JOURNAL_NOTES: 'haven-journal-notes', GROUNDING_ITEMS: 'haven-grounding-items'
             };
             const escapeHtml = (str) => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
 
-            // 首次访问toast
+            // ==================== 首次访问友好提示 ====================
             if (!localStorage.getItem('haven-visited')) {
                 const toast = document.createElement('div');
                 toast.textContent = '欢迎来到避风港。这里的一切都只保存在你的设备上。';
@@ -446,10 +447,10 @@
                 localStorage.setItem('haven-visited', '1');
             }
 
-            // 使用计数器
+            // ==================== 使用计数器 ====================
             try { let c = parseInt(localStorage.getItem(KEYS.VISIT) || '0'); localStorage.setItem(KEYS.VISIT, ++c); $('usageCounter').textContent = '使用次数：' + c; } catch (e) { }
 
-            // 夜间自动模式
+            // ==================== 自动夜间模式 ====================
             function autoTheme() {
                 if (!localStorage.getItem(KEYS.THEME)) {
                     const hour = new Date().getHours();
@@ -458,7 +459,7 @@
             }
             autoTheme();
 
-            // 主题与颜色
+            // ==================== 主题与颜色自定义 ====================
             const colorBtn = $('colorBtn'), colorPanel = $('colorPanel');
             const bgP = $('bgPicker'), cardP = $('cardPicker'), textP = $('textPicker');
             function applyColors(bg, card, text) {
@@ -497,16 +498,16 @@
             });
             if (localStorage.getItem(KEYS.SILENT) === 'true') document.body.style.filter = 'brightness(0.8) saturate(0.5)';
 
-            // 清除所有数据
+            // 删除所有记录
             $('clearAllDataBtn').addEventListener('click', () => {
-                if (confirm('确定要删除所有记录吗？包括使用次数、心情、收藏等。')) {
+                if (confirm('确定要删除所有记录吗？')) {
                     Object.values(KEYS).forEach(k => localStorage.removeItem(k));
                     alert('已清除。');
                     location.reload();
                 }
             });
 
-            // 自适应 textarea
+            // ==================== textarea 自适应高度 ====================
             function autoResize(ta) {
                 if (!ta) return;
                 const minRows = parseInt(ta.getAttribute('rows')) || 1;
@@ -522,16 +523,16 @@
                 resizeTimeout = setTimeout(() => document.querySelectorAll('textarea').forEach(ta => autoResize(ta)), 100);
             });
 
-            // 面板互斥
+            // ==================== 面板互斥逻辑 ====================
             const bodyPicker = $('bodyPicker'), thoughtInput = $('thoughtInput'), actionPicker = $('actionPicker');
             function closeAll() { [bodyPicker, thoughtInput, actionPicker].forEach(el => el.classList.remove('open')); }
             $('bodyBtn').addEventListener('click', () => { if (!bodyPicker.classList.contains('open')) { closeAll(); bodyPicker.classList.add('open'); } else bodyPicker.classList.remove('open'); });
             $('thoughtBtn').addEventListener('click', () => { if (!thoughtInput.classList.contains('open')) { closeAll(); thoughtInput.classList.add('open'); $('thoughtField').focus(); } else thoughtInput.classList.remove('open'); });
             $('actionBtn').addEventListener('click', () => { if (!actionPicker.classList.contains('open')) { closeAll(); actionPicker.classList.add('open'); } else actionPicker.classList.remove('open'); });
 
-            // 身体部位
+            // ==================== 身体部位选择与通用记录 ====================
             let selectedParts = [];
-            let generalNotes = JSON.parse(localStorage.getItem(KEYS.JOURNAL_NOTES) || '[]'); // 通用记录
+            let generalNotes = JSON.parse(localStorage.getItem(KEYS.JOURNAL_NOTES) || '[]');
             document.querySelectorAll('.body-dot').forEach(dot => {
                 dot.addEventListener('click', () => {
                     dot.classList.toggle('selected'); dot.setAttribute('aria-checked', dot.classList.contains('selected') ? 'true' : 'false');
@@ -547,8 +548,6 @@
                 selectedParts = []; document.querySelectorAll('.body-dot').forEach(d => { d.classList.remove('selected'); d.setAttribute('aria-checked', 'false'); });
                 $('selectedPartsHint').textContent = ''; $('journalFeedback').innerHTML = '📌 身体：没有记录也没关系。';
             });
-
-            // 念头与行为
             $('thoughtConfirm').addEventListener('click', () => {
                 const v = $('thoughtField').value.trim();
                 $('journalFeedback').innerHTML = v ? `💭 念头："${escapeHtml(v)}"。` : '💭 没捕捉到念头也没关系。';
@@ -557,8 +556,6 @@
             document.querySelectorAll('.action-option').forEach(btn => {
                 btn.addEventListener('click', () => { $('journalFeedback').innerHTML = `🕊️ 行为：${btn.dataset.action}。`; actionPicker.classList.remove('open'); });
             });
-
-            // 通用记录输入
             $('generalNoteBtn').addEventListener('click', () => {
                 const note = $('generalNote').value.trim();
                 if (note) {
@@ -569,12 +566,11 @@
                     autoResize($('generalNote'));
                 }
             });
-            $('generalNote').addEventListener('input', () => autoResize($('generalNote')));
 
-            // 接地
+            // ==================== 感官接地练习 ====================
             const startGround = $('startGrounding'), groundSteps = $('groundingSteps'), groundMsg = $('groundingMsg');
             let tasteDone = false;
-            let groundingData = []; // 存储接地内容用于导出
+            let groundingData = [];
             function buildGroundUI() {
                 groundSteps.innerHTML = `
                     <div class="sense-step"><strong>👁️ 看5样东西</strong><div class="sense-fields" id="seeFields"></div></div>
@@ -593,14 +589,13 @@
                     if (e.target.id === 'resetGround') {
                         groundSteps.querySelectorAll('.sense-input').forEach(inp => inp.value = '');
                         tasteDone = false; const tb = document.getElementById('tasteBtn'); if (tb) { tb.textContent = '💧 我喝了口水'; tb.disabled = false; }
-                        groundMsg.innerHTML = '已重置。';
-                        groundingData = [];
+                        groundMsg.innerHTML = '已重置。'; groundingData = [];
                     }
                     if (e.target.id === 'completeGround') {
                         const inputs = Array.from(groundSteps.querySelectorAll('.sense-input'));
                         const filled = inputs.filter(inp => inp.value.trim()).length + (tasteDone ? 1 : 0);
                         if (filled >= 5 || tasteDone) {
-                            groundingData = inputs.map(inp => inp.value.trim()).filter(v=>v);
+                            groundingData = inputs.map(inp => inp.value.trim()).filter(v => v);
                             if (tasteDone) groundingData.push('尝了味道');
                             groundMsg.innerHTML = '🧘 你完成了接地练习。<br><strong>现在，你在这里。</strong>';
                             groundSteps.style.display = 'none'; startGround.style.display = 'inline-block';
@@ -610,9 +605,9 @@
             }
             startGround.addEventListener('click', () => { startGround.style.display = 'none'; groundSteps.style.display = 'block'; tasteDone = false; buildGroundUI(); });
 
-            // 当时的我
+            // ==================== 当时的我…… ====================
             const pastW = $('pastWhat'), pastT = $('pastThought'), sendPast = $('sendToPastBtn'), msgPast = $('messageToPast'), pastFb = $('pastFeedback');
-            let lastPastMemory = null; // 记录最近一次“当时的我”内容
+            let lastPastMemory = null;
             function syncHeights() { requestAnimationFrame(() => { const h = Math.max(pastW.scrollHeight, pastT.scrollHeight, 60); pastW.style.height = h + 'px'; pastT.style.height = h + 'px'; }); }
             pastW.addEventListener('input', syncHeights); pastT.addEventListener('input', syncHeights);
             document.querySelectorAll('.seed-phrase').forEach(s => s.addEventListener('click', () => msgPast.value = s.dataset.text));
@@ -627,8 +622,6 @@
                 setTimeout(() => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity 0.8s'; setTimeout(() => { overlay.style.display = 'none'; overlay.style.opacity = '1'; }, 800); }, 20000);
             });
             $('sootheOverlay').addEventListener('click', () => $('sootheOverlay').style.display = 'none');
-
-            // 收藏种子
             $('saveSeedBtn').addEventListener('click', () => {
                 const txt = msgPast.value.trim();
                 if (txt) {
@@ -637,38 +630,20 @@
                     else showToast('已经收藏过了。');
                 }
             });
-            function showToast(msg) {
-                const t = document.createElement('div'); t.textContent = msg; t.style.cssText = 'position:fixed; bottom:20%; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:10px 24px; border-radius:30px; z-index:5000; font-size:0.9rem;';
-                document.body.appendChild(t); setTimeout(() => t.remove(), 2000);
-            }
+            function showToast(msg) { const t = document.createElement('div'); t.textContent = msg; t.style.cssText = 'position:fixed; bottom:20%; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:10px 24px; border-radius:30px; z-index:5000; font-size:0.9rem;'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
 
-            // 微小连接
+            // ==================== 微小连接 ====================
             const completedSteps = new Set(JSON.parse(localStorage.getItem(KEYS.STEPS) || '[]'));
             const stepBtns = document.querySelectorAll('.step-btn');
-            function updateStepBtns() {
-                stepBtns.forEach(btn => {
-                    if (completedSteps.has(btn.dataset.step)) { btn.style.opacity = '0.6'; btn.textContent = '✓ ' + btn.textContent.replace('✓ ', ''); }
-                    else { btn.style.opacity = '1'; btn.textContent = btn.textContent.replace('✓ ', ''); }
-                });
-            }
+            function updateStepBtns() { stepBtns.forEach(btn => { if (completedSteps.has(btn.dataset.step)) { btn.style.opacity = '0.6'; btn.textContent = '✓ ' + btn.textContent.replace('✓ ', ''); } else { btn.style.opacity = '1'; btn.textContent = btn.textContent.replace('✓ ', ''); } }); }
             updateStepBtns();
             stepBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    $('stepFeedback').innerHTML = '你已经在照顾自己了。这一步就足够。';
-                    completedSteps.add(btn.dataset.step);
-                    localStorage.setItem(KEYS.STEPS, JSON.stringify([...completedSteps]));
-                    updateStepBtns();
-                });
+                btn.addEventListener('click', () => { $('stepFeedback').innerHTML = '你已经在照顾自己了。这一步就足够。'; completedSteps.add(btn.dataset.step); localStorage.setItem(KEYS.STEPS, JSON.stringify([...completedSteps])); updateStepBtns(); });
             });
             $('fearBtn').addEventListener('click', () => $('stepFeedback').innerHTML = '😟 害怕很正常。可以不做。');
-            $('resetStepsBtn').addEventListener('click', () => {
-                completedSteps.clear();
-                localStorage.setItem(KEYS.STEPS, JSON.stringify([]));
-                updateStepBtns();
-                $('stepFeedback').innerHTML = '已重置小步记录。';
-            });
+            $('resetStepsBtn').addEventListener('click', () => { completedSteps.clear(); localStorage.setItem(KEYS.STEPS, JSON.stringify([])); updateStepBtns(); $('stepFeedback').innerHTML = '已重置小步记录。'; });
 
-            // 情绪打分（每天只保留最后一条）
+            // ==================== 情绪打分（每天一次） ====================
             document.querySelectorAll('.mood-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const score = parseInt(btn.dataset.score);
@@ -689,56 +664,32 @@
                     if (last7.length) {
                         const avg = (last7.reduce((a, b) => a + b, 0) / last7.length).toFixed(1);
                         $('moodTrend').innerHTML = `近7天情绪：${last7.map(s => '●').join('')} (均分${avg})`;
-                    } else {
-                        $('moodTrend').innerHTML = '';
-                    }
+                    } else { $('moodTrend').innerHTML = ''; }
                 } catch (e) { }
             }
             showMoodTrend();
 
-            // 崩溃急救
+            // ==================== 崩溃急救 ====================
             $('panicBtn').addEventListener('click', () => {
-                const toast = document.createElement('div');
-                toast.textContent = '我们来做一次深呼吸，我会陪着你。';
-                toast.style.cssText = 'position:fixed; bottom:20%; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:12px 24px; border-radius:30px; z-index:2600; font-size:0.9rem;';
+                const toast = document.createElement('div'); toast.textContent = '我们来做一次深呼吸，我会陪着你。'; toast.style.cssText = 'position:fixed; bottom:20%; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:12px 24px; border-radius:30px; z-index:2600; font-size:0.9rem;';
                 document.body.appendChild(toast);
-                setTimeout(() => {
-                    toast.remove();
-                    if (!window.breatheRunning) $('startBreathe').click();
-                    setTimeout(() => { if (groundSteps.style.display === 'none') $('startGrounding').click(); }, 600);
-                }, 2000);
+                setTimeout(() => { toast.remove(); if (!window.breatheRunning) $('startBreathe').click(); setTimeout(() => { if (groundSteps.style.display === 'none') $('startGrounding').click(); }, 600); }, 2000);
             });
 
-            // 导出记录（整合所有模块数据）
+            // ==================== 导出今日记录（整合所有模块） ====================
             $('exportBtn').addEventListener('click', () => {
                 const moodLog = JSON.parse(localStorage.getItem(KEYS.MOOD) || '[]');
                 const seeds = JSON.parse(localStorage.getItem(KEYS.SEEDS) || '[]');
                 const today = new Date().toISOString().slice(0,10);
                 const todayMoods = moodLog.filter(e => e.time.startsWith(today));
-                // 身体部位、念头、行为、通用记录
-                let bodyPartText = selectedParts.length ? selectedParts.join('、') : '无';
-                let thoughtText = '无'; // 只能记录最近一次念头，或者暂时空
-                let actionText = '无';
-                // 从generalNotes中获取今天的记录
+                const bodyPartText = selectedParts.length ? selectedParts.join('、') : '无';
                 const todayNotes = generalNotes.filter(n => n.time.startsWith(today)).map(n => n.text);
-                // 当时的我（如果有）
                 let pastText = '';
                 if (lastPastMemory && lastPastMemory.time.startsWith(today)) {
                     pastText = `发生了什么：${lastPastMemory.what}\n那时的想法：${lastPastMemory.thought}\n当时我做了：${lastPastMemory.action}\n想对那时的我说：${lastPastMemory.message}`;
-                } else {
-                    pastText = '无';
-                }
-                // 接地
-                let groundText = groundingData.length ? groundingData.join('；') : '无';
-
-                let text = `避风港今日记录 (${today})\n`;
-                text += `【身体紧张部位】${bodyPartText}\n`;
-                text += `【通用记录】${todayNotes.length ? todayNotes.join(' | ') : '无'}\n`;
-                text += `【心情分数】${todayMoods.length ? todayMoods.map(e => e.score + '分').join(', ') : '暂无'}\n`;
-                text += `【微小连接】${[...completedSteps].join(',')}\n`;
-                text += `【当时的我】${pastText}\n`;
-                text += `【感官接地】${groundText}\n`;
-                text += `【收藏句子】${seeds.length ? seeds.join(' | ') : '无'}`;
+                } else pastText = '无';
+                const groundText = groundingData.length ? groundingData.join('；') : '无';
+                let text = `避风港今日记录 (${today})\n【身体紧张部位】${bodyPartText}\n【通用记录】${todayNotes.length ? todayNotes.join(' | ') : '无'}\n【心情分数】${todayMoods.length ? todayMoods.map(e => e.score + '分').join(', ') : '暂无'}\n【微小连接】${[...completedSteps].join(',')}\n【当时的我】${pastText}\n【感官接地】${groundText}\n【收藏句子】${seeds.length ? seeds.join(' | ') : '无'}`;
                 const blob = new Blob([text], { type: 'text/plain' });
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `避风港记录_${today}.txt`; a.click();
                 showToast('记录已导出，请小心分享。');
@@ -746,232 +697,78 @@
 
             // 极简接地
             const simpleGroundHint = $('simpleGroundHint');
-            $('simpleGroundBtn').addEventListener('click', () => {
-                const items = ['看一样东西', '摸一样东西', '听一种声音'];
-                let i = 0;
-                function next() { if (i < items.length) { simpleGroundHint.textContent = items[i]; i++; setTimeout(next, 2500); } else { simpleGroundHint.textContent = '你回来了。'; } }
-                next();
-            });
+            $('simpleGroundBtn').addEventListener('click', () => { const items = ['看一样东西', '摸一样东西', '听一种声音']; let i = 0; function next() { if (i < items.length) { simpleGroundHint.textContent = items[i]; i++; setTimeout(next, 2500); } else { simpleGroundHint.textContent = '你回来了。'; } } next(); });
 
-            // 发泄
+            // ==================== 发泄窗口 ====================
             const ventModal = $('ventModal'), ventArea = $('ventArea');
             $('ventBtn').addEventListener('click', () => { ventModal.classList.add('open'); ventArea.value = ''; ventArea.focus(); });
-            $('ventCloseBtn').addEventListener('click', () => {
-                if (ventArea.value.trim().length > 20) {
-                    const toast = document.createElement('div'); toast.textContent = '你已经把那些话说出来了，它们现在留在这个窗口里，不会跟你走。'; toast.style.cssText = 'position:fixed; bottom:20%; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:12px 20px; border-radius:30px; z-index:2600;'; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000);
-                }
-                ventModal.classList.remove('open');
-            });
+            $('ventCloseBtn').addEventListener('click', () => { if (ventArea.value.trim().length > 20) { const toast = document.createElement('div'); toast.textContent = '你已经把那些话说出来了，它们现在留在这个窗口里，不会跟你走。'; toast.style.cssText = 'position:fixed; bottom:20%; left:50%; transform:translateX(-50%); background:var(--card-bg); color:var(--text); padding:12px 20px; border-radius:30px; z-index:2600;'; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); } ventModal.classList.remove('open'); });
             $('ventDestroyBtn').addEventListener('click', () => { if (confirm('确定销毁？')) { ventArea.value = ''; showToast('文字已销毁。'); } });
 
-            // 呼吸
+            // ==================== 呼吸引导 ====================
             const breatheCircle = $('breatheCircle'), startBreathe = $('startBreathe');
             let breatheInterval, breatheRunning = false;
             window.breatheRunning = false;
             function clearBreathe() { if (breatheInterval) clearInterval(breatheInterval); breatheRunning = false; window.breatheRunning = false; startBreathe.textContent = '开始呼吸引导'; breatheCircle.textContent = '4-7-8'; breatheCircle.className = 'breathe-circle'; }
-            startBreathe.addEventListener('click', () => {
-                if (breatheRunning) { clearBreathe(); return; }
-                clearBreathe(); breatheRunning = true; window.breatheRunning = true; startBreathe.textContent = '停止引导';
-                let phase = 0, count = 4;
-                const phases = [{ name: '吸气', dur: 4, cls: 'inhale' }, { name: '屏息', dur: 7, cls: 'hold' }, { name: '呼气', dur: 8, cls: 'exhale' }];
-                const update = () => { if (!breatheRunning) return; const c = phases[phase]; breatheCircle.textContent = `${c.name} ${count}`; breatheCircle.className = 'breathe-circle ' + c.cls; breatheCircle.style.transitionDuration = c.dur + 's'; count--; if (count < 0) { phase = (phase + 1) % 3; count = phases[phase].dur; } };
-                update(); breatheInterval = setInterval(update, 1000);
-            });
+            startBreathe.addEventListener('click', () => { if (breatheRunning) { clearBreathe(); return; } clearBreathe(); breatheRunning = true; window.breatheRunning = true; startBreathe.textContent = '停止引导'; let phase = 0, count = 4; const phases = [{ name: '吸气', dur: 4, cls: 'inhale' }, { name: '屏息', dur: 7, cls: 'hold' }, { name: '呼气', dur: 8, cls: 'exhale' }]; const update = () => { if (!breatheRunning) return; const c = phases[phase]; breatheCircle.textContent = `${c.name} ${count}`; breatheCircle.className = 'breathe-circle ' + c.cls; breatheCircle.style.transitionDuration = c.dur + 's'; count--; if (count < 0) { phase = (phase + 1) % 3; count = phases[phase].dur; } }; update(); breatheInterval = setInterval(update, 1000); });
 
-            // 休息
+            // ==================== 休息倒计时 ====================
             const restOverlay = $('restOverlay'), restDisplay = $('restTimerDisplay'), restLabel = $('restLabel');
             let restInterval, restSeconds;
             function stopRest() { clearInterval(restInterval); restLabel.textContent = '休息结束了，慢慢回来吧'; restDisplay.textContent = '✨'; navigator.vibrate && navigator.vibrate(200); setTimeout(() => { restOverlay.classList.remove('open'); restLabel.textContent = '🛌 休息中……'; }, 3000); }
-            $('startRestBtn').addEventListener('click', () => {
-                const m = parseInt($('restMinutes').value);
-                if (isNaN(m) || m < 1 || m > 120) return;
-                restSeconds = m * 60; restDisplay.textContent = `${String(Math.floor(restSeconds / 60)).padStart(2, '0')}:${String(restSeconds % 60).padStart(2, '0')}`; restOverlay.classList.add('open');
-                restInterval = setInterval(() => { restSeconds--; if (restSeconds <= 0) stopRest(); else { const mm = Math.floor(restSeconds / 60), ss = restSeconds % 60; restDisplay.textContent = `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`; } }, 1000);
-            });
+            $('startRestBtn').addEventListener('click', () => { const m = parseInt($('restMinutes').value); if (isNaN(m) || m < 1 || m > 120) return; restSeconds = m * 60; restDisplay.textContent = `${String(Math.floor(restSeconds / 60)).padStart(2, '0')}:${String(restSeconds % 60).padStart(2, '0')}`; restOverlay.classList.add('open'); restInterval = setInterval(() => { restSeconds--; if (restSeconds <= 0) stopRest(); else { const mm = Math.floor(restSeconds / 60), ss = restSeconds % 60; restDisplay.textContent = `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`; } }, 1000); });
             $('cancelRestBtn').addEventListener('click', () => stopRest());
 
-            // 石头
+            // ==================== 石头 ====================
             let stoneTimer = null;
-            $('dropStoneBtn').addEventListener('click', () => {
-                const t = $('stoneText').value.trim();
-                if (t) {
-                    if (stoneTimer) clearTimeout(stoneTimer);
-                    $('stoneText').classList.add('sinking'); $('stoneText').disabled = true;
-                    $('stoneMsg').innerHTML = '🌊 石头沉下去了。';
-                    stoneTimer = setTimeout(() => {
-                        $('stoneText').value = ''; $('stoneText').classList.remove('sinking');
-                        $('stoneText').disabled = false; $('stoneText').focus();
-                        const msgs = ['你已经很努力了。', '这件事不再属于你。', '放下也是一种力量。'];
-                        $('stoneMsg').innerHTML += `<em>${msgs[Math.floor(Math.random() * msgs.length)]}</em> <span id="stoneAgain" style="cursor:pointer; text-decoration:underline;">再放一块？</span>`;
-                        document.getElementById('stoneAgain')?.addEventListener('click', () => { $('stoneText').focus(); $('stoneMsg').innerHTML = ''; });
-                        stoneTimer = null;
-                    }, 900);
-                }
-            });
+            $('dropStoneBtn').addEventListener('click', () => { const t = $('stoneText').value.trim(); if (t) { if (stoneTimer) clearTimeout(stoneTimer); $('stoneText').classList.add('sinking'); $('stoneText').disabled = true; $('stoneMsg').innerHTML = '🌊 石头沉下去了。'; stoneTimer = setTimeout(() => { $('stoneText').value = ''; $('stoneText').classList.remove('sinking'); $('stoneText').disabled = false; $('stoneText').focus(); const msgs = ['你已经很努力了。', '这件事不再属于你。', '放下也是一种力量。']; $('stoneMsg').innerHTML += `<em>${msgs[Math.floor(Math.random() * msgs.length)]}</em> <span id="stoneAgain" style="cursor:pointer; text-decoration:underline;">再放一块？</span>`; document.getElementById('stoneAgain')?.addEventListener('click', () => { $('stoneText').focus(); $('stoneMsg').innerHTML = ''; }); stoneTimer = null; }, 900); } });
 
-            // AI 陪伴（恢复安全数学计算，增强话题延续）
+            // ==================== AI 陪伴 (安全数学计算 + 话题延续) ====================
             const chatToggle = $('chatToggle'), chatWindow = $('chatWindow'), chatMessages = $('chatMessages'), chatInput = $('chatInput'), chatSend = $('chatSendBtn');
-            let lastAI = '';
-            let chatHistory = []; // 存储用户与AI的对话对象 {user, ai}
-            let userCtx = { name: localStorage.getItem(KEYS.NICK) || '', topics: [] };
-
+            let lastAI = '', chatHistory = [], userCtx = { name: localStorage.getItem(KEYS.NICK) || '', topics: [] };
             function updateSend() { chatSend.disabled = !chatInput.value.trim(); }
             chatInput.addEventListener('input', updateSend);
-            $('clearChatBtn').addEventListener('click', () => {
-                chatMessages.innerHTML = '<div class="msg ai-msg">对话已清空，我还在你身边。</div>';
-                lastAI = ''; chatHistory = [];
-                try { localStorage.setItem(KEYS.CHAT_HISTORY, JSON.stringify([])); } catch(e) {}
-            });
+            $('clearChatBtn').addEventListener('click', () => { chatMessages.innerHTML = '<div class="msg ai-msg">对话已清空，我还在你身边。</div>'; lastAI = ''; chatHistory = []; });
             chatToggle.addEventListener('click', () => { chatWindow.classList.toggle('open'); if (chatWindow.classList.contains('open')) chatInput.focus(); });
+            function addChatMessage(text, isUser, html = false) { const d = document.createElement('div'); d.className = `msg ${isUser ? 'user-msg' : 'ai-msg'}`; if (html) d.innerHTML = text; else d.textContent = text; chatMessages.appendChild(d); const atBottom = chatMessages.scrollHeight - chatMessages.clientHeight <= chatMessages.scrollTop + 100; if (isUser || atBottom) chatMessages.scrollTop = chatMessages.scrollHeight; $('chatLiveRegion').textContent = text; }
 
-            function addChatMessage(text, isUser, html = false) {
-                const d = document.createElement('div'); d.className = `msg ${isUser ? 'user-msg' : 'ai-msg'}`;
-                if (html) d.innerHTML = text; else d.textContent = text;
-                chatMessages.appendChild(d);
-                const atBottom = chatMessages.scrollHeight - chatMessages.clientHeight <= chatMessages.scrollTop + 100;
-                if (isUser || atBottom) chatMessages.scrollTop = chatMessages.scrollHeight;
-                $('chatLiveRegion').textContent = text;
-            }
+            function safeEvaluate(expr) { if (expr.length > 80) return null; if (!/^[\d\s\+\-\*\/\.\(\)]+$/.test(expr)) return null; if (!/\d/.test(expr)) return null; try { const result = new Function('"use strict"; return (' + expr + ')')(); return (typeof result === 'number' && isFinite(result)) ? result : null; } catch (e) { return null; } }
 
-            // 安全数学求值
-            function safeEvaluate(expr) {
-                if (expr.length > 80) return null;
-                if (!/^[\d\s\+\-\*\/\.\(\)]+$/.test(expr)) return null;
-                if (!/\d/.test(expr)) return null;
-                try {
-                    const result = new Function('"use strict"; return (' + expr + ')')();
-                    return (typeof result === 'number' && isFinite(result)) ? result : null;
-                } catch (e) { return null; }
-            }
-
-            const emotionDict = {
-                悲伤: ['难受','崩溃','哭','眼泪','痛苦','失落','难过','伤心'],
-                无力: ['累','疲惫','没力气','不想动','空','倦','无力','乏'],
-                孤独: ['一个人','孤单','寂寞','孤独','冷清'],
-                愤怒: ['生气','愤怒','烦','恼火','火大','憋屈'],
-                恐惧: ['害怕','恐惧','担心','紧张','不安','怕'],
-                羞耻: ['丢脸','内疚','怪我','我不配','羞耻'],
-                委屈: ['委屈','冤枉','误解','不甘'],
-                绝望: ['想死','不想活','结束','活不下去'],
-            };
+            const emotionDict = { 悲伤: ['难受','崩溃','哭','眼泪','痛苦','失落'], 无力: ['累','疲惫','没力气','不想动','空','倦'], 孤独: ['一个人','孤单','寂寞'], 愤怒: ['生气','愤怒','烦'], 恐惧: ['害怕','恐惧','担心'], 羞耻: ['丢脸','内疚','怪我'], 委屈: ['委屈','冤枉'], 绝望: ['想死','不想活','结束'] };
             function detectEmotion(t) { for (const [e, ws] of Object.entries(emotionDict)) for (const w of ws) if (t.includes(w)) return e; return null; }
-
-            const responsePool = {
-                悲伤: ['嗯……那种感觉确实会很重。','我明白，好像心里被什么东西压着。','那种难受，就像阴沉的天。','你不需要马上好起来。','我在这里陪你。','哭出来会好一点，我帮你守着。','心里的雨下得很大，我听到了。'],
-                无力: ['累的时候，什么都不做也是可以的。','歇一歇吧，你已经很努力了。','现在只需要呼吸。','你不需要一直撑着，我就在这里。','累了就停下来，我陪你。','电量低的时候，充电就好。'],
-                孤独: ['我懂那种感觉，但我看到你了。','你就在我身边，你不是一个人。','那种空旷感，我明白。','我会一直在这里，直到你不需要。'],
-                愤怒: ['生气是可以的，它是在说：有东西不对。','你可以发火，我听着。','让怒气出来吧。','愤怒是你的边界。'],
-                恐惧: ['害怕的时候，身体会缩得很紧。','没关系，你可以害怕。','我就在旁边，不走开。','恐惧是本能，不是软弱。'],
-                羞耻: ['那不是你的错。','你当时已经做了你能做的。','羞耻感很沉重，但你不必独自承担。'],
-                委屈: ['被误解一定很难受。','你值得被好好理解。','那种委屈，像淋了一场大雨。'],
-                默认: ['今天有什么小事，愿意说给我听吗？','如果不想说话，我也可以就这样陪着你。','愿意多说说刚才发生了什么吗？','你现在身体哪里最不舒服？','有时候说出来就已经是很大的进步了。','慢慢来，没有关系。','我在这里。','你的存在本身就很有意义。','无论是好是坏，我都愿意听。','我感觉你今天需要一点温暖。']
-            };
-
-            function extractTopics(text) {
-                const topics = [];
-                const patterns = [/(?:考试|工作|妈妈|爸爸|朋友|对象|老师|孩子|家庭|钱|身体)/g, /因为(.{2,8})/];
-                patterns.forEach(p => { const m = text.match(p); if (m) topics.push(...m); });
-                return [...new Set(topics)].slice(0,3);
-            }
+            const responsePool = { 悲伤: ['嗯……那种感觉确实会很重。','我明白，好像心里被什么东西压着。','你不需要马上好起来。','我在这里陪你。'], 无力: ['累的时候，什么都不做也是可以的。','歇一歇吧，你已经很努力了。','你不需要一直撑着。','累了就停下来，我陪你。'], 孤独: ['我懂那种感觉，但我看到你了。','你不是一个人。','那种空旷感，我明白。'], 愤怒: ['生气是可以的。','你可以发火，我听着。','让怒气出来吧。'], 恐惧: ['害怕的时候，身体会缩得很紧。','没关系，你可以害怕。','我就在旁边。'], 羞耻: ['那不是你的错。','你当时已经做了你能做的。'], 委屈: ['被误解一定很难受。','你值得被好好理解。'], 默认: ['今天有什么小事愿意说给我听吗？','如果不想说话，我也可以就这样陪着你。','愿意多说说刚才发生了什么吗？','慢慢来，没有关系。','我在这里。'] };
+            function extractTopics(text) { const topics = []; const patterns = [/(?:考试|工作|妈妈|爸爸|朋友|对象|老师|孩子|家庭|钱|身体)/g, /因为(.{2,8})/]; patterns.forEach(p => { const m = text.match(p); if (m) topics.push(...m); }); return [...new Set(topics)].slice(0,3); }
 
             function getAIResponse(txt) {
                 const l = txt.toLowerCase().trim();
-                // 数学运算
                 const mathResult = safeEvaluate(l);
-                if (mathResult !== null) {
-                    return `计算结果：${l} = ${mathResult}。`;
-                }
-                if (/(去世|死了|离开了我|不在了)/.test(l)) return '听到这个消息，我的心也沉了一下。失去重要的人那种痛，是语言很难描述的。你想说说他/她吗？或者就这样安静待着也可以。';
+                if (mathResult !== null) return `计算结果：${l} = ${mathResult}。`;
+                if (/(去世|死了|离开了我|不在了)/.test(l)) return '听到这个消息，我的心也沉了一下。失去重要的人那种痛，是语言很难描述的。你想说说他/她吗？';
                 if (/^(别管我|不想说|算了)/.test(l)) return '好的，我不打扰你。我会在这里安静待着。';
                 if (/我该怎么办|帮帮我/.test(l)) return '你可以试试这些：<span class="clickable-action" data-action="breathe" role="button" tabindex="0">开始呼吸引导</span> 或 <span class="clickable-action" data-action="vent" role="button" tabindex="0">打开发泄窗口</span>';
                 if (/(想死|不想活|结束生命)/.test(l)) { $('sootheOverlay').style.display = 'flex'; return '我听到你非常痛苦。如果需要立刻和人说话，请拨打页面底部的心理援助热线。我在这里陪你。'; }
-
                 const em = detectEmotion(l) || '默认';
                 const pool = responsePool[em] || responsePool['默认'];
                 let resp = pool[Math.floor(Math.random() * pool.length)];
-                if (resp === lastAI) {
-                    const filtered = pool.filter(r => r !== lastAI);
-                    resp = filtered.length ? filtered[Math.floor(Math.random() * filtered.length)] : pool[0];
-                }
-
-                // 话题延续：如果上一轮AI提及了某些内容，且当前无强烈情绪，尝试延续
-                if (chatHistory.length > 0 && !em) {
-                    const lastExchange = chatHistory[chatHistory.length-1];
-                    if (lastExchange.ai && lastExchange.ai.includes('愿意多说说')) {
-                        resp = '嗯，我还在听呢。你继续说吧。';
-                    } else if (lastExchange.ai && lastExchange.ai.includes('感觉')) {
-                        resp = '那种感觉还在吗？你可以多讲讲。';
-                    }
-                }
-
-                if (userCtx.topics.length > 0 && Math.random() < 0.2) {
-                    const randomTopic = escapeHtml(userCtx.topics[Math.floor(Math.random() * userCtx.topics.length)]);
-                    resp = `你之前提到过“${randomTopic}”，那件事最近怎么样了？` + ' ' + resp;
-                    userCtx.topics = userCtx.topics.filter(t => t !== randomTopic);
-                }
-
-                if (l.includes('你好') || l.includes('嗨')) {
-                    const h = new Date().getHours(); const n = userCtx.name ? '，' + userCtx.name : '';
-                    if (h < 6) return `这么晚了还没睡吗${n}？我在这里陪你。`;
-                    if (h < 12) return `早上好呀${n}。`;
-                    if (h < 18) return `下午好${n}。`;
-                    return `晚上好${n}，可以在这里歇一歇。`;
-                }
+                if (resp === lastAI) { const filtered = pool.filter(r => r !== lastAI); resp = filtered.length ? filtered[Math.floor(Math.random() * filtered.length)] : pool[0]; }
+                if (chatHistory.length > 0 && !em) { const last = chatHistory[chatHistory.length-1]; if (last.ai && last.ai.includes('愿意多说说')) resp = '嗯，我还在听呢。你继续说吧。'; else if (last.ai && last.ai.includes('感觉')) resp = '那种感觉还在吗？你可以多讲讲。'; }
+                if (userCtx.topics.length > 0 && Math.random() < 0.2) { const randomTopic = escapeHtml(userCtx.topics[Math.floor(Math.random() * userCtx.topics.length)]); resp = `你之前提到过“${randomTopic}”，那件事最近怎么样了？` + ' ' + resp; userCtx.topics = userCtx.topics.filter(t => t !== randomTopic); }
+                if (l.includes('你好') || l.includes('嗨')) { const h = new Date().getHours(); const n = userCtx.name ? '，' + userCtx.name : ''; if (h < 6) return `这么晚了还没睡吗${n}？`; if (h < 12) return `早上好呀${n}。`; if (h < 18) return `下午好${n}。`; return `晚上好${n}，可以在这里歇一歇。`; }
                 return resp;
             }
 
-            function handleChat() {
-                const msg = chatInput.value.trim(); if (!msg) return;
-                addChatMessage(msg, true); chatInput.value = ''; updateSend();
-                const nameM = msg.match(/你可以叫我(.{1,10})/); if (nameM) { userCtx.name = nameM[1].trim(); localStorage.setItem(KEYS.NICK, userCtx.name); addChatMessage(`好的，${userCtx.name}，我会记住。`, false); return; }
-                const topics = extractTopics(msg);
-                if (topics.length > 0) {
-                    userCtx.topics.push(...topics);
-                    userCtx.topics = [...new Set(userCtx.topics)].slice(-5);
-                }
-                const typing = document.createElement('div'); typing.className = 'typing-indicator'; typing.innerHTML = '<span></span><span></span><span></span>';
-                chatMessages.appendChild(typing); chatMessages.scrollTop = chatMessages.scrollHeight;
-                setTimeout(() => {
-                    typing.remove();
-                    const reply = getAIResponse(msg);
-                    addChatMessage(reply, false, reply.includes('<span'));
-                    chatHistory.push({ user: msg, ai: reply }); if (chatHistory.length > 10) chatHistory.shift();
-                    lastAI = reply;
-                }, 600 + Math.random() * 500);
-            }
+            function handleChat() { const msg = chatInput.value.trim(); if (!msg) return; addChatMessage(msg, true); chatInput.value = ''; updateSend(); const nameM = msg.match(/你可以叫我(.{1,10})/); if (nameM) { userCtx.name = nameM[1].trim(); localStorage.setItem(KEYS.NICK, userCtx.name); addChatMessage(`好的，${userCtx.name}，我会记住。`, false); return; } const topics = extractTopics(msg); if (topics.length > 0) { userCtx.topics.push(...topics); userCtx.topics = [...new Set(userCtx.topics)].slice(-5); } const typing = document.createElement('div'); typing.className = 'typing-indicator'; typing.innerHTML = '<span></span><span></span><span></span>'; chatMessages.appendChild(typing); chatMessages.scrollTop = chatMessages.scrollHeight; setTimeout(() => { typing.remove(); const reply = getAIResponse(msg); addChatMessage(reply, false, reply.includes('<span')); chatHistory.push({ user: msg, ai: reply }); if (chatHistory.length > 10) chatHistory.shift(); lastAI = reply; }, 600 + Math.random() * 500); }
             chatSend.addEventListener('click', handleChat);
             chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleChat(); });
-            chatMessages.addEventListener('click', e => {
-                if (e.target.classList.contains('clickable-action')) {
-                    if (e.target.dataset.action === 'breathe') startBreathe.click();
-                    if (e.target.dataset.action === 'vent') $('ventBtn').click();
-                }
-            });
-            chatMessages.addEventListener('keydown', e => {
-                if (e.target.classList.contains('clickable-action') && (e.key === 'Enter' || e.key === ' ')) {
-                    e.preventDefault(); e.target.click();
-                }
-            });
+            chatMessages.addEventListener('click', e => { if (e.target.classList.contains('clickable-action')) { if (e.target.dataset.action === 'breathe') startBreathe.click(); if (e.target.dataset.action === 'vent') $('ventBtn').click(); } });
+            chatMessages.addEventListener('keydown', e => { if (e.target.classList.contains('clickable-action') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.target.click(); } });
             document.addEventListener('keydown', e => { if (e.key === 'Escape' && chatWindow.classList.contains('open')) chatWindow.classList.remove('open'); });
 
             // 移动端键盘避让
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', () => {
-                    const keyboardHeight = window.innerHeight - window.visualViewport.height;
-                    const chatToggleEl = $('chatToggle'), colorBtnEl = $('colorBtn');
-                    const bottomOffset = keyboardHeight > 100 ? (keyboardHeight + 20) + 'px' : '22px';
-                    if (chatToggleEl) chatToggleEl.style.bottom = bottomOffset;
-                    if (colorBtnEl) colorBtnEl.style.bottom = bottomOffset;
-                });
-            }
+            if (window.visualViewport) { window.visualViewport.addEventListener('resize', () => { const keyboardHeight = window.innerHeight - window.visualViewport.height; const chatToggleEl = $('chatToggle'), colorBtnEl = $('colorBtn'); const bottomOffset = keyboardHeight > 100 ? (keyboardHeight + 20) + 'px' : '22px'; if (chatToggleEl) chatToggleEl.style.bottom = bottomOffset; if (colorBtnEl) colorBtnEl.style.bottom = bottomOffset; }); }
 
-            // 清理30天前日志
-            try {
-                const moodLog = JSON.parse(localStorage.getItem(KEYS.MOOD) || '[]');
-                const cutoff = Date.now() - 30 * 86400000;
-                const filtered = moodLog.filter(e => new Date(e.time).getTime() > cutoff);
-                localStorage.setItem(KEYS.MOOD, JSON.stringify(filtered));
-            } catch (e) { }
+            // 定期清理旧日志
+            try { const moodLog = JSON.parse(localStorage.getItem(KEYS.MOOD) || '[]'); const cutoff = Date.now() - 60 * 86400000; const filtered = moodLog.filter(e => new Date(e.time).getTime() > cutoff); localStorage.setItem(KEYS.MOOD, JSON.stringify(filtered)); } catch (e) { }
         })();
     </script>
 </body>
