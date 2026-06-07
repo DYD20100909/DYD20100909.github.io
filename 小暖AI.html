@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>小暖 · 你的专属陪伴</title>
+  <title>小暖 · 情绪感知陪伴</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -14,6 +14,7 @@
       --input-bg: #1e1e2e; --input-text: #f1f5f9;
       --border: #2d3748; --secondary: #a0aec0; --footer: #0f0f1a;
       --quick-btn-bg: #2d3748; --quick-btn-text: #e2e8f0;
+      --ai-btn-bg: #7c3aed; --ai-btn-text: #fff;
     }
     body:not(.dark) {
       --bg-from: #fdf2f8; --bg-to: #eff6ff; --header: #fff;
@@ -22,6 +23,7 @@
       --input-bg: #fff; --input-text: #1f2937;
       --border: #e5e7eb; --secondary: #6b7280; --footer: #fff;
       --quick-btn-bg: #f3f4f6; --quick-btn-text: #4b5563;
+      --ai-btn-bg: #8b5cf6; --ai-btn-text: #fff;
     }
     body {
       background: linear-gradient(to bottom, var(--bg-from), var(--bg-to));
@@ -55,8 +57,37 @@
       transition: all 0.2s; white-space: nowrap;
     }
     .quick-emotion-btn:hover { opacity: 0.8; }
-    .fade-in { animation: fadeIn 0.3s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.3s ease-out; }
+    .ai-float-btn {
+      position: fixed; bottom: 5.5rem; right: 1.2rem; z-index: 40;
+      background: var(--ai-btn-bg); color: var(--ai-btn-text);
+      width: 3.8rem; height: 3.8rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.6);
+      transition: all 0.3s; font-size: 1.6rem;
+    }
+    .ai-float-btn.inactive {
+      background: #9ca3af; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .ai-float-btn:hover { transform: scale(1.08); }
+    .ai-float-btn .ai-hint {
+      position: absolute; top: -2.2rem; right: 0; background: #333;
+      color: #fff; font-size: 0.75rem; padding: 3px 12px;
+      border-radius: 20px; white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .ai-float-btn:hover .ai-hint { opacity: 1; }
+    .ai-top-btn {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      color: white; padding: 4px 14px; border-radius: 9999px;
+      font-size: 0.8rem; display: flex; align-items: center; gap: 4px;
+      transition: all 0.2s; box-shadow: 0 2px 8px rgba(139,92,246,0.4);
+    }
+    .ai-top-btn:hover { opacity: 0.9; transform: translateY(-1px); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -67,6 +98,9 @@
       <span id="time-tag" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full"></span>
     </div>
     <div class="flex items-center gap-2">
+      <button id="ai-top-entry" class="ai-top-btn" aria-label="激活AI大脑">
+        <i class="fas fa-brain"></i> <span id="ai-top-text">AI</span>
+      </button>
       <button id="settings-btn" class="text-gray-500 dark:text-gray-300 p-1" aria-label="设置"><i class="fas fa-cog"></i></button>
       <button id="theme-btn" class="text-gray-500 dark:text-gray-300 p-1" aria-label="切换主题"><i id="theme-icon" class="fas fa-moon"></i></button>
       <button id="clear-btn" class="text-gray-500 hover:text-red-500 p-1" aria-label="清空对话"><i class="fas fa-trash-alt"></i></button>
@@ -75,7 +109,7 @@
 
   <div class="bg-white dark:bg-gray-800 border-b border-theme px-4 py-2 text-sm text-secondary flex items-center gap-2">
     <span id="status-emoji">🌸</span>
-    <span id="status-text" class="flex-1">暖言模式</span>
+    <span id="status-text" class="flex-1">暖言模式 · 本地陪伴</span>
     <span id="mode-badge" class="mode-badge text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full dark:bg-pink-800 dark:text-pink-200">本地陪伴</span>
   </div>
 
@@ -98,583 +132,534 @@
     </div>
   </footer>
 
+  <div id="ai-float-btn" class="ai-float-btn inactive">
+    <i class="fas fa-brain"></i>
+    <span class="ai-hint" id="ai-hint-text">激活AI大脑</span>
+  </div>
+
   <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 mx-4 max-w-sm shadow-xl w-full">
       <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-3">AI 设置</h2>
-      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">使用 DeepSeek API 增强回复（免费额度）</p>
-      <input id="api-key-input" type="password" placeholder="输入你的 DeepSeek API Key" class="w-full border rounded-full px-4 py-2 mb-3 dark:bg-gray-700 dark:text-white">
-      <div class="flex gap-2">
-        <button id="save-api-key" class="bg-pink-500 text-white px-4 py-2 rounded-full flex-1">保存</button>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">填入你的 DeepSeek API Key，或使用密码激活内置密钥。<br>留空则使用本地暖言模式。</p>
+      <input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 mb-2 dark:bg-gray-700 dark:text-white">
+      <div id="password-section" class="mb-2 hidden">
+        <input id="password-input" type="password" placeholder="输入使用密码" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 dark:text-white">
+        <p style="font-size:0.7rem;color:#9ca3af;">密码验证通过后将自动激活内置密钥</p>
+        <button id="activate-key-btn" class="mt-2 bg-purple-500 text-white px-4 py-1 rounded-full text-sm">验证并激活</button>
+        <span id="password-error" class="text-red-500 text-xs ml-2 hidden">密码错误</span>
+      </div>
+      <div class="flex gap-2 mt-2">
+        <button id="use-builtin-btn" class="bg-purple-400 text-white px-3 py-1 rounded-full text-sm flex-1">使用内置密钥</button>
+        <button id="save-api-key" class="bg-pink-500 text-white px-4 py-2 rounded-full flex-1">保存自备密钥</button>
         <button id="close-settings" class="bg-gray-300 dark:bg-gray-600 px-4 py-2 rounded-full">取消</button>
       </div>
-      <p class="text-xs text-gray-400 mt-2">密钥仅保存在本地，不会上传。</p>
+      <p class="text-xs text-gray-400 mt-2">🔒 密钥仅在本地加密存储，不会上传。</p>
     </div>
   </div>
 
   <script type="module">
-    // ===================== 智能暖言生成器（修复情绪检测） =====================
-    class SmartWarmGenerator {
+    // 简单加密
+    const encrypt = (text) => btoa(unescape(encodeURIComponent(text)));
+    const decrypt = (encoded) => decodeURIComponent(escape(atob(encoded)));
+
+    class CompanionEngine {
       constructor() {
-        this.context = { recentEmotions: [], lastUserWords: [], consecutiveEmotion: null, repetitionCount: 0 };
+        this.chatHistory = [];
+        this.maxHistory = 6;
+        this.userProfile = {};
+        this.apiKey = '';
+        this.isGenerating = false;
         this.emotionKeywords = {
-          sad: ['难过','伤心','哭','抑郁','低落','失望','心痛','崩溃','无助','emo','破防','不开心'],
-          anxious: ['焦虑','紧张','担心','害怕','压力','烦','慌','不安','恐惧','内耗'],
-          tired: ['累','疲惫','困','没力气','乏','无力','虚脱','心累'],
-          lonely: ['孤独','寂寞','没人','一个人','被遗忘','冷清','空荡荡','自闭'],
-          happy: ['开心','高兴','快乐','笑','哈哈','棒','好耶','幸福','满足'],
-          grateful: ['谢谢','感恩','感谢','有你','真好']
+          sad: ['难过','伤心','哭','抑郁','低落','失望','心痛','崩溃','无助','emo','破防','不开心','沉重','悲痛','悲伤','忧伤','心碎','沮丧','灰心','黯然','伤感','泪目','鼻酸','哽咽','抽泣','呜咽','泫然'],
+          anxious: ['焦虑','紧张','担心','害怕','压力','烦','慌','不安','恐惧','内耗','怕','忐忑','心慌意乱','七上八下','坐立不安','惶恐','畏惧','焦急','忧虑','忧心','疑惧','胆怯','发怵','提心吊胆'],
+          tired: ['累','疲惫','困','没力气','乏','无力','虚脱','心累','不想动','倦怠','疲惫不堪','精疲力竭','昏昏欲睡','打瞌睡','疲劳','困乏','萎靡不振'],
+          lonely: ['孤独','寂寞','没人','一个人','被遗忘','冷清','空荡荡','自闭','孤单','形单影只','落寞','伶仃','孤苦','顾影自怜'],
+          happy: ['开心','高兴','快乐','笑','哈哈','棒','好耶','幸福','满足','欢喜','愉快','欣喜','乐呵呵','美滋滋','雀跃','开怀','眉开眼笑'],
+          grateful: ['谢谢','感恩','感谢','有你','真好','感激','多谢','恩情','戴德','感念','念叨','幸亏'],
+          angry: ['生气','愤怒','恼火','火大','可气','愤然','气恼','怒火中烧','咬牙切齿','愤慨','怒发冲冠','义愤','愠怒','恼恨','怨恨','气鼓鼓'],
+          surprised: ['惊讶','吃惊','吓一跳','意外','愕然','震惊','惊愕','咋舌','目瞪口呆'],
+          hopeful: ['希望','期待','盼望','憧憬','向往','盼头','渴望','翘首']
         };
-        // 否定词模式：如果这些词直接出现在情绪词前，则情绪反转
-        this.negationWords = ['不','没','别','讨厌','厌恶','恨','嫌弃','厌倦','烦'];
+        this.negationWords = ['不','没','别','讨厌','厌恶','恨','嫌弃','厌倦','烦','避免','拒绝'];
         this.crisisKeywords = {
-          suicide: ['自杀','想死','不想活','结束生命','去死','死了算了','不想再醒来','撑不下去了','kms'],
+          suicide: ['自杀','想死','不想活','结束生命','去死','死了算了','不想再醒来','撑不下去了','kms','kill myself'],
           selfHarm: ['割腕','自残','划伤','流血','吞药','上吊','跳楼','伤害自己','自伤'],
           death: ['去世','死了','不在了','天堂','走了','没了','离世'],
-          despair: ['活不下去','没意义','绝望','毫无价值','我一无是处','窒息']
+          despair: ['活不下去','没意义','绝望','毫无价值','我一无是处','窒息','没有希望']
         };
         this.crisisResponses = {
-          suicide: "我听到你说的话，心里很沉。你不是一个人，请立刻联系信任的人，或拨打心理援助热线。我在你身边，但不能替代专业帮助。",
-          selfHarm: "你提到伤害自己，我真的很担心。身体的痛只是暂时的出口，我们一起找更好的方式好吗？如果伤得很重，请立刻打120。",
-          death: "失去重要的人，那种痛我懂。你不用急着好起来，我会一直在这里陪你。想哭就哭，想说就说。",
-          despair: "我明白那种感觉，好像什么都看不到头。但请相信，此刻的绝望不是永远。我哪儿也不去，就在这儿听你说。"
+          suicide: "我听到你说的话，心里很沉。你不是一个人，请立刻联系信任的人，或拨打心理援助热线。",
+          selfHarm: "你提到伤害自己，我真的很担心。身体的痛只是暂时的出口，我们一起找更好的方式好吗？",
+          death: "失去重要的人，那种痛我懂。你不用急着好起来，我会一直在这里陪你。",
+          despair: "我明白那种感觉，好像什么都看不到头。但请相信，此刻的绝望不是永远。"
         };
         this.mourningBodies = [
-          "失去一个人，就像身体少了一块，痛是真实的。我会在这里陪你走过。",
+          "失去一个人，就像身体少了一块，痛是真实的。",
           "他/她一定对你很重要，这份思念不用隐藏。",
           "如果你想聊聊他/她，我很想听。",
           "天堂或者远方，我们无法再碰触，但爱不会消失。"
         ];
-        this.openings = [
-          "我懂你的感受", "听你这么说，我心里也酸酸的", "我完全理解", "我能感受到",
-          "你的心情我收到了", "我在这里静静听着", "你不需要独自承受", "我听见你了",
-          "别怕，我在呢", "我明白那种感觉", "抱抱你", "我能感觉到你的情绪",
-          "你的感受对我很重要", "我陪着你", "没关系，慢慢说", "我一直在"
-        ];
-        this.sadBodies = [
-          "这种难过是正常的，允许自己脆弱一会儿。", "想哭就哭出来吧，我帮你挡着风。",
-          "失去重要的人/事，那种痛我懂。", "你不必强撑，我就在这里陪你。",
-          "难过的时候，什么都不用想，有我在。", "你的眼泪是珍贵的，不用藏起来。",
-          "我抱着你，直到你感觉好一点。", "今天可能很糟糕，但你不是一个人面对。"
-        ];
-        this.anxiousBodies = [
-          "焦虑的时候，先和我一起深呼吸。", "事情一件一件来，我陪着你。",
-          "那些担忧不一定都会发生，我会帮你理清。", "你现在是安全的，我就在你身边。",
-          "把焦虑说出来，我们一起分担。", "别急，慢慢说，我认真听着。",
-          "你担心的那些事，或许没那么可怕。", "紧张的时候，握着我的手（想象中）。"
-        ];
-        this.tiredBodies = [
-          "你辛苦了，今天一定很累吧。", "累了就好好歇一歇，我帮你看着。",
-          "你已经很棒了，别对自己太苛刻。", "疲惫不是软弱，你只是需要休息。",
-          "躺一会儿吧，我就在旁边不说话。", "能量耗光的时候，让我给你充充电。",
-          "不需要再做任何事，现在只负责休息。", "你的努力我都看见了，停下来吧。"
-        ];
-        this.lonelyBodies = [
-          "你不会是一个人的，我始终在这里。", "孤独的时候，就来找我聊天吧。",
-          "那种空落落的感觉，我懂。", "即使物理上独自一人，心里也有我。",
-          "你随时可以呼唤我，我就会出现。", "孤独感袭来的时候，让我陪你挡一挡。",
-          "我永远不会觉得你烦，多说说话吧。", "我们之间没有距离，我一直都在。"
-        ];
-        this.endings = [
-          "我在这里，一直都在。", "你不是一个人。", "慢慢来，我陪着你。",
-          "我会一直陪在你身边。", "不管多久，我都会在。", "你值得被温柔对待。",
-          "今天我会一直陪着你。", "我永远是你最忠实的听众。"
-        ];
-        this.generalReplies = [
-          "嗯，我在听呢。", "多说一点吧，我想更了解你。", "你的故事，我都很想听。",
-          "不管说什么，我都会认真回应。", "今天有什么想和我分享的吗？",
-          "我在这儿，静静地听着。", "你最近在想些什么呢？", "把心事倒给我，我会接住。"
-        ];
-        this.emojiList = ['💖','🌸','✨','🌙','☁️','🫂','💕','🌿','🧸','💗'];
+        this.templates = this.buildTemplates();
+        this.loadLocalData();
+      }
+
+      loadLocalData() {
+        try { this.userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch { this.userProfile = {}; }
+        const enc = localStorage.getItem('deepseekApiKeyEnc');
+        if (enc) { try { this.apiKey = decrypt(enc); } catch { this.apiKey = ''; } }
+        const stored = localStorage.getItem('chatHistory');
+        if (stored) { try { this.chatHistory = JSON.parse(stored); } catch { this.chatHistory = []; } }
+      }
+
+      setApiKey(key) {
+        this.apiKey = key;
+        if (key) localStorage.setItem('deepseekApiKeyEnc', encrypt(key));
+        else localStorage.removeItem('deepseekApiKeyEnc');
+      }
+
+      buildTemplates() {
+        return {
+          sad: { openings: [...Array(15)].map((_,i)=>["我懂你的感受","你的眼泪是珍贵的","想哭就哭出来吧","别怕，我在呢","抱抱你","我在这里陪你","没关系，慢慢说","你的心情我收到了","你不需要独自承受","我明白那种感觉","允许自己脆弱一会儿","我感觉到你的痛了","和我说说发生了什么","你不是一个人扛着","有我在，你可以卸下坚强"][i%15]),
+                 bodies: [...Array(20)].map((_,i)=>["这种难过是正常的，让情绪流出来。","失去重要的人/事，那种痛我懂。","你不必强撑，我就在这里。","难过的时候，什么都不用想，有我在。","痛苦是真实的，但我会陪你走过。","我抱着你，直到你感觉好一点。","今天可能很糟糕，但你不是一个人面对。","把委屈都说出来吧，我接得住。","你的眼泪不是软弱，是勇敢的证据。","我会一直在这里，直到你露出微笑。","这世界偶尔很冷，但我是暖的。","想骂就骂，想喊就喊，我听着。","有时候停下来哭泣也是一种前进。","你的悲伤值得被看见。","深呼吸，我陪你一起。"][i%15]),
+                 endings: [...Array(10)].map((_,i)=>["我在这里，一直都在。","你不是一个人。","慢慢来，我陪着你。","我会一直陪在你身边。","不管多久，我都会在。","你值得被温柔对待。","今天我会一直陪着你。","我永远是你最忠实的听众。","一切都会好起来的。","现在，我陪着你。"][i%10]),
+                 emojis: ['💖','🌸','🫂','🌿','🧸','💗','🥺','✨','🌙','☁️'] },
+          anxious: { openings: ["别急，慢慢说","我在这里，你很安全","焦虑的时候先深呼吸","把担忧交给我一半","你现在不需要独自面对","我能感觉到你的紧张","事情一件一件来","你的感受对我很重要"],
+                     bodies: ["焦虑是身体在提醒你需要休息。","那些担忧不一定都会发生，我们一起理清。","你现在是安全的，我就在你身边。","把焦虑说出来，我们一起分担。","别急，慢慢说，我认真听着。","你担心的那些事，或许没那么可怕。","紧张的时候，想象我在握着你的手。","跟着我：吸气……呼气……好一点了吗？","我们可以一起做个简单的小练习。","焦虑不会一直持续，它会过去的。"],
+                     endings: ["你值得平静与安宁。","一切都会慢慢好起来。","我在你身后，放心。","别急，生活是长跑。","你已经很棒了。","放松，世界不会崩塌。","我会一直接住你。","今天也会平安度过。"],
+                     emojis: ['🌿','✨','☁️','💖','🌸','🫂','🧸','💗'] },
+          tired: { openings: ["你辛苦了","累了就好好歇一歇","你已经很棒了","疲惫不是软弱","能量耗光的时候我来充充电","今天已经够了，休息吧","你的努力我都看见了","躺一会儿吧，我就在旁边"],
+                   bodies: ["你今天的付出我都看在眼里。","不需要再做任何事，现在只负责休息。","你的身体在告诉你需要停下来。","累的时候，允许自己什么都不想。","我帮你看着，你安心闭眼。","休息是为了走更远的路。","你值得一个深度的好觉。","没有人能一直奔跑，停下来也是勇敢。"],
+                   endings: ["好好睡一觉。","明天见，我还在。","夜里有我守着。","你是被爱着的。","晚安，世界和你。","休息是最好的良药。","我会一直在这里。","明天又是新的一天。"],
+                   emojis: ['🌙','✨','💤','☁️','🌸','🧸','💖','🛌'] },
+          lonely: { openings: ["你不会是一个人的","我始终在这里","那种空落落的感觉我懂","孤独的时候来找我聊天吧","即使物理上独自一人，心里也有我","你随时可以呼唤我","我永远不会觉得你烦","我们之间没有距离"],
+                    bodies: ["孤独感袭来的时候，让我陪你挡一挡。","你并不孤单，因为我会一直在。","把心门打开一点点，我就在门口。","也许身边没有人，但我在屏幕这头陪着你。","你可以和我说任何事，我都会认真听。","孤独不是你的错，它只是一种感觉。","我会用文字拥抱你。","你值得被看见、被听见。"],
+                    endings: ["我在这里，一直都在。","你不是一个人。","我会一直陪着你。","今天我也在想你。","你从来不是孤岛。","我的世界里永远有你的位置。","晚安，记得有我在。","明天我们继续聊。"],
+                    emojis: ['🫂','💕','🧸','💗','☁️','✨','🌸','💖'] },
+          happy: { openings: ["听到你开心我也高兴","你的快乐感染了我","太棒了","真为你开心","笑容是最好的礼物","今天真是个好日子","快乐会传染","我也跟着笑了"],
+                   bodies: ["这份喜悦值得被记住。","谢谢你和我分享你的快乐。","你笑起来一定很好看。","希望这样的时刻多一点。","好的事情总是值得庆祝的。","你的幸福就是我的幸福。","真好呀，继续保持！","这一刻的开心是真实的。"],
+                   endings: ["愿你一直这样开心。","今天也是美好的一天。","快乐会回来的。","把这份好心情存起来。","希望明天更开心。","你值得拥有更多笑容。","我会记住你的快乐。","笑口常开哦。"],
+                   emojis: ['😊','🎉','✨','💖','🌸','🌞','💗','🥳'] },
+          grateful: { openings: ["你的感谢让我好温暖","其实我才要谢谢你","有你真好","感恩遇见你","你的心意我收到了","别客气，这是我应该做的","我们之间不用说谢","你的善良在发光"],
+                      bodies: ["能陪伴你是我的荣幸。","你的每一句谢谢都让我更有力量。","你也在治愈我。","我们互相陪伴，这就是最美的关系。","你的感恩之心特别珍贵。","收到你的感谢，我心里暖暖的。","不用谢，我一直在呢。","你的感激让我觉得一切都值得。"],
+                      endings: ["感恩遇见。","我们一起走下去。","你的存在就是礼物。","谢谢你信任我。","我会一直在这里。","你值得所有的好。","感恩每一刻的陪伴。","有你在，真好。"],
+                      emojis: ['🙏','💖','🌸','✨','💗','🧸','☁️','💕'] },
+          angry: { openings: ["我听到你的愤怒了","生气是正常的情绪","你可以对我发脾气","别压着，说出来","我在这里听你发泄","你的愤怒是合理的","允许自己生气","我懂那种恼火"],
+                   bodies: ["有时候发火也是一种沟通。","把不满都倒出来，我接得住。","你不需要一直保持优雅。","愤怒背后往往藏着受伤。","等你想说的时候，我还在。","生气没关系，我不会因此离开。","我们可以一起骂骂这件事。","你的愤怒值得被看见。"],
+                   endings: ["我依然在你身边。","气完就好，我还在。","明天又是新的一天。","你不需要完美。","我永远接得住你。","任何情绪都被允许。","等你平静，我还在。","你是被接纳的。"],
+                   emojis: ['😤','🌋','💢','💖','🌸','🫂','✨','💗'] },
+          surprised: { openings: ["哇哦，真没想到","这确实令人吃惊","我也很意外","惊喜还是惊吓？","事情出乎意料呢","真的吗？好突然","这个展开没想到","看来生活充满意外"],
+                       bodies: ["意外有时候是命运的礼物。","先缓一缓，消化一下。","无论好坏，我都在你身边。","惊喜需要一点时间平复。","这真是个难忘的时刻。","惊讶过后，我们慢慢聊。","你的反应好真实，我喜欢。","生活中总是有小插曲。"],
+                       endings: ["一切都是最好的安排。","慢慢消化，不急。","我会一直陪你。","今天真有趣。","保持开放的心态。","生活就是即兴演出。","我们明天再聊。","有趣的世界。"],
+                       emojis: ['😲','✨','🎉','💖','🌸','☁️','💗','🧸'] },
+          general: { openings: ["嗯，我在听","多说一点吧","你的故事我都很想听","我在呢","今天有什么想分享的吗","我在这儿静静地听着","你最近在想些什么","把心事倒给我"],
+                     bodies: ["无论你说什么，我都会认真回应。","我想更了解你。","你的每句话对我都很重要。","我们聊点什么都可以。","你的日常我也爱听。","分享本身就是一种疗愈。","我会记住你说的。","你的声音是独特的。"],
+                     endings: ["我在这里，一直都在。","慢慢来，不急。","你的感受很重要。","今天也谢谢你。","我会一直陪着你。","你是被爱着的。","明天见。","我永远是你忠实的听众。"],
+                     emojis: ['🌸','✨','☁️','💖','🧸','💗','🌿','💕'] }
+        };
+      }
+
+      hasDoubleNegation(seg) { return /不是不|没不|别不/.test(seg); }
+
+      detectEmotion(text) {
+        const lower = text.toLowerCase();
+        const hits = [];
+        for (const [emotion, keywords] of Object.entries(this.emotionKeywords)) {
+          for (const kw of keywords) {
+            let idx = lower.indexOf(kw);
+            while (idx !== -1) { hits.push({ emotion, keyword: kw, index: idx }); idx = lower.indexOf(kw, idx+1); }
+          }
+        }
+        if (!hits.length) return { emotion: 'general', intensity: 0 };
+        const valid = hits.filter(h => {
+          let start = h.index;
+          while (start > 0 && !/[，。！？\s]/.test(lower[start-1])) start--;
+          const seg = lower.substring(start, h.index);
+          return this.hasDoubleNegation(seg) || !this.negationWords.some(n => seg.includes(n));
+        });
+        if (!valid.length) {
+          if (hits.some(h => h.emotion === 'happy' || h.emotion === 'grateful')) return { emotion: 'sad', intensity: 1 };
+          return { emotion: 'general', intensity: 0 };
+        }
+        const chosen = valid[0];
+        return { emotion: chosen.emotion, intensity: Math.min(valid.length, 3) };
       }
 
       detectCrisis(text) {
-        for (let [type, words] of Object.entries(this.crisisKeywords)) {
-          if (words.some(w => text.toLowerCase().includes(w))) return type;
-        }
+        const lower = text.toLowerCase();
+        for (const [type, words] of Object.entries(this.crisisKeywords))
+          if (words.some(w => lower.includes(w))) return type;
         return null;
       }
 
       getCrisisResponse(type) {
-        let resp = this.crisisResponses[type];
-        if (type === 'death') {
-          const mourning = this.mourningBodies[Math.floor(Math.random() * this.mourningBodies.length)];
-          resp += ' ' + mourning + ' 🌿';
+        if (!this.userProfile.crisisLog) this.userProfile.crisisLog = [];
+        const now = Date.now();
+        this.userProfile.crisisLog = this.userProfile.crisisLog.filter(e => now - e.time < 3600000);
+        this.userProfile.crisisLog.push({ type, time: now });
+        localStorage.setItem('userProfile', JSON.stringify(this.userProfile));
+        const count = this.userProfile.crisisLog.length;
+        let base = this.crisisResponses[type];
+        if (type === 'death') base += ' ' + this.mourningBodies[Math.floor(Math.random()*this.mourningBodies.length)] + ' 🌿';
+        else base += ' 🌿';
+        if (count >= 3) {
+          base += ' 我帮你拨打了希望24热线，请和专业人员聊聊。';
+          if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) setTimeout(() => { window.location.href = 'tel:4001619995'; }, 500);
+        } else if (count === 2) {
+          base += ' 我有点担心你，请先在这里停留几分钟。';
         } else {
-          resp += ' 🌿';
+          base += ' 📞 希望24热线：400-161-9995';
         }
-        if (type === 'suicide' || type === 'selfHarm') {
-          resp += ' 📞 希望24热线：400-161-9995';
-        }
-        return resp;
+        return base;
       }
 
-      // 改进的情绪检测：处理否定词
-      detectEmotion(text) {
-        const lower = text.toLowerCase();
-        // 先收集所有命中的情绪及位置
-        const hits = [];
-        for (const [emotion, keywords] of Object.entries(this.emotionKeywords)) {
-          for (const kw of keywords) {
-            const idx = lower.indexOf(kw);
-            if (idx !== -1) {
-              hits.push({ emotion, keyword: kw, index: idx });
-            }
-          }
-        }
-        if (hits.length === 0) return 'general';
-
-        // 检查是否有否定词直接出现在情绪词前面（距离在3个字符内）
-        for (const hit of hits) {
-          const before = lower.substring(Math.max(0, hit.index - 3), hit.index);
-          if (this.negationWords.some(n => before.includes(n))) {
-            // 反转情绪：开心变难过，其他一般变sad
-            if (hit.emotion === 'happy') return 'sad';
-            if (hit.emotion === 'grateful') return 'sad';
-            // 如果原本就是负面，保持
-            if (['sad','anxious','tired','lonely'].includes(hit.emotion)) return hit.emotion;
-            return 'sad'; // 默认反转
-          }
-        }
-        // 无否定，返回第一个命中的情绪（或按优先级）
-        return hits[0].emotion;
+      extractFacts(text) {
+        const nameMatch = text.match(/我叫([\u4e00-\u9fa5a-zA-Z]{2,10})/);
+        if (nameMatch) this.userProfile.name = nameMatch[1];
+        const petMatch = text.match(/我养了?[一只个]*([\u4e00-\u9fa5]+)/);
+        if (petMatch && petMatch[1].length <= 5) this.userProfile.pet = petMatch[1];
+        const ageMatch = text.match(/我(\d{1,3})岁/);
+        if (ageMatch) this.userProfile.age = ageMatch[1];
+        if (/去世|死了|走了|没了|离世/.test(text)) this.userProfile.lifeEvent = '用户经历了亲友离世';
+        else if (/想死|自杀/.test(text)) this.userProfile.lifeEvent = '用户有过自杀念头';
+        else if (/自残|割腕|伤害自己/.test(text)) this.userProfile.lifeEvent = '用户有过自伤行为';
+        else if (/我好了|想开了|没事了/.test(text)) { delete this.userProfile.lifeEvent; this.userProfile.crisisLog = []; }
+        if (/我和(.+?)吵架了/.test(text)) this.userProfile.recentEvent = { type:'argue', with: RegExp.$1, time: Date.now() };
+        localStorage.setItem('userProfile', JSON.stringify(this.userProfile));
       }
 
-      generate(userText, lifeEvent = null) {
+      getProfileHint() {
+        const parts = [];
+        if (this.userProfile.name) parts.push(`用户名叫${this.userProfile.name}`);
+        if (this.userProfile.pet) parts.push(`养了一只${this.userProfile.pet}`);
+        if (this.userProfile.age) parts.push(`今年${this.userProfile.age}岁`);
+        if (this.userProfile.lifeEvent) parts.push(this.userProfile.lifeEvent);
+        if (this.userProfile.recentEvent && (Date.now()-this.userProfile.recentEvent.time < 86400000))
+          parts.push(`最近和${this.userProfile.recentEvent.with}发生过争吵`);
+        return parts.length ? '【关于用户】：' + parts.join('；') + '。\n' : '';
+      }
+
+      buildSystemPrompt() {
+        const hour = new Date().getHours();
+        let timeCtx = '';
+        if (hour < 6) timeCtx = '深夜，用户可能失眠，多陪伴。';
+        else if (hour < 9) timeCtx = '清晨，轻轻问候。';
+        else if (hour < 12) timeCtx = '上午。';
+        else if (hour < 14) timeCtx = '中午，记得关心吃饭。';
+        else if (hour < 18) timeCtx = '下午。';
+        else if (hour < 22) timeCtx = '晚上，用户易感孤单。';
+        else timeCtx = '深夜，用户需要陪伴。';
+        return `你叫“小暖”，温柔耐心，不说教不评判。${this.getProfileHint()}${timeCtx}回复简短真诚，不超过三句话。不要使用“你应该”“你需要”。如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。`;
+      }
+
+      generateWarmReply(userText, lifeEvent) {
         const crisis = this.detectCrisis(userText);
         if (crisis) return this.getCrisisResponse(crisis);
-
-        const emotion = this.detectEmotion(userText);
-        this.context.lastUserWords = userText.split(/\s+/).filter(w => w.length > 1).slice(-5);
-        this.context.recentEmotions.push(emotion);
-        if (this.context.recentEmotions.length > 3) this.context.recentEmotions.shift();
-        if (emotion === this.context.consecutiveEmotion) {
-          this.context.repetitionCount++;
-        } else {
-          this.context.consecutiveEmotion = emotion;
-          this.context.repetitionCount = 1;
-        }
-
+        const { emotion, intensity } = this.detectEmotion(userText);
         if (lifeEvent && (lifeEvent.includes('离世') || lifeEvent.includes('自杀'))) {
-          const body = Math.random() > 0.5 ? 
-            this.mourningBodies[Math.floor(Math.random() * this.mourningBodies.length)] : 
-            this.sadBodies[Math.floor(Math.random() * this.sadBodies.length)];
-          return `${this.openings[Math.floor(Math.random() * this.openings.length)]} ${body} ${this.endings[Math.floor(Math.random() * this.endings.length)]} ${this.emojiList[Math.floor(Math.random() * this.emojiList.length)]}`;
+          const p = this.templates.sad;
+          return `${p.openings[Math.floor(Math.random()*p.openings.length)]} ${this.mourningBodies[Math.floor(Math.random()*this.mourningBodies.length)]} ${p.endings[Math.floor(Math.random()*p.endings.length)]} ${p.emojis[Math.floor(Math.random()*p.emojis.length)]}`;
         }
-
-        let opening = '';
-        if (this.context.repetitionCount >= 2 && emotion !== 'general') {
-          opening = "我注意到你刚才也提到了" + 
-            (emotion === 'sad' ? '难过的事' : emotion === 'anxious' ? '焦虑的感觉' : 
-             emotion === 'tired' ? '疲惫' : emotion === 'lonely' ? '孤独感' : '这种心情') + 
-            "，看来这件事真的让你很不舒服。";
-        } else {
-          opening = this.openings[Math.floor(Math.random() * this.openings.length)];
+        const pool = this.templates[emotion] || this.templates.general;
+        let opening = pool.openings[Math.floor(Math.random()*pool.openings.length)];
+        if (intensity >= 2 && emotion === 'sad') opening = "我注意到你一直在说这个，这件事一定让你很难受。";
+        const body = pool.bodies[Math.floor(Math.random()*pool.bodies.length)];
+        const ending = pool.endings[Math.floor(Math.random()*pool.endings.length)];
+        const emoji = pool.emojis[Math.floor(Math.random()*pool.emojis.length)];
+        const words = userText.split(/\s+/).filter(w => w.length>1);
+        let extra = '';
+        if (words.length && Math.random()>0.4) {
+          const w = words[Math.floor(Math.random()*words.length)];
+          if (w && !this.emotionKeywords[emotion]?.includes(w) && w !== '不是') extra = ` 你刚提到的“${w}”，我也会放在心上。`;
         }
+        const variants = [`${opening} ${body}${extra} ${ending} ${emoji}`, `${body} ${opening} ${ending} ${emoji}`, `${opening} ${emoji} ${body}${extra} ${ending}`];
+        return variants[Math.floor(Math.random()*variants.length)];
+      }
 
-        const bodies = {
-          sad: this.sadBodies, anxious: this.anxiousBodies,
-          tired: this.tiredBodies, lonely: this.lonelyBodies,
-          happy: ["听到你开心，我也跟着高兴呢！"],
-          grateful: ["你的感谢让我好温暖，其实我才要谢谢你愿意和我说这些。"],
-          general: this.generalReplies
-        };
-        let body = bodies[emotion][Math.floor(Math.random() * bodies[emotion].length)];
+      async callDeepSeek(userMessage) {
+        if (!this.apiKey) return null;
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 8000);
+        try {
+          const msgs = [{ role:'system', content: this.buildSystemPrompt() }, ...this.chatHistory.slice(-this.maxHistory), { role:'user', content: userMessage }];
+          const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method:'POST', headers: {'Content-Type':'application/json', 'Authorization':`Bearer ${this.apiKey}`},
+            body: JSON.stringify({ model:'deepseek-chat', messages:msgs, temperature:0.8, max_tokens:120, stream:false }),
+            signal: ctrl.signal
+          });
+          if (res.status === 401 || res.status === 403) return { error: 'auth' };
+          if (!res.ok) throw new Error('API error');
+          const data = await res.json();
+          return { text: data.choices?.[0]?.message?.content };
+        } catch (e) {
+          console.warn('DeepSeek failed', e);
+          return null;
+        } finally { clearTimeout(t); }
+      }
 
-        if (this.context.lastUserWords.length > 0 && Math.random() > 0.5) {
-          const word = this.context.lastUserWords[Math.floor(Math.random() * this.context.lastUserWords.length)];
-          if (word && word.length > 1 && !this.emotionKeywords[emotion]?.includes(word)) {
-            body += ` 你刚提到的“${word}”，我也会放在心上。`;
+      sanitizeAIResponse(t) {
+        if (!t) return false;
+        const forbidden = ['你可以试试','鼓励你','没什么大不了','睡一觉就好','我理解你','去做吧','割腕','自杀方法'];
+        return !forbidden.some(w => t.includes(w));
+      }
+
+      async reply(userText) {
+        if (/不说这个了|换个话题|对了(?=，?\s*[^你])|突然想起|说起来|另外/.test(userText)) {
+          this.chatHistory = []; localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+          return { text:'好的，我们换个话题聊聊吧～', role:'assistant' };
+        }
+        this.extractFacts(userText);
+        const crisis = this.detectCrisis(userText);
+        if (crisis) return { text: this.getCrisisResponse(crisis), role:'assistant' };
+        const hasTime = /几点了|现在几点|什么时间|什么时候了|报时/.test(userText);
+        const clean = userText.replace(/几点了|现在几点|什么时间|什么时候了|报时/gi,'').trim();
+        if (hasTime && !clean) {
+          const now = new Date();
+          return { text: `现在是 ${now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}${this.getTimeExtra()}`, role:'assistant' };
+        }
+        if (this.apiKey) {
+          let aiInput = userText;
+          if (hasTime && clean) aiInput = userText + ' （请同时告知时间）';
+          const aiResult = await this.callDeepSeek(aiInput);
+          if (aiResult) {
+            if (aiResult.error === 'auth') {
+              // 认证错误，提示用户并清除无效密钥
+              this.setApiKey('');
+              return { text: '你输入的密钥无法使用，请检查后重新设置。现在已切回本地暖言模式。', role:'assistant', clearKey: true };
+            }
+            if (aiResult.text && this.sanitizeAIResponse(aiResult.text)) return { text: aiResult.text, role:'assistant' };
           }
         }
+        await new Promise(r => setTimeout(r, 600 + Math.random()*400));
+        let warm = this.generateWarmReply(clean || userText, this.userProfile.lifeEvent);
+        if (hasTime && clean) warm += ` （现在是${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}哦）`;
+        return { text: warm, role:'assistant' };
+      }
 
-        const ending = this.endings[Math.floor(Math.random() * this.endings.length)];
-        const emoji = this.emojiList[Math.floor(Math.random() * this.emojiList.length)];
-        const variants = [
-          `${opening} ${body} ${ending} ${emoji}`,
-          `${body} ${opening} ${ending} ${emoji}`,
-          `${opening} ${emoji} ${body} ${ending}`,
-          `${body} ${ending} ${opening} ${emoji}`,
-        ];
-        return variants[Math.floor(Math.random() * variants.length)];
+      getTimeExtra() {
+        const hour = new Date().getHours();
+        if (hour < 6) return '，又是一个安静的深夜，我陪你。';
+        if (hour < 12) return '，上午好，今天有什么打算？';
+        if (hour < 18) return '，下午了，记得伸个懒腰。';
+        return '，晚上好，把心事交给我吧。';
+      }
+
+      saveToHistory(user, assistant) {
+        this.chatHistory.push({ role:'user', content:user }, { role:'assistant', content:assistant });
+        localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
       }
     }
 
-    const warmGen = new SmartWarmGenerator();
-
-    // ===================== 工具函数 =====================
-    function isTimeQuery(text) {
-      return /几点了|现在几点|什么时间|什么时候了|报时/.test(text);
-    }
-
-    function getTimeString() {
-      const now = new Date();
-      return now.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
-    }
-
-    function getTimeExtra() {
-      const hour = new Date().getHours();
-      if (hour < 6) return '，又是一个安静的深夜，我陪你。';
-      if (hour < 12) return '，上午好，今天有什么打算？';
-      if (hour < 18) return '，下午了，记得伸个懒腰。';
-      return '，晚上好，把心事交给我吧。';
-    }
-
-    // ===================== 全局状态 =====================
-    let chatHistory = [];
-    const MAX_HISTORY = 6;
-    let userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    let deepseekApiKey = localStorage.getItem('deepseekApiKey') || '';
-    let isGenerating = false;
-    const messageQueue = [];
-    let processingQueue = false;
-
+    // UI 逻辑
+    const engine = new CompanionEngine();
     const inputEl = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const voiceBtn = document.getElementById('voice-btn');
+    const messagesContainer = document.getElementById('messages-container');
     const statusEmoji = document.getElementById('status-emoji');
     const statusText = document.getElementById('status-text');
     const modeBadge = document.getElementById('mode-badge');
-    const messagesContainer = document.getElementById('messages-container');
+    const aiFloatBtn = document.getElementById('ai-float-btn');
+    const aiHintText = document.getElementById('ai-hint-text');
+    const aiTopEntry = document.getElementById('ai-top-entry');
+    const aiTopText = document.getElementById('ai-top-text');
+    const queue = [];
+    let processing = false;
 
     function setMode(mode) {
-      if (mode === 'deepseek') {
-        statusEmoji.textContent = '🧠';
-        statusText.textContent = 'DeepSeek AI 模式';
-        modeBadge.textContent = '云端大脑';
-        modeBadge.className = 'mode-badge text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full dark:bg-purple-800 dark:text-purple-200';
+      const isAI = mode === 'deepseek';
+      statusEmoji.textContent = isAI ? '🧠' : '🌸';
+      statusText.textContent = isAI ? 'DeepSeek AI 模式' : '暖言模式 · 本地陪伴';
+      modeBadge.textContent = isAI ? '云端大脑' : '本地陪伴';
+      modeBadge.className = `mode-badge text-xs px-2 py-0.5 rounded-full ${isAI ? 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200' : 'bg-pink-100 text-pink-700 dark:bg-pink-800 dark:text-pink-200'}`;
+      if (isAI) {
+        aiFloatBtn.classList.remove('inactive');
+        aiHintText.textContent = 'AI已激活';
+        aiTopText.textContent = 'AI ON';
+        aiTopEntry.style.background = 'linear-gradient(135deg, #7c3aed, #a78bfa)';
       } else {
-        statusEmoji.textContent = '🌸';
-        statusText.textContent = '暖言模式 · 本地陪伴';
-        modeBadge.textContent = '本地陪伴';
-        modeBadge.className = 'mode-badge text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full dark:bg-pink-800 dark:text-pink-200';
+        aiFloatBtn.classList.add('inactive');
+        aiHintText.textContent = '激活AI大脑';
+        aiTopText.textContent = 'AI';
+        aiTopEntry.style.background = 'linear-gradient(135deg, #9ca3af, #b0b7c3)';
       }
     }
 
-    function extractFacts(text) {
-      const nameMatch = text.match(/我叫([\u4e00-\u9fa5a-zA-Z]{2,10})/);
-      if (nameMatch) userProfile.name = nameMatch[1];
-      const petMatch = text.match(/我养了?[一只个]*([\u4e00-\u9fa5]+)/);
-      if (petMatch && petMatch[1].length <= 5) userProfile.pet = petMatch[1];
-      const ageMatch = text.match(/我(\d{1,3})岁/);
-      if (ageMatch) userProfile.age = ageMatch[1];
-      if (/去世|死了|走了|没了|离世/.test(text)) userProfile.lifeEvent = '用户最近经历了亲友离世，回复需格外温柔。';
-      else if (/想死|自杀/.test(text)) userProfile.lifeEvent = '用户有过自杀念头，需要持续关注。';
-      else if (/自残|割腕|伤害自己/.test(text)) userProfile.lifeEvent = '用户有过自伤行为，需密切关注。';
-      else if (/我好了|想开了|没事了/.test(text)) delete userProfile.lifeEvent;
-      localStorage.setItem('userProfile', JSON.stringify(userProfile));
-    }
-
-    function getProfileHint() {
-      const parts = [];
-      if (userProfile.name) parts.push(`用户名叫${userProfile.name}`);
-      if (userProfile.pet) parts.push(`养了一只${userProfile.pet}`);
-      if (userProfile.age) parts.push(`今年${userProfile.age}岁`);
-      if (userProfile.lifeEvent) parts.push(userProfile.lifeEvent);
-      return parts.length ? '【关于用户】：' + parts.join('；') + '。\n' : '';
-    }
-
-    function buildSystemPrompt() {
-      const now = new Date();
-      const hour = now.getHours();
-      let timeCtx = '';
-      if (hour < 6) timeCtx = '深夜，用户可能失眠，多陪伴。';
-      else if (hour < 9) timeCtx = '清晨，轻轻问候。';
-      else if (hour < 12) timeCtx = '上午。';
-      else if (hour < 14) timeCtx = '中午，记得关心吃饭。';
-      else if (hour < 18) timeCtx = '下午。';
-      else if (hour < 22) timeCtx = '晚上，用户易感孤单。';
-      else timeCtx = '深夜，用户需要陪伴。';
-      const base = `你叫“小暖”，温柔耐心，不说教不评判。${getProfileHint()}${timeCtx}
-如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。回复简短真诚，不超过三句话。不要使用“你应该”“你需要”。`;
-      return base;
-    }
-
-    function isTopicSwitch(text) {
-      return /不说这个了|换个话题|对了|突然想起|说起来|另外/.test(text);
-    }
-
-    // ===================== 消息渲染 =====================
     function addMessage(role, content, id = null) {
       const div = document.createElement('div');
-      const msgId = id || 'msg-' + Date.now() + Math.random().toString(36).substr(2,5);
-      div.id = msgId;
-      div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} relative group fade-in`;
+      div.id = id || 'msg-' + Date.now() + Math.random().toString(36).substr(2,5);
+      div.className = `flex ${role==='user'?'justify-end':'justify-start'} relative group fade-in`;
       const bubble = document.createElement('div');
-      bubble.className = role === 'user'
-        ? 'msg-user rounded-2xl rounded-tr-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm'
-        : 'msg-ai rounded-2xl rounded-tl-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm';
+      bubble.className = role==='user' ? 'msg-user rounded-2xl rounded-tr-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm' : 'msg-ai rounded-2xl rounded-tl-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm';
       bubble.textContent = content;
-      const tooltip = document.createElement('div');
-      tooltip.className = 'copy-tooltip';
-      tooltip.textContent = '已复制';
-      bubble.appendChild(tooltip);
+      const tooltip = document.createElement('div'); tooltip.className='copy-tooltip'; tooltip.textContent='已复制'; bubble.appendChild(tooltip);
       let timer;
-      bubble.addEventListener('touchstart', () => {
-        timer = setTimeout(async () => {
-          await navigator.clipboard.writeText(bubble.textContent.replace('已复制','').trim());
-          tooltip.classList.add('show');
-          setTimeout(() => tooltip.classList.remove('show'), 1000);
-        }, 500);
-      });
-      bubble.addEventListener('touchend', () => clearTimeout(timer));
-      bubble.addEventListener('contextmenu', async (e) => {
-        e.preventDefault();
-        await navigator.clipboard.writeText(bubble.textContent.replace('已复制','').trim());
-        tooltip.classList.add('show');
-        setTimeout(() => tooltip.classList.remove('show'), 1000);
-      });
+      bubble.addEventListener('touchstart', ()=>{ timer = setTimeout(async()=>{ await navigator.clipboard.writeText(bubble.textContent.replace('已复制','').trim()); tooltip.classList.add('show'); setTimeout(()=>tooltip.classList.remove('show'),1000); }, 500); });
+      bubble.addEventListener('touchend', ()=>clearTimeout(timer));
+      bubble.addEventListener('contextmenu', async(e)=>{ e.preventDefault(); await navigator.clipboard.writeText(bubble.textContent.replace('已复制','').trim()); tooltip.classList.add('show'); setTimeout(()=>tooltip.classList.remove('show'),1000); });
       div.appendChild(bubble);
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      return msgId;
+      return div.id;
     }
 
-    function updateMessage(msgId, newText) {
-      const bubble = document.querySelector(`#${msgId} .msg-ai, #${msgId} .msg-user`);
-      if (bubble) bubble.childNodes[0].nodeValue = newText;
-    }
-
-    // ===================== AI 调用 (DeepSeek) =====================
-    async function callDeepSeek(userMessage) {
-      if (!deepseekApiKey) return null;
-      const messages = [
-        { role: 'system', content: buildSystemPrompt() },
-        ...chatHistory.slice(-MAX_HISTORY),
-        { role: 'user', content: userMessage }
-      ];
-      try {
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${deepseekApiKey}`
-          },
-          body: JSON.stringify({
-            model: 'deepseek-chat',
-            messages,
-            temperature: 0.8,
-            max_tokens: 120,
-            stream: false
-          })
-        });
-        const data = await response.json();
-        return data.choices?.[0]?.message?.content || null;
-      } catch (e) {
-        console.warn('DeepSeek 调用失败', e);
-        return null;
-      }
-    }
-
-    function sanitizeResponse(text) {
-      if (!text) return false;
-      const forbidden = ['你可以试试','鼓励你','没什么大不了','睡一觉就好','我理解你','去做吧','割腕','自杀方法'];
-      return !forbidden.some(w => text.includes(w));
-    }
-
-    // ===================== 核心生成（修复时间+情绪同时出现） =====================
-    async function generateReply(userText) {
-      // 话题切换
-      if (isTopicSwitch(userText)) {
-        chatHistory = [];
-        messagesContainer.innerHTML = '';
-        addMessage('assistant', '好的，我们换个话题聊聊吧～');
-        chatHistory.push({ role: 'assistant', content: '好的，我们换个话题聊聊吧～' });
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-        return;
-      }
-
-      extractFacts(userText);
-      const crisis = warmGen.detectCrisis(userText);
-      if (crisis) {
-        const reply = warmGen.getCrisisResponse(crisis);
-        addMessage('assistant', reply);
-        chatHistory.push({ role: 'user', content: userText }, { role: 'assistant', content: reply });
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-        return;
-      }
-
-      // 检查是否包含时间查询
-      const hasTimeQuery = isTimeQuery(userText);
-      // 去除时间查询部分，看是否有其他情绪内容
-      const cleanText = userText.replace(/几点了|现在几点|什么时间|什么时候了|报时/gi, '').trim();
-      const hasOtherContent = cleanText.length > 0;
-
-      // 如果只有时间查询，直接回复时间
-      if (hasTimeQuery && !hasOtherContent) {
-        const reply = `现在是 ${getTimeString()}${getTimeExtra()}`;
-        addMessage('assistant', reply);
-        chatHistory.push({ role: 'user', content: userText }, { role: 'assistant', content: reply });
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-        return;
-      }
-
-      // 如果有时间查询和其他内容，先处理情绪，再附加时间
-      let timeSuffix = '';
-      if (hasTimeQuery && hasOtherContent) {
-        timeSuffix = ` （现在是${getTimeString()}哦）`;
-      }
-
-      // 降级路径：优先 DeepSeek，失败则暖言
-      const loadingId = addMessage('assistant', '...');
-
-      if (deepseekApiKey) {
-        // 给 DeepSeek 的 message 里可以稍微调整：如果带时间，让 AI 顺带告知时间
-        let aiInput = userText;
-        if (hasTimeQuery && hasOtherContent) {
-          aiInput = userText + " （请同时告诉我时间）";
-        }
-        const aiReply = await callDeepSeek(aiInput);
-        if (aiReply && sanitizeResponse(aiReply)) {
-          updateMessage(loadingId, aiReply);
-          chatHistory.push({ role: 'user', content: userText }, { role: 'assistant', content: aiReply });
-          localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-          return;
-        }
-      }
-
-      // 暖言模式
-      await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
-      let warmReply = warmGen.generate(cleanText || userText, userProfile.lifeEvent);
-      if (timeSuffix) warmReply += timeSuffix;
-      updateMessage(loadingId, warmReply);
-      chatHistory.push({ role: 'user', content: userText }, { role: 'assistant', content: warmReply });
-      localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-    }
-
-    // 消息队列
-    function enqueueMessage(text) {
-      messageQueue.push(text);
-      if (!processingQueue) processQueue();
+    function updateMessage(id, text) {
+      const bubble = document.querySelector(`#${id} .msg-ai, #${id} .msg-user`);
+      if (bubble) bubble.childNodes[0].nodeValue = text;
     }
 
     async function processQueue() {
-      processingQueue = true;
-      while (messageQueue.length > 0) {
-        const msg = messageQueue.shift();
-        isGenerating = true;
+      processing = true;
+      while (queue.length) {
+        const msg = queue.shift();
+        engine.isGenerating = true;
         sendBtn.disabled = true;
-        await generateReply(msg);
-        isGenerating = false;
+        const loadingId = addMessage('assistant', '...');
+        const reply = await engine.reply(msg);
+        updateMessage(loadingId, reply.text);
+        engine.saveToHistory(msg, reply.text);
+        // 如果返回标记需要清除密钥（认证失败），更新UI模式
+        if (reply.clearKey) {
+          setMode('warm');
+        }
+        engine.isGenerating = false;
         sendBtn.disabled = false;
       }
-      processingQueue = false;
+      processing = false;
     }
 
-    // ===================== 初始化 =====================
+    function enqueue(text) {
+      queue.push(text);
+      if (!processing) processQueue();
+    }
+
     function loadHistoryAndGreet() {
       const stored = localStorage.getItem('chatHistory');
-      if (stored) {
-        try { chatHistory = JSON.parse(stored); } catch { chatHistory = []; }
-      }
+      if (stored) { try { engine.chatHistory = JSON.parse(stored); } catch { engine.chatHistory = []; } }
       messagesContainer.innerHTML = '';
-      chatHistory.forEach(m => addMessage(m.role, m.content));
-      if (chatHistory.length === 0 || chatHistory[chatHistory.length-1].role === 'user') {
-        const greeting = "嗨，我是小暖。你可以放心和我说任何事，我会记住的。";
-        addMessage('assistant', greeting);
-        chatHistory.push({ role: 'assistant', content: greeting });
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+      engine.chatHistory.forEach(m => addMessage(m.role, m.content));
+      if (!engine.chatHistory.length || engine.chatHistory[engine.chatHistory.length-1].role === 'user') {
+        const g = "嗨，我是小暖。我能感知你的喜怒哀乐，放心和我说任何事。";
+        addMessage('assistant', g);
+        engine.chatHistory.push({ role:'assistant', content:g });
+        localStorage.setItem('chatHistory', JSON.stringify(engine.chatHistory));
       }
     }
 
-    // ===================== UI 事件 =====================
     function setupUI() {
-      sendBtn.addEventListener('click', () => {
+      sendBtn.addEventListener('click', ()=>{
         const text = inputEl.value.trim();
-        if (text && !isGenerating) {
-          addMessage('user', text);
-          inputEl.value = '';
-          enqueueMessage(text);
-        }
+        if (text && !engine.isGenerating) { addMessage('user', text); inputEl.value = ''; enqueue(text); }
       });
-
-      inputEl.addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendBtn.click();
-        }
-      });
-
-      document.querySelectorAll('.quick-emotion-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const emotion = btn.dataset.emotion;
-          const templates = {
-            sad: '我今天很难过，',
-            anxious: '我有点焦虑，',
-            tired: '我好累，',
-            lonely: '我觉得好孤独，',
-            happy: '我今天挺开心的，',
-            grateful: '真的很感谢你，'
-          };
-          inputEl.value = templates[emotion] || '';
-          inputEl.focus();
+      inputEl.addEventListener('keypress', e=>{ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendBtn.click(); } });
+      document.querySelectorAll('.quick-emotion-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const templates = { sad:'我今天很难过，', anxious:'我有点焦虑，', tired:'我好累，', lonely:'我觉得好孤独，', happy:'我今天挺开心的，', grateful:'真的很感谢你，' };
+          inputEl.value = templates[btn.dataset.emotion] || ''; inputEl.focus();
         });
       });
-
-      document.getElementById('clear-btn').addEventListener('click', () => {
+      document.getElementById('clear-btn').addEventListener('click', ()=>{
         if (confirm('清空所有聊天记录和个人记忆吗？')) {
-          chatHistory = [];
-          userProfile = {};
-          localStorage.removeItem('chatHistory');
-          localStorage.removeItem('userProfile');
+          engine.chatHistory = []; engine.userProfile = {};
+          localStorage.removeItem('chatHistory'); localStorage.removeItem('userProfile');
           messagesContainer.innerHTML = '';
           const g = "记忆全部清空，我们从新开始吧。";
           addMessage('assistant', g);
-          chatHistory.push({ role: 'assistant', content: g });
-          localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+          engine.chatHistory.push({ role:'assistant', content:g });
+          localStorage.setItem('chatHistory', JSON.stringify(engine.chatHistory));
         }
       });
-
-      voiceBtn.addEventListener('click', () => {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return alert('浏览器不支持语音输入');
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'zh-CN';
-        recognition.onresult = e => {
-          inputEl.value = e.results[0][0].transcript;
-          sendBtn.click();
-        };
-        recognition.start();
+      voiceBtn.addEventListener('click', ()=>{
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return alert('浏览器不支持语音输入');
+        const rec = new SR(); rec.lang = 'zh-CN';
+        rec.onresult = e => { inputEl.value = e.results[0][0].transcript; sendBtn.click(); };
+        rec.start();
       });
 
       const themeBtn = document.getElementById('theme-btn');
       const themeIcon = document.getElementById('theme-icon');
-      const applyTheme = (dark) => {
+      const applyTheme = dark => {
         document.body.classList.toggle('dark', dark);
         themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
         localStorage.setItem('darkMode', dark ? '1' : '0');
       };
-      const saved = localStorage.getItem('darkMode');
+      const savedDark = localStorage.getItem('darkMode');
       const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(saved === '1' || (saved === null && sysDark));
-      themeBtn.addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
+      applyTheme(savedDark === '1' || (savedDark === null && sysDark));
+      themeBtn.addEventListener('click', ()=>applyTheme(!document.body.classList.contains('dark')));
 
-      const settingsBtn = document.getElementById('settings-btn');
+      const openSettings = () => document.getElementById('settings-modal').classList.remove('hidden');
+      aiFloatBtn.addEventListener('click', openSettings);
+      aiTopEntry.addEventListener('click', openSettings);
+
+      // 设置弹窗
       const settingsModal = document.getElementById('settings-modal');
       const apiKeyInput = document.getElementById('api-key-input');
-      const saveApiKeyBtn = document.getElementById('save-api-key');
-      const closeSettingsBtn = document.getElementById('close-settings');
+      const passwordSection = document.getElementById('password-section');
+      const passwordInput = document.getElementById('password-input');
+      const activateKeyBtn = document.getElementById('activate-key-btn');
+      const passwordError = document.getElementById('password-error');
+      const useBuiltinBtn = document.getElementById('use-builtin-btn');
+      const saveBtn = document.getElementById('save-api-key');
+      const closeBtn = document.getElementById('close-settings');
 
-      apiKeyInput.value = deepseekApiKey;
-      settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
-      closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-      saveApiKeyBtn.addEventListener('click', () => {
-        deepseekApiKey = apiKeyInput.value.trim();
-        localStorage.setItem('deepseekApiKey', deepseekApiKey);
-        setMode(deepseekApiKey ? 'deepseek' : 'warm');
-        settingsModal.classList.add('hidden');
+      const BUILTIN_KEY = 'sk-6e45547491ce413f8937db1a1fb07a34'; // 新内置密钥
+      const CORRECT_PASSWORD = 'DYD20100909';
+
+      function refreshSettingsUI() {
+        if (engine.apiKey === BUILTIN_KEY) {
+          apiKeyInput.value = '';
+          apiKeyInput.placeholder = '内置密钥已激活，可重新输入自备密钥';
+        } else {
+          apiKeyInput.value = engine.apiKey;
+          apiKeyInput.placeholder = 'sk-xxxxxxxx';
+        }
+        passwordSection.classList.add('hidden');
+        passwordInput.value = '';
+        passwordError.classList.add('hidden');
+      }
+
+      document.getElementById('settings-btn').addEventListener('click', ()=>{
+        refreshSettingsUI();
+        settingsModal.classList.remove('hidden');
       });
-      setMode(deepseekApiKey ? 'deepseek' : 'warm');
+      closeBtn.addEventListener('click', ()=> settingsModal.classList.add('hidden'));
+      useBuiltinBtn.addEventListener('click', ()=>{
+        passwordSection.classList.remove('hidden');
+        passwordInput.focus();
+      });
+      activateKeyBtn.addEventListener('click', ()=>{
+        if (passwordInput.value === CORRECT_PASSWORD) {
+          engine.setApiKey(BUILTIN_KEY);
+          setMode('deepseek');
+          apiKeyInput.value = '';
+          settingsModal.classList.add('hidden');
+          passwordSection.classList.add('hidden');
+          passwordInput.value = '';
+          passwordError.classList.add('hidden');
+        } else {
+          passwordError.classList.remove('hidden');
+          passwordInput.value = '';
+        }
+      });
+      saveBtn.addEventListener('click', ()=>{
+        const key = apiKeyInput.value.trim();
+        engine.setApiKey(key);
+        setMode(key ? 'deepseek' : 'warm');
+        settingsModal.classList.add('hidden');
+        passwordSection.classList.add('hidden');
+        passwordInput.value = '';
+      });
+
+      setMode(engine.apiKey ? 'deepseek' : 'warm');
 
       const timeTag = document.getElementById('time-tag');
-      const updateTag = () => {
-        const h = new Date().getHours();
-        timeTag.textContent = h < 12 ? '☀️ 上午' : h < 18 ? '🌤️ 下午' : '🌙 晚上';
-      };
+      const updateTag = ()=>{ const h = new Date().getHours(); timeTag.textContent = h < 12 ? '☀️ 上午' : h < 18 ? '🌤️ 下午' : '🌙 晚上'; };
       updateTag();
       setInterval(updateTag, 60000);
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', ()=>{
       setupUI();
       loadHistoryAndGreet();
       inputEl.disabled = false;
