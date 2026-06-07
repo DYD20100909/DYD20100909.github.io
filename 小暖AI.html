@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* ===== 颜色变量 ===== */
     :root {
       --bg-from: #f8fafc; --bg-to: #f1f5f9; --header: #ffffff;
       --msg-user-bg: #3b82f6; --msg-user-text: #ffffff;
@@ -56,23 +55,12 @@
     .fade-in { animation: fadeInUp 0.25s ease-out; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* 复制提示：柔和半透明，默认隐藏 */
     .copy-tooltip {
-      position: absolute;
-      bottom: 110%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
-      color: #fff;
-      font-size: 0.7rem;
-      padding: 3px 10px;
-      border-radius: 20px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-      z-index: 10;
+      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #fff;
+      font-size: 0.7rem; padding: 3px 10px; border-radius: 20px;
+      pointer-events: none; opacity: 0; transition: opacity 0.2s;
+      white-space: nowrap; z-index: 10;
     }
     .copy-tooltip.show { opacity: 1; }
 
@@ -105,7 +93,6 @@
   </style>
 </head>
 <body>
-  <!-- 头部 -->
   <header class="header-bg shadow-sm py-3 px-4 flex justify-between items-center">
     <div class="flex items-center gap-2">
       <i class="fas fa-heart text-pink-500 text-xl"></i>
@@ -113,7 +100,7 @@
       <span id="time-tag" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full"></span>
     </div>
     <div class="flex items-center gap-1 sm:gap-2">
-      <button id="ai-top-entry" class="ai-top-btn" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:white;padding:4px 14px;border-radius:9999px;font-size:0.8rem;display:flex;align-items:center;gap:4px;border:none;cursor:pointer;">
+      <button id="ai-top-entry" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:white;padding:4px 14px;border-radius:9999px;font-size:0.8rem;display:flex;align-items:center;gap:4px;border:none;cursor:pointer;">
         <i class="fas fa-brain"></i> <span id="ai-top-text">AI</span>
       </button>
       <button id="settings-btn" class="text-gray-500 dark:text-gray-300 p-1" aria-label="设置"><i class="fas fa-cog"></i></button>
@@ -122,17 +109,14 @@
     </div>
   </header>
 
-  <!-- 状态栏 -->
   <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm text-secondary flex items-center gap-2 border-b border-theme">
     <span id="status-emoji">🌸</span>
     <span id="status-text" class="flex-1">暖言模式 · 本地陪伴</span>
     <span id="mode-badge" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">本地陪伴</span>
   </div>
 
-  <!-- 消息区域 -->
   <main id="messages-container" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3" aria-live="polite" style="overscroll-behavior: contain;"></main>
 
-  <!-- 快捷情绪 -->
   <div class="px-3 sm:px-4 py-2 flex gap-2 overflow-x-auto" id="quick-emotions">
     <button class="quick-emotion-btn" data-emotion="sad">😢 难过</button>
     <button class="quick-emotion-btn" data-emotion="anxious">😰 焦虑</button>
@@ -142,7 +126,6 @@
     <button class="quick-emotion-btn" data-emotion="grateful">🙏 感恩</button>
   </div>
 
-  <!-- 输入区域 -->
   <footer class="footer-bg p-2 sm:p-3">
     <div class="flex items-center gap-2">
       <button id="voice-btn" class="text-gray-500 dark:text-gray-300 p-2" aria-label="语音输入"><i class="fas fa-microphone"></i></button>
@@ -151,13 +134,14 @@
     </div>
   </footer>
 
-  <!-- AI浮动按钮 -->
+  <!-- 作者署名，极低调但可见 -->
+  <div class="text-center text-xs py-1" style="color: var(--secondary); opacity: 0.6; font-size: 0.65rem;">Designed by DYD</div>
+
   <div id="ai-float-btn" class="ai-float-btn inactive" aria-label="打开AI设置">
     <i class="fas fa-brain"></i>
     <span class="ai-hint" id="ai-hint-text">激活AI大脑</span>
   </div>
 
-  <!-- 设置弹窗 -->
   <div id="settings-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 w-full max-w-sm shadow-xl">
       <h2 class="text-lg font-bold mb-3">AI 设置</h2>
@@ -183,6 +167,27 @@
     const encrypt = (text) => btoa(unescape(encodeURIComponent(text)));
     const decrypt = (encoded) => decodeURIComponent(escape(atob(encoded)));
     const escapeHtml = (str) => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+
+    // 内置密钥 XOR 加密（密码保护）
+    const BUILTIN_KEY_ENCRYPTED = 'Cjw6WjshJyorLRkuLCwwIyk2MjA0ITc+MjQyJTswPDA9OyU6MiwqNz8=';
+    const CORRECT_PASSWORD = 'DYD20100909';
+
+    function xorEncryptDecrypt(data, password) {
+      let result = '';
+      for (let i = 0; i < data.length; i++) {
+        result += String.fromCharCode(data.charCodeAt(i) ^ password.charCodeAt(i % password.length));
+      }
+      return result;
+    }
+
+    function decryptBuiltinKey(password) {
+      try {
+        const decoded = atob(BUILTIN_KEY_ENCRYPTED);
+        const decrypted = xorEncryptDecrypt(decoded, password);
+        if (decrypted.startsWith('sk-')) return decrypted;
+        return null;
+      } catch { return null; }
+    }
 
     // ==================== 核心引擎 ====================
     class CompanionEngine {
@@ -366,7 +371,7 @@
         else if (hour < 18) timeCtx = '下午。';
         else if (hour < 22) timeCtx = '晚上，用户易感孤单。';
         else timeCtx = '深夜，用户需要陪伴。';
-        return `你叫“小暖”，温柔耐心，不说教不评判。${this.getProfileHint()}${timeCtx}回复简短真诚，不超过三句话。不要使用“你应该”“你需要”。如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。`;
+        return `你叫“小暖”，是一个温柔耐心的陪伴者。你正在和一位用户聊天。用户的名字可能未知，除非用户告诉过你（见下方记忆）。如果用户没有告诉你名字，请不要随意称呼用户的名字，不要称用户为“小暖”。${this.getProfileHint()}${timeCtx}回复简短真诚，不超过三句话。不要使用“你应该”“你需要”。如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。`;
       }
 
       generateWarmReply(userText, lifeEvent) {
@@ -659,11 +664,8 @@
       const saveBtn = document.getElementById('save-api-key');
       const closeBtn = document.getElementById('close-settings');
 
-      const BUILTIN_KEY = 'sk-6e45547491ce413f8937db1a1fb07a34';
-      const CORRECT_PASSWORD = 'DYD20100909';
-
       function refreshSettingsUI() {
-        if (engine.apiKey === BUILTIN_KEY) {
+        if (engine.apiKey === decryptBuiltinKey(CORRECT_PASSWORD)) {
           apiKeyInput.value = ''; apiKeyInput.placeholder = '内置密钥已激活，可重新输入自备密钥';
         } else {
           apiKeyInput.value = engine.apiKey; apiKeyInput.placeholder = 'sk-xxxxxxxx';
@@ -675,11 +677,17 @@
       closeBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
       useBuiltinBtn.addEventListener('click', () => { passwordSection.classList.remove('hidden'); passwordInput.focus(); });
       activateKeyBtn.addEventListener('click', () => {
-        if (passwordInput.value === CORRECT_PASSWORD) {
-          engine.setApiKey(BUILTIN_KEY); setMode('deepseek');
-          settingsModal.classList.add('hidden'); passwordSection.classList.add('hidden');
+        const pwd = passwordInput.value;
+        const decryptedKey = decryptBuiltinKey(pwd);
+        if (decryptedKey) {
+          engine.setApiKey(decryptedKey);
+          setMode('deepseek');
+          settingsModal.classList.add('hidden');
+          passwordSection.classList.add('hidden');
+          passwordInput.value = '';
         } else {
-          passwordError.classList.remove('hidden'); passwordInput.value = '';
+          passwordError.classList.remove('hidden');
+          passwordInput.value = '';
         }
       });
       saveBtn.addEventListener('click', async () => {
