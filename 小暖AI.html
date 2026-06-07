@@ -134,7 +134,6 @@
     </div>
   </footer>
 
-  
   <div class="text-center text-xs py-1" style="color: var(--secondary); opacity: 0.6; font-size: 0.65rem;">Designed by DYD</div>
 
   <div id="ai-float-btn" class="ai-float-btn inactive" aria-label="打开AI设置">
@@ -145,7 +144,7 @@
   <div id="settings-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 w-full max-w-sm shadow-xl">
       <h2 class="text-lg font-bold mb-3">AI 设置</h2>
-      <p class="text-sm text-secondary mb-2">填入 DeepSeek API Key，或使用密码激活内置密钥。</p>
+      <p class="text-sm text-secondary mb-2">填入 DeepSeek API Key，或使用内置密钥（需密码激活）。</p>
       <input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 mb-2 dark:bg-gray-700 text-sm">
       <div id="password-section" class="mb-2 hidden">
         <input id="password-input" type="password" placeholder="输入使用密码" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm">
@@ -163,33 +162,13 @@
   </div>
 
   <script type="module">
-    // ==================== 工具函数 ====================
     const encrypt = (text) => btoa(unescape(encodeURIComponent(text)));
     const decrypt = (encoded) => decodeURIComponent(escape(atob(encoded)));
     const escapeHtml = (str) => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
 
-    // 内置密钥 XOR 加密（密码保护）
-    const BUILTIN_KEY_ENCRYPTED = 'Cjw6WjshJyorLRkuLCwwIyk2MjA0ITc+MjQyJTswPDA9OyU6MiwqNz8=';
+    const BUILTIN_KEY = 'sk-6e45547491ce413f8937db1a1fb07a34';
     const CORRECT_PASSWORD = 'DYD20100909';
 
-    function xorEncryptDecrypt(data, password) {
-      let result = '';
-      for (let i = 0; i < data.length; i++) {
-        result += String.fromCharCode(data.charCodeAt(i) ^ password.charCodeAt(i % password.length));
-      }
-      return result;
-    }
-
-    function decryptBuiltinKey(password) {
-      try {
-        const decoded = atob(BUILTIN_KEY_ENCRYPTED);
-        const decrypted = xorEncryptDecrypt(decoded, password);
-        if (decrypted.startsWith('sk-')) return decrypted;
-        return null;
-      } catch { return null; }
-    }
-
-    // ==================== 核心引擎 ====================
     class CompanionEngine {
       constructor() {
         this.chatHistory = [];
@@ -477,7 +456,6 @@
       }
     }
 
-    // ===================== UI 层 =====================
     const engine = new CompanionEngine();
     const elements = {
       input: document.getElementById('user-input'),
@@ -665,7 +643,7 @@
       const closeBtn = document.getElementById('close-settings');
 
       function refreshSettingsUI() {
-        if (engine.apiKey === decryptBuiltinKey(CORRECT_PASSWORD)) {
+        if (engine.apiKey === BUILTIN_KEY) {
           apiKeyInput.value = ''; apiKeyInput.placeholder = '内置密钥已激活，可重新输入自备密钥';
         } else {
           apiKeyInput.value = engine.apiKey; apiKeyInput.placeholder = 'sk-xxxxxxxx';
@@ -677,10 +655,8 @@
       closeBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
       useBuiltinBtn.addEventListener('click', () => { passwordSection.classList.remove('hidden'); passwordInput.focus(); });
       activateKeyBtn.addEventListener('click', () => {
-        const pwd = passwordInput.value;
-        const decryptedKey = decryptBuiltinKey(pwd);
-        if (decryptedKey) {
-          engine.setApiKey(decryptedKey);
+        if (passwordInput.value === CORRECT_PASSWORD) {
+          engine.setApiKey(BUILTIN_KEY);
           setMode('deepseek');
           settingsModal.classList.add('hidden');
           passwordSection.classList.add('hidden');
