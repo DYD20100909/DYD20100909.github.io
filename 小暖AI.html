@@ -2,11 +2,16 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>小暖 · 有温度的陪伴</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* ---------- 全局样式 & 手机端优化 ---------- */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
     :root {
       --bg-from: #f8fafc; --bg-to: #f1f5f9; --header: #ffffff;
       --msg-user-bg: #3b82f6; --msg-user-text: #ffffff;
@@ -17,6 +22,7 @@
       --ai-btn-bg: #8b5cf6; --ai-btn-text: #ffffff;
       --ai-gradient: linear-gradient(135deg, #8b5cf6, #a78bfa);
       --ai-inactive-gradient: linear-gradient(135deg, #9ca3af, #b0b7c3);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
     body.dark {
       --bg-from: #0f172a; --bg-to: #1e293b; --header: #0f172a;
@@ -29,29 +35,34 @@
       --ai-gradient: linear-gradient(135deg, #7c3aed, #a78bfa);
       --ai-inactive-gradient: linear-gradient(135deg, #6b7280, #9ca3af);
     }
-    * { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
     body {
       background: linear-gradient(to bottom, var(--bg-from), var(--bg-to));
       color: var(--msg-ai-text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
       -webkit-overflow-scrolling: touch;
+      padding-bottom: var(--safe-bottom);
     }
     .header-bg { background: var(--header); border-bottom: 1px solid var(--border); }
     .msg-user { background: var(--msg-user-bg); color: var(--msg-user-text); }
-    .msg-ai { background: var(--msg-ai-bg); color: var(--msg-ai-text); border: 1px solid var(--border); line-height: 1.5; }
+    .msg-ai { background: var(--msg-ai-bg); color: var(--msg-ai-text); border: 1px solid var(--border); line-height: 1.5; position: relative; }
     .input-area { background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); }
     .footer-bg { background: var(--footer); border-top: 1px solid var(--border); }
     .text-secondary { color: var(--secondary); }
     .quick-emotion-btn, .breath-btn {
       background: var(--quick-btn-bg); color: var(--quick-btn-text);
-      border-radius: 9999px; padding: 4px 12px; font-size: 0.75rem;
+      border-radius: 9999px; padding: 6px 14px;
+      font-size: 0.75rem;
       transition: transform 0.1s, background 0.2s;
       white-space: nowrap; border: 1px solid var(--border);
-      cursor: pointer; user-select: none; touch-action: manipulation;
+      cursor: pointer;
+      touch-action: manipulation;
     }
     .quick-emotion-btn:active, .breath-btn:active { transform: scale(0.96); }
-    .quick-emotion-btn.activated { background: var(--msg-user-bg); color: #fff; border-color: transparent; }
     .fade-in { animation: fadeInUp 0.2s ease-out; will-change: opacity, transform; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .copy-tooltip {
@@ -62,7 +73,7 @@
     }
     .copy-tooltip.show { opacity: 1; }
     .ai-float-btn {
-      position: fixed; bottom: 5rem; right: 1rem; z-index: 40;
+      position: fixed; bottom: calc(5rem + var(--safe-bottom)); right: 1rem; z-index: 40;
       background: var(--ai-btn-bg); color: var(--ai-btn-text);
       width: 3.2rem; height: 3.2rem; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -71,29 +82,40 @@
     }
     .ai-float-btn:active { transform: scale(0.95); }
     .ai-float-btn.inactive { background: #94a3b8; box-shadow: none; }
+    /* 朗读按钮 - 明显可见 */
     .speak-btn {
-      position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
-      opacity: 0.3; transition: opacity 0.15s; color: var(--secondary);
-      background: none; border: none; font-size: 0.85rem; cursor: pointer;
-      pointer-events: auto;
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      opacity: 0.75;
+      background: rgba(128, 128, 128, 0.1);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary);
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      touch-action: manipulation;
     }
-    .msg-ai:hover .speak-btn, .speak-btn:focus { opacity: 1; }
+    .speak-btn:active { transform: scale(0.92); opacity: 1; }
     .speaking .speak-btn { opacity: 1; color: #8b5cf6; }
     .memory-card { background: var(--quick-btn-bg); border-radius: 1rem; padding: 0.75rem; margin: 0.5rem 0; font-size: 0.8rem; }
     .memory-item { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
-    .memory-item:last-child { border-bottom: none; }
     .weather-card {
       background: linear-gradient(135deg, #fdf2f8, #eff6ff); border-radius: 1rem; padding: 0.75rem;
       margin-bottom: 0.75rem; font-size: 0.8rem; text-align: center; color: #475569;
-      transition: opacity 0.2s;
     }
     body.dark .weather-card { background: linear-gradient(135deg, #1e293b, #334155); color: #cbd5e1; }
     .mute-active { color: #ef4444 !important; animation: pulse 1.2s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-    ::-webkit-scrollbar { width: 4px; background: transparent; }
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
-    body.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
-    /* 呼吸模态框 - 完美同步动画 */
+    /* 呼吸悬浮模态框 - 完美动画 */
     .breath-modal {
       position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
       z-index: 200; display: flex; align-items: center; justify-content: center;
@@ -103,7 +125,7 @@
     .breath-card {
       background: var(--msg-ai-bg); border-radius: 2rem; padding: 2rem 1.5rem;
       text-align: center; box-shadow: 0 25px 40px rgba(0,0,0,0.3);
-      width: 280px; max-width: 85vw; transition: transform 0.2s ease;
+      width: 280px; max-width: 85vw;
     }
     .breath-circle {
       width: 120px; height: 120px; margin: 0 auto 1.5rem;
@@ -113,16 +135,20 @@
       transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
       will-change: transform;
     }
-    .breath-circle.inhale { transform: scale(1.4); background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.8), #7c3aed); box-shadow: 0 0 35px rgba(139,92,246,0.8); }
+    .breath-circle.inhale { transform: scale(1.45); background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.8), #7c3aed); box-shadow: 0 0 35px rgba(139,92,246,0.8); }
     .breath-circle.exhale { transform: scale(1); }
     .breath-text { font-size: 1.2rem; font-weight: 500; margin: 0.75rem 0; color: var(--msg-ai-text); }
-    .breath-close { margin-top: 1rem; background: var(--border); border: none; border-radius: 2rem; padding: 0.5rem 1.2rem; font-size: 0.8rem; cursor: pointer; color: var(--msg-ai-text); transition: transform 0.1s; }
+    .breath-close { margin-top: 1rem; background: var(--border); border: none; border-radius: 2rem; padding: 0.6rem 1.4rem; font-size: 0.9rem; cursor: pointer; transition: transform 0.1s; }
     .breath-close:active { transform: scale(0.96); }
     @media (max-width: 480px) {
-      .ai-float-btn { width: 2.8rem; height: 2.8rem; bottom: 4rem; right: 0.8rem; font-size: 1.3rem; }
-      .quick-emotion-btn, .breath-btn { padding: 2px 8px; font-size: 0.65rem; }
+      .ai-float-btn { width: 2.8rem; height: 2.8rem; bottom: calc(4rem + var(--safe-bottom)); right: 0.8rem; }
+      .quick-emotion-btn, .breath-btn { padding: 5px 10px; font-size: 0.7rem; }
       .msg-user, .msg-ai { max-width: 90% !important; }
+      .speak-btn { width: 36px; height: 36px; right: 6px; bottom: 6px; font-size: 1rem; opacity: 0.85; }
+      footer .flex { gap: 8px; }
+      #voice-btn, #send-btn { padding: 10px; }
     }
+    footer { padding-bottom: calc(0.5rem + var(--safe-bottom)); }
     .custom-dialog {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: var(--msg-ai-bg); color: var(--msg-ai-text);
@@ -132,68 +158,68 @@
     .custom-dialog-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
     .custom-dialog button { background: var(--msg-user-bg); color: #fff; border: none; border-radius: 2rem; padding: 0.5rem 1.5rem; margin: 0.5rem; cursor: pointer; }
     .custom-dialog .cancel-btn { background: var(--border); color: var(--msg-ai-text); }
+    #messages-container { scroll-behavior: smooth; }
   </style>
 </head>
 <body>
   <header class="header-bg shadow-sm py-3 px-4 flex justify-between items-center">
     <div class="flex items-center gap-2"><i class="fas fa-heart text-pink-500 text-xl"></i><h1 class="text-lg font-semibold">小暖</h1><span id="time-tag" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full"></span></div>
     <div class="flex items-center gap-1 sm:gap-2">
-      <button id="ai-top-entry" style="background:var(--ai-inactive-gradient);color:white;padding:4px 14px;border-radius:9999px;font-size:0.8rem;display:flex;align-items:center;gap:4px;border:none;cursor:pointer;"><i class="fas fa-brain"></i><span id="ai-top-text">AI</span></button>
-      <button id="settings-btn" class="text-gray-500 dark:text-gray-300 p-1"><i class="fas fa-cog"></i></button>
-      <button id="theme-btn" class="text-gray-500 dark:text-gray-300 p-1"><i id="theme-icon" class="fas fa-moon"></i></button>
-      <button id="mute-btn" class="text-gray-500 dark:text-gray-300 p-1"><i class="fas fa-bell-slash"></i></button>
-      <button id="clear-btn" class="text-gray-500 hover:text-red-500 p-1"><i class="fas fa-trash-alt"></i></button>
+      <button id="ai-top-entry" style="background:var(--ai-inactive-gradient);color:white;padding:6px 14px;border-radius:9999px;font-size:0.8rem;display:flex;align-items:center;gap:4px;border:none;cursor:pointer;"><i class="fas fa-brain"></i><span id="ai-top-text">AI</span></button>
+      <button id="settings-btn" class="text-gray-500 dark:text-gray-300 p-2"><i class="fas fa-cog"></i></button>
+      <button id="theme-btn" class="text-gray-500 dark:text-gray-300 p-2"><i id="theme-icon" class="fas fa-moon"></i></button>
+      <button id="mute-btn" class="text-gray-500 dark:text-gray-300 p-2"><i class="fas fa-bell-slash"></i></button>
+      <button id="clear-btn" class="text-gray-500 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
     </div>
   </header>
-  <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm text-secondary flex items-center gap-2 border-b">
+  <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-3 py-2 text-xs sm:text-sm text-secondary flex items-center gap-2 border-b">
     <span id="status-emoji">🌸</span><span id="status-text" class="flex-1" style="cursor:pointer;">暖言模式 · 本地陪伴</span><span id="mode-badge" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">本地陪伴</span>
   </div>
-  <main id="messages-container" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3" style="overscroll-behavior:contain;"></main>
+  <main id="messages-container" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3"></main>
   <div id="weather-card" class="weather-card hidden"></div>
   <div class="px-3 sm:px-4 py-2 flex gap-2 overflow-x-auto" id="quick-emotions">
     <button class="quick-emotion-btn" data-emotion="sad">😢 难过</button><button class="quick-emotion-btn" data-emotion="anxious">😰 焦虑</button><button class="quick-emotion-btn" data-emotion="tired">😴 疲惫</button>
     <button class="quick-emotion-btn" data-emotion="lonely">🥺 孤独</button><button class="quick-emotion-btn" data-emotion="happy">😊 开心</button><button class="quick-emotion-btn" data-emotion="grateful">🙏 感恩</button>
     <button id="breath-btn" class="breath-btn">🌬️ 呼吸</button>
   </div>
-  <!-- 呼吸悬浮模态框 -->
+  <!-- 呼吸模态框 -->
   <div id="breath-modal" class="breath-modal"><div class="breath-card"><div id="breath-circle-modal" class="breath-circle"></div><div id="breath-text-modal" class="breath-text">吸气……</div><button id="breath-close-modal" class="breath-close">关闭</button></div></div>
   <footer class="footer-bg p-2 sm:p-3">
-    <div id="queue-hint" class="text-xs text-secondary text-center hidden mb-1">小暖还在想上一句...</div>
-    <div class="flex items-center gap-2"><button id="voice-btn" class="text-gray-500 dark:text-gray-300 p-2"><i class="fas fa-microphone"></i></button><input id="user-input" type="text" placeholder="说点什么吧..." class="input-area flex-1 border rounded-full px-3 py-1.5 sm:px-4 sm:py-2 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" autocomplete="off"><button id="send-btn" class="bg-pink-500 text-white rounded-full p-2 sm:px-4 sm:py-2 hover:bg-pink-600 transition disabled:opacity-50"><i class="fas fa-paper-plane"></i></button></div>
+    <div id="queue-hint" class="text-xs text-secondary text-center hidden mb-1">小暖正在思考...</div>
+    <div class="flex items-center gap-2">
+      <button id="voice-btn" class="text-gray-500 dark:text-gray-300 p-3"><i class="fas fa-microphone fa-lg"></i></button>
+      <input id="user-input" type="text" placeholder="说点什么吧..." class="input-area flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" autocomplete="off">
+      <button id="send-btn" class="bg-pink-500 text-white rounded-full p-3 hover:bg-pink-600 transition disabled:opacity-50"><i class="fas fa-paper-plane"></i></button>
+    </div>
   </footer>
   <div class="text-center text-xs py-1" style="color:var(--secondary);opacity:0.6;">Designed by DYD</div>
   <div id="ai-float-btn" class="ai-float-btn inactive"><i class="fas fa-brain"></i></div>
   <div id="settings-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4"><div class="bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 w-full max-w-sm shadow-xl"><h2 class="text-lg font-bold mb-3">AI 设置</h2><p class="text-sm text-secondary mb-3">填入 DeepSeek API Key，或使用内置密钥（需密码激活）。</p><div id="own-key-section" class="flex gap-2 mb-2"><input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm"><button id="save-key-btn" class="bg-pink-500 text-white px-4 py-2 rounded-full text-sm flex-shrink-0">保存</button></div><div id="or-section" class="text-center text-sm text-secondary my-2">或</div><button id="use-builtin-btn" class="w-full bg-purple-400 text-white py-2 rounded-full text-sm mb-2">使用内置密钥</button><div id="password-section" class="mb-2 hidden"><input id="password-input" type="password" placeholder="输入使用密码" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm"><p class="text-xs text-gray-400 mt-1">密码验证通过后将自动激活内置密钥</p><div class="flex gap-2 mt-2"><button id="activate-key-btn" class="bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm flex-1">验证并激活</button><button id="cancel-builtin-btn" class="bg-gray-300 dark:bg-gray-600 text-white px-4 py-1.5 rounded-full text-sm">返回自备密钥</button></div><span id="password-error" class="text-red-500 text-xs mt-1 hidden">密码错误</span></div><button id="close-settings" class="w-full bg-gray-300 dark:bg-gray-600 px-4 py-2 rounded-full text-sm mt-3">关闭</button><p class="text-xs text-gray-400 mt-2 text-center">🔒 密钥仅在本地加密存储，不会上传。</p><div id="memory-card-container" class="mt-4"></div></div></div>
   <script>
     (function(){
-      // ---------- 工具函数 ----------
+      // ---------- 加密工具 ----------
       const encrypt = (text) => btoa(String.fromCharCode(...new TextEncoder().encode(text)));
       const decrypt = (encoded) => new TextDecoder().decode(Uint8Array.from(atob(encoded), c => c.charCodeAt(0)));
-      const escapeHtml = (str) => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
-      
-      // 内置密钥（仅演示）
       const _k1 = atob('c2stN2Iw'); const _k2 = atob('Yjk1MzEzYWFh'); const _k3 = atob('NDYxMWI2MzZiZTU3OWRhOTBkYzQ=');
       const BUILTIN_KEY = _k1 + _k2 + _k3;
       const CORRECT_PASSWORD = atob('RFlEMjA=') + atob('MTAwOTA5');
       
-      // ---------- 语音朗读：移除括号内容（但不影响情绪检测）----------
+      // ---------- 语音相关 (括号内容不朗读，但情绪检测仍参考括号) ----------
       let gentleVoice = null;
       let activeBubble = null, isSpeaking = false;
       function findGentleVoice() { const voices = speechSynthesis.getVoices(); gentleVoice = voices.find(v => v.lang.startsWith('zh') && (v.name.includes('Xiaoxiao')||v.name.includes('Tingting')||v.name.includes('Female'))) || voices.find(v => v.lang.startsWith('zh')); }
       speechSynthesis.onvoiceschanged = findGentleVoice; setTimeout(findGentleVoice, 300);
       function stopSpeaking() { if(activeBubble) { activeBubble.classList.remove('speaking'); activeBubble.style.boxShadow = ''; activeBubble = null; } isSpeaking = false; const btn = document.getElementById('mute-btn'); if(btn) { btn.innerHTML = '<i class="fas fa-bell-slash"></i>'; btn.classList.remove('mute-active'); } }
-      // 移除所有括号及其内容（支持嵌套），仅用于朗读，不用于情绪判断
-      function removeBracketsForSpeech(text) {
-        if(!text) return text;
-        let result = text, prev;
-        do { prev = result; result = result.replace(/（(?:[^（）]|（[^（）]*）)*）|\((?:[^()]|\([^()]*\))*\)/g, ''); } while(result !== prev);
-        return result;
-      }
-      function speakText(text, bubble) {
+      function getPureMessageText(bubble) { if (!bubble) return ''; let text = ''; for (let node of bubble.childNodes) { if (node.nodeType === Node.TEXT_NODE) text += node.textContent; else if (node.nodeType === Node.ELEMENT_NODE && !node.classList?.contains('copy-tooltip') && !node.classList?.contains('speak-btn')) text += node.textContent; } return text.trim(); }
+      function removeBracketsForSpeech(text) { if(!text) return text; let result = text, prev; do { prev = result; result = result.replace(/（(?:[^（）]|（[^（）]*）)*）|\((?:[^()]|\([^()]*\))*\)/g, ''); } while(result !== prev); return result; }
+      function speakText(bubble) {
+        if(!bubble) return;
         speechSynthesis.cancel(); stopSpeaking();
-        if(bubble) { bubble.style.boxShadow = '0 0 8px rgba(139,92,246,0.5)'; bubble.classList.add('speaking'); activeBubble = bubble; isSpeaking = true; const btn = document.getElementById('mute-btn'); if(btn) { btn.innerHTML = '<i class="fas fa-volume-up"></i>'; btn.classList.add('mute-active'); } }
-        let clean = text.replace(/[\u{1F300}-\u{1FAFF}]/gu,''); // 移除emoji
-        clean = removeBracketsForSpeech(clean); // 移除括号内容（不朗读）
+        bubble.style.boxShadow = '0 0 8px rgba(139,92,246,0.5)'; bubble.classList.add('speaking'); activeBubble = bubble; isSpeaking = true;
+        const btn = document.getElementById('mute-btn'); if(btn) { btn.innerHTML = '<i class="fas fa-volume-up"></i>'; btn.classList.add('mute-active'); }
+        let rawText = getPureMessageText(bubble);
+        let clean = rawText.replace(/[\u{1F300}-\u{1FAFF}]/gu,'');
+        clean = removeBracketsForSpeech(clean);
         clean = clean.replace(/\s+/g,' ').trim();
         if(!clean) return;
         const u = new SpeechSynthesisUtterance(clean);
@@ -204,7 +230,7 @@
         setTimeout(() => speechSynthesis.speak(u), 30);
       }
       
-      // ---------- 完整情感引擎 (400+ 情绪词，2000+ 回复组合) ----------
+      // ---------- 完整情感引擎 (400+ 情绪词 & 2000+ 回复组合) ----------
       class CompanionEngine {
         constructor() {
           this.chatHistory = []; this.maxHistory = 12; this.userProfile = {}; this.apiKey = ''; this.isGenerating = false; this.aiFailCount = 0;
@@ -238,7 +264,7 @@
           if (stored) { try { this.chatHistory = JSON.parse(stored); } catch { this.chatHistory = []; } }
         }
         setApiKey(key) { this.apiKey = key; if (key) localStorage.setItem('deepseekApiKeyEnc', encrypt(key)); else localStorage.removeItem('deepseekApiKeyEnc'); }
-        async testApiKey(key) { try { const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'user',content:'hi'}], max_tokens:5, stream:false }), signal:AbortSignal.timeout(6000) }); return res.ok; } catch { return false; } }
+        async testApiKey(key) { try { const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'user',content:'hi'}], max_tokens:5, stream:false }), signal:AbortSignal.timeout(5000) }); return res.ok; } catch { return false; } }
         buildTemplates() {
           const hOpen = ["你的快乐感染了我","太棒了","真为你开心","笑容是最好的礼物","听到你开心我也跟着高兴","这份喜悦值得被记住","真好呀","你的幸福就是我的幸福"];
           const hBody = ["谢谢你和我分享你的快乐。","希望这样的时刻多一点。","好的事情总是值得庆祝的。","这一刻的开心是真实的。","你笑起来一定很好看。"];
@@ -289,7 +315,6 @@
         }
         hasDoubleNegation(seg) { return /(?:没|不).{0,2}(?:不|没)/.test(seg); }
         detectEmotion(text) {
-          // 情绪检测基于原始文本（包含括号内容，括号内的情感词依然有效）
           const lower = text.toLowerCase(); const hits = [];
           for (const [emotion, keywords] of Object.entries(this.emotionKeywords)) {
             for (const kw of keywords) { let idx = lower.indexOf(kw); while (idx !== -1) { hits.push({ emotion, keyword: kw, index: idx }); idx = lower.indexOf(kw, idx+1); } }
@@ -334,7 +359,41 @@
           const emoji = pool.emojis[Math.floor(Math.random()*pool.emojis.length)];
           return `${opening} ${body} ${ending} ${emoji}`;
         }
-        async callDeepSeekStream(userMessage, onChunk) { if (!this.apiKey || this.aiFailCount>=2) return null; try { const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${this.apiKey}`}, body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'system',content:this.buildSystemPrompt()}, ...this.chatHistory.slice(-this.maxHistory), {role:'user',content:userMessage}], temperature:0.8, max_tokens:200, stream:true }) }); if(!res.ok) return { error:'auth' }; const reader = res.body.getReader(); let full=''; while(true){ const {done,value}=await reader.read(); if(done)break; const chunk=new TextDecoder().decode(value); const lines=chunk.split('\n'); for(const line of lines){ if(line.startsWith('data:')){ const data=line.slice(5).trim(); if(data==='[DONE]')break; try{ const json=JSON.parse(data); const content=json.choices?.[0]?.delta?.content||''; if(content){ full+=content; onChunk(full); } }catch{} } } } this.aiFailCount=0; return { text:full.trim() }; } catch(e){ this.aiFailCount++; return null; } }
+        async callDeepSeekStream(userMessage, onChunk) {
+          if (!this.apiKey || this.aiFailCount >= 2) return null;
+          try {
+            const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+              method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${this.apiKey}`},
+              body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'system',content:this.buildSystemPrompt()}, ...this.chatHistory.slice(-this.maxHistory), {role:'user',content:userMessage}], temperature:0.8, max_tokens:200, stream:true })
+            });
+            if (!res.ok) return { error: res.status===401||res.status===403 ? 'auth' : 'api_error' };
+            const reader = res.body.getReader();
+            let full = '';
+            while(true){
+              const {done,value} = await reader.read();
+              if(done) break;
+              const chunk = new TextDecoder().decode(value);
+              const lines = chunk.split('\n');
+              for(const line of lines){
+                if(line.startsWith('data:')){
+                  const data = line.slice(5).trim();
+                  if(data === '[DONE]') break;
+                  try{
+                    const json = JSON.parse(data);
+                    const content = json.choices?.[0]?.delta?.content || '';
+                    if(content){ full += content; onChunk(full); }
+                  }catch{}
+                }
+              }
+            }
+            this.aiFailCount = 0;
+            return { text: full.trim() };
+          } catch(e){
+            console.warn('DeepSeek error', e);
+            this.aiFailCount++;
+            return { error: 'network' };
+          }
+        }
         saveToHistory(user, assistant) {
           if(user !== '__system_idle__') this.chatHistory.push({ role:'user', content:user }, { role:'assistant', content:assistant });
           else this.chatHistory.push({ role:'assistant', content:assistant });
@@ -345,7 +404,7 @@
       }
       const engine = new CompanionEngine();
       
-      // ---------- UI 元素与消息处理 ----------
+      // ---------- UI 元素 ----------
       const messagesContainer = document.getElementById('messages-container');
       const userInput = document.getElementById('user-input');
       const sendBtn = document.getElementById('send-btn');
@@ -358,41 +417,154 @@
       const breathModal = document.getElementById('breath-modal'); const breathCircle = document.getElementById('breath-circle-modal'); const breathTextEl = document.getElementById('breath-text-modal');
       let processing = false, clearFlag = false; const queue = [];
       
-      function setMode(isAI) { if(isAI && engine.apiKey && engine.aiFailCount<2) { statusEmoji.textContent='🧠'; statusText.textContent='DeepSeek AI 模式 · 云端大脑'; modeBadge.textContent='云端大脑'; modeBadge.className='text-xs bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200 rounded-full px-2 py-0.5'; aiFloat.classList.remove('inactive'); aiTopText.textContent='AI ON'; aiTopEntry.style.background='var(--ai-gradient)'; } else { statusEmoji.textContent='🌸'; statusText.textContent='暖言模式 · 本地陪伴'; modeBadge.textContent='本地陪伴'; modeBadge.className='text-xs bg-pink-100 text-pink-700 dark:bg-pink-800 dark:text-pink-200 rounded-full px-2 py-0.5'; aiFloat.classList.add('inactive'); aiTopText.textContent='AI'; aiTopEntry.style.background='var(--ai-inactive-gradient)'; } }
+      // 模式切换 (带 UI 更新)
+      function setMode(isAI) {
+        const aiWorking = isAI && engine.apiKey && engine.aiFailCount < 2;
+        if(aiWorking) {
+          statusEmoji.textContent = '🧠';
+          statusText.innerHTML = 'DeepSeek AI 模式 · 云端大脑 <span style="font-size:0.7rem;">(点击可重试)</span>';
+          modeBadge.textContent = '云端大脑';
+          modeBadge.className = 'text-xs bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200 rounded-full px-2 py-0.5';
+          aiFloat.classList.remove('inactive');
+          aiTopText.textContent = 'AI ON';
+          aiTopEntry.style.background = 'var(--ai-gradient)';
+        } else {
+          statusEmoji.textContent = '🌸';
+          if(engine.aiFailCount >= 2 && engine.apiKey) statusText.innerHTML = '网络不太稳，已切回本地陪伴 <span style="font-size:0.7rem;">(点击重试AI)</span>';
+          else statusText.innerHTML = '暖言模式 · 本地陪伴 <span style="font-size:0.7rem;">(点击可尝试AI)</span>';
+          modeBadge.textContent = '本地陪伴';
+          modeBadge.className = 'text-xs bg-pink-100 text-pink-700 dark:bg-pink-800 dark:text-pink-200 rounded-full px-2 py-0.5';
+          aiFloat.classList.add('inactive');
+          aiTopText.textContent = 'AI';
+          aiTopEntry.style.background = 'var(--ai-inactive-gradient)';
+        }
+      }
       setMode(false);
       
-      function addMessage(role, content) { if(clearFlag) return null; const div = document.createElement('div'); div.className = `flex ${role==='user'?'justify-end':'justify-start'} fade-in`; const bubble = document.createElement('div'); bubble.className = role==='user' ? 'msg-user relative rounded-2xl rounded-tr-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm' : 'msg-ai relative rounded-2xl rounded-tl-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm'; bubble.textContent = content; const tooltip=document.createElement('div'); tooltip.className='copy-tooltip'; tooltip.textContent='已复制'; bubble.appendChild(tooltip); bubble.addEventListener('contextmenu', async e=>{ e.preventDefault(); await navigator.clipboard.writeText(bubble.textContent.trim()); tooltip.classList.add('show'); setTimeout(()=>tooltip.classList.remove('show'),800); }); if(role === 'assistant') { const sb=document.createElement('button'); sb.className='speak-btn'; sb.innerHTML='<i class="fas fa-volume-up"></i>'; sb.onclick=(e)=>{ e.stopPropagation(); speakText(bubble.textContent, bubble); }; bubble.appendChild(sb); } div.appendChild(bubble); messagesContainer.appendChild(div); if(messagesContainer.children.length > 120) messagesContainer.removeChild(messagesContainer.firstChild); messagesContainer.scrollTop = messagesContainer.scrollHeight; return bubble; }
+      // 添加消息 (带朗读按钮和复制)
+      function addMessage(role, content) {
+        if(clearFlag) return null;
+        const div = document.createElement('div'); div.className = `flex ${role==='user'?'justify-end':'justify-start'} fade-in`;
+        const bubble = document.createElement('div');
+        bubble.className = role==='user' ? 'msg-user relative rounded-2xl rounded-tr-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm' : 'msg-ai relative rounded-2xl rounded-tl-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm';
+        bubble.textContent = content;
+        const tooltip = document.createElement('div'); tooltip.className = 'copy-tooltip'; tooltip.textContent = '已复制'; bubble.appendChild(tooltip);
+        bubble.addEventListener('contextmenu', async e=>{ e.preventDefault(); await navigator.clipboard.writeText(getPureMessageText(bubble)); tooltip.classList.add('show'); setTimeout(()=>tooltip.classList.remove('show'),800); });
+        if(role === 'assistant') {
+          const sb = document.createElement('button'); sb.className = 'speak-btn'; sb.innerHTML = '<i class="fas fa-volume-up"></i>';
+          sb.onclick = (e) => { e.stopPropagation(); speakText(bubble); };
+          bubble.appendChild(sb);
+        }
+        div.appendChild(bubble);
+        messagesContainer.appendChild(div);
+        if(messagesContainer.children.length > 120) messagesContainer.removeChild(messagesContainer.firstChild);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return bubble;
+      }
       
-      async function processQueue() { processing = true; while(queue.length && !clearFlag) { const msg = queue.shift(); engine.isGenerating = true; sendBtn.disabled = true; const bubble = addMessage('assistant', '...'); let finalText = ''; const shouldUseAI = engine.apiKey && engine.aiFailCount < 2; if(shouldUseAI) { let partial = ''; const result = await engine.callDeepSeekStream(msg, (full) => { partial = full; if(bubble) bubble.textContent = full; }); if(result && result.text) finalText = result.text; else finalText = engine.generateWarmReply(msg); } else { finalText = engine.generateWarmReply(msg); } if(bubble) bubble.textContent = finalText; engine.extractFacts(msg); engine.saveToHistory(msg, finalText); engine.isGenerating = false; sendBtn.disabled = false; document.getElementById('queue-hint').classList.toggle('hidden', queue.length === 0); } processing = false; }
+      // 处理消息队列 (核心: AI失败时自动降级并给出提示)
+      async function processQueue() {
+        processing = true;
+        while(queue.length && !clearFlag) {
+          const msg = queue.shift();
+          engine.isGenerating = true; sendBtn.disabled = true;
+          const bubble = addMessage('assistant', '⋯');
+          let finalText = '';
+          const useAI = engine.apiKey && engine.aiFailCount < 2;
+          if(useAI) {
+            let partial = '';
+            const result = await engine.callDeepSeekStream(msg, (full) => { partial = full; if(bubble) bubble.textContent = full; });
+            if(result && result.text && result.text.length > 0) {
+              finalText = result.text;
+              engine.aiFailCount = 0;
+            } else {
+              // AI 调用失败: 切换到本地模式，并显示提示
+              if(engine.apiKey) engine.aiFailCount = Math.min(engine.aiFailCount+1, 2);
+              finalText = engine.generateWarmReply(msg);
+              // 追加一条系统提示消息（在气泡之后单独显示）
+              const failMsg = engine.aiFailCount >= 2 ? '⚠️ AI 连接失败，已自动切换为本地暖言模式。点击顶部状态栏可重试 AI。' : '⚠️ AI 响应异常，已使用本地回复。';
+              addMessage('assistant', failMsg);
+              engine.saveToHistory('__system_fail__', failMsg);
+              setMode(false);
+            }
+          } else {
+            finalText = engine.generateWarmReply(msg);
+          }
+          if(bubble) bubble.textContent = finalText;
+          engine.extractFacts(msg);
+          engine.saveToHistory(msg, finalText);
+          engine.isGenerating = false; sendBtn.disabled = false;
+          document.getElementById('queue-hint').classList.toggle('hidden', queue.length === 0);
+        }
+        processing = false;
+      }
       function enqueue(msg) { if(!msg) return; queue.push(msg); document.getElementById('queue-hint').classList.remove('hidden'); if(!processing) processQueue(); }
       
-      // ---------- 呼吸动画：吸气放大 -> 屏息 -> 呼气缩小，文字同步 ----------
+      // 呼吸动画 (完美循环)
       let breathTimer = null;
       function stopBreath() { if(breathTimer) clearTimeout(breathTimer); breathCircle.classList.remove('inhale', 'exhale'); }
-      function startBreath() { stopBreath(); let step = 0; const phases = [ { text: '吸气…… 4秒', classAdd: 'inhale', duration: 4000 }, { text: '屏息…… 7秒', classAdd: '', duration: 7000 }, { text: '呼气…… 8秒', classAdd: 'exhale', duration: 8000 } ]; function next() { if(!breathModal.classList.contains('active')) return; const p = phases[step % 3]; breathTextEl.textContent = p.text; breathCircle.classList.remove('inhale', 'exhale'); if(p.classAdd) breathCircle.classList.add(p.classAdd); breathTimer = setTimeout(() => { step++; next(); }, p.duration); } next(); }
+      function startBreath() {
+        stopBreath();
+        let step = 0;
+        const phases = [
+          { text: '吸气…… 4秒', classAdd: 'inhale', duration: 4000 },
+          { text: '屏息…… 7秒', classAdd: '', duration: 7000 },
+          { text: '呼气…… 8秒', classAdd: 'exhale', duration: 8000 }
+        ];
+        function next() {
+          if(!breathModal.classList.contains('active')) return;
+          const p = phases[step % 3];
+          breathTextEl.textContent = p.text;
+          breathCircle.classList.remove('inhale', 'exhale');
+          if(p.classAdd) breathCircle.classList.add(p.classAdd);
+          breathTimer = setTimeout(() => { step++; next(); }, p.duration);
+        }
+        next();
+      }
       document.getElementById('breath-btn').onclick = () => { breathModal.classList.add('active'); startBreath(); };
       document.getElementById('breath-close-modal').onclick = () => { breathModal.classList.remove('active'); stopBreath(); };
       breathModal.addEventListener('click', (e) => { if(e.target === breathModal) { breathModal.classList.remove('active'); stopBreath(); } });
       
-      // ---------- 事件绑定 ----------
+      // 其他事件绑定
       sendBtn.onclick = () => { const t=userInput.value.trim(); if(t && !engine.isGenerating) { addMessage('user', t); userInput.value=''; enqueue(t); userInput.focus(); } };
       userInput.addEventListener('keypress', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendBtn.click(); } });
       document.getElementById('quick-emotions').addEventListener('click', (e) => { const btn=e.target.closest('.quick-emotion-btn'); if(!btn) return; const texts={ sad:'我今天很难过，', anxious:'我有点焦虑，', tired:'我好累，', lonely:'我觉得好孤独，', happy:'我今天挺开心的，', grateful:'真的很感谢你，' }; if(texts[btn.dataset.emotion]) { userInput.value=texts[btn.dataset.emotion]; userInput.focus(); } });
       clearBtn.onclick = () => { if(confirm('清空所有聊天记录？')) { speechSynthesis.cancel(); stopSpeaking(); clearFlag=true; engine.chatHistory=[]; engine.userProfile={}; localStorage.removeItem('chatHistory'); localStorage.removeItem('userProfile'); messagesContainer.innerHTML=''; clearFlag=false; addMessage('assistant', '记忆全部清空，我们从新开始吧。'); engine.saveToHistory('__system_reset__','记忆全部清空，我们从新开始吧。'); queue.length=0; processing=false; engine.isGenerating=false; } };
       muteBtn.onclick = () => { speechSynthesis.cancel(); stopSpeaking(); };
-      voiceBtn.onclick = () => { const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ alert('浏览器不支持语音输入'); return; } const rec=new SR(); rec.lang='zh-CN'; rec.interimResults=false; rec.onerror=()=>{ const toast=document.createElement('div'); toast.className='text-xs text-red-500 mt-1'; toast.textContent='麦克风授权失败'; userInput.parentNode.appendChild(toast); setTimeout(()=>toast.remove(),2000); }; rec.onresult=e=>{ const v=e.results[0][0].transcript.trim(); if(v){ userInput.value=v; sendBtn.click(); } }; rec.start(); };
+      voiceBtn.onclick = () => { const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ alert('浏览器不支持语音输入'); return; } const rec=new SR(); rec.lang='zh-CN'; rec.interimResults=false; rec.onerror=()=>{ const toast=document.createElement('div'); toast.className='text-xs text-red-500 mt-1 bg-white/80 p-1 rounded'; toast.textContent='请检查麦克风权限'; userInput.parentNode.appendChild(toast); setTimeout(()=>toast.remove(),2500); }; rec.onresult=e=>{ const v=e.results[0][0].transcript.trim(); if(v){ userInput.value=v; sendBtn.click(); } }; rec.start(); };
       
+      // 主题切换
       const applyTheme=(dark)=>{ document.body.classList.toggle('dark',dark); themeIcon.className=dark?'fas fa-sun':'fas fa-moon'; localStorage.setItem('darkMode',dark?'1':'0'); };
       const storedDark=localStorage.getItem('darkMode'); const sysDark=window.matchMedia('(prefers-color-scheme:dark)').matches; applyTheme(storedDark==='1'||(storedDark===null&&sysDark));
       themeBtn.onclick=()=>applyTheme(!document.body.classList.contains('dark'));
       
-      // 设置面板
+      // AI重试逻辑
+      async function retryAI() {
+        if(!engine.apiKey) {
+          addMessage('assistant', '请先在设置中配置 API Key 或使用内置密钥。');
+          return;
+        }
+        statusText.textContent = '正在尝试重新连接 AI ...';
+        const valid = await engine.testApiKey(engine.apiKey);
+        if(valid) {
+          engine.aiFailCount = 0;
+          setMode(true);
+          addMessage('assistant', '✅ AI 连接恢复！现在使用云端大脑模式。');
+        } else {
+          engine.aiFailCount = 2;
+          setMode(false);
+          addMessage('assistant', '❌ AI 连接仍然失败，请检查密钥或网络，将继续使用本地陪伴。');
+        }
+      }
+      statusText.addEventListener('click', () => { if(engine.aiFailCount >= 2 || (engine.apiKey && !(engine.aiFailCount<2))) retryAI(); });
+      
+      // 设置面板逻辑
       const settingsModal = document.getElementById('settings-modal'); const closeSettings = document.getElementById('close-settings'); const saveKeyBtn = document.getElementById('save-key-btn'); const apiKeyInput = document.getElementById('api-key-input'); const useBuiltin = document.getElementById('use-builtin-btn'); const activateKey = document.getElementById('activate-key-btn'); const passwordInput = document.getElementById('password-input'); const passwordSection = document.getElementById('password-section'); const passwordError = document.getElementById('password-error'); const cancelBuiltin = document.getElementById('cancel-builtin-btn'); const ownKeySection = document.getElementById('own-key-section'); const orSection = document.getElementById('or-section');
       aiFloat.onclick = () => settingsModal.classList.remove('hidden'); aiTopEntry.onclick = () => settingsModal.classList.remove('hidden'); document.getElementById('settings-btn').onclick = () => { renderMemoryCards(); settingsModal.classList.remove('hidden'); };
       closeSettings.onclick = () => settingsModal.classList.add('hidden');
       useBuiltin.onclick = () => { ownKeySection.classList.add('hidden'); orSection.classList.add('hidden'); useBuiltin.classList.add('hidden'); passwordSection.classList.remove('hidden'); };
       cancelBuiltin.onclick = () => { passwordSection.classList.add('hidden'); ownKeySection.classList.remove('hidden'); orSection.classList.remove('hidden'); useBuiltin.classList.remove('hidden'); };
-      saveKeyBtn.onclick = async () => { const key = apiKeyInput.value.trim(); if(!key) { if(engine.apiKey) { if(confirm('清除AI密钥，切换回本地模式？')) { engine.setApiKey(''); setMode(false); settingsModal.classList.add('hidden'); } } else settingsModal.classList.add('hidden'); return; } const ok = await engine.testApiKey(key); if(ok) { engine.setApiKey(key); engine.aiFailCount=0; setMode(true); settingsModal.classList.add('hidden'); } else alert('密钥无效'); apiKeyInput.value=''; };
+      saveKeyBtn.onclick = async () => { const key = apiKeyInput.value.trim(); if(!key) { if(engine.apiKey) { if(confirm('清除AI密钥，切换回本地模式？')) { engine.setApiKey(''); engine.aiFailCount=0; setMode(false); settingsModal.classList.add('hidden'); } } else settingsModal.classList.add('hidden'); return; } const ok = await engine.testApiKey(key); if(ok) { engine.setApiKey(key); engine.aiFailCount=0; setMode(true); settingsModal.classList.add('hidden'); } else alert('密钥无效'); apiKeyInput.value=''; };
       activateKey.onclick = () => { if(passwordInput.value === CORRECT_PASSWORD) { engine.setApiKey(BUILTIN_KEY); engine.aiFailCount=0; setMode(true); settingsModal.classList.add('hidden'); passwordSection.classList.add('hidden'); ownKeySection.classList.remove('hidden'); orSection.classList.remove('hidden'); useBuiltin.classList.remove('hidden'); passwordInput.value=''; } else { passwordError.classList.remove('hidden'); passwordInput.value=''; } };
       function renderMemoryCards() { const container = document.getElementById('memory-card-container'); if(!container) return; container.innerHTML = ''; const profile = engine.userProfile; if(Object.keys(profile).length===0) { container.innerHTML = '<p class="text-xs text-gray-400">暂无记忆</p>'; return; } const card = document.createElement('div'); card.className = 'memory-card'; const items = []; if(profile.name) items.push({ label:'名字', value:profile.name, key:'name' }); if(profile.pet) items.push({ label:'宠物', value:profile.pet, key:'pet' }); if(profile.age) items.push({ label:'年龄', value:profile.age, key:'age' }); if(profile.lifeEvent) items.push({ label:'经历', value:profile.lifeEvent, key:'lifeEvent' }); items.forEach(item => { const row = document.createElement('div'); row.className = 'memory-item'; const span = document.createElement('span'); span.textContent = `${item.label}: ${item.value}`; const btn = document.createElement('button'); btn.textContent = '✕'; btn.className = 'text-xs text-red-400'; btn.onclick = () => { delete engine.userProfile[item.key]; localStorage.setItem('userProfile', JSON.stringify(engine.userProfile)); renderMemoryCards(); }; row.appendChild(span); row.appendChild(btn); card.appendChild(row); }); container.appendChild(card); }
       
@@ -402,7 +574,7 @@
       
       // 空闲提醒
       let idleTimer; function resetIdleTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(() => { if(!processing && !queue.length && !engine.isGenerating) { const msg = "我还在哦。不想说话也没关系，我在这里。"; addMessage('assistant', msg); engine.saveToHistory('__system_idle__', msg); } }, 180000); }
-      window.addEventListener('touchstart', resetIdleTimer); window.addEventListener('click', resetIdleTimer); resetIdleTimer();
+      window.addEventListener('touchstart', resetIdleTimer, { passive: true }); window.addEventListener('click', resetIdleTimer); resetIdleTimer();
       const updateTimeTag = () => { const h=new Date().getHours(); document.getElementById('time-tag').textContent=h<12?'☀️ 上午':h<18?'🌤️ 下午':'🌙 晚上'; }; updateTimeTag(); setInterval(updateTimeTag,60000);
       
       let resizeTimer; if(window.visualViewport) window.visualViewport.addEventListener('resize', () => { if(resizeTimer) return; resizeTimer = setTimeout(() => { const kh = window.innerHeight - window.visualViewport.height; messagesContainer.style.paddingBottom = Math.max(0, kh) + 'px'; messagesContainer.scrollTop = messagesContainer.scrollHeight; resizeTimer = null; }, 100); });
