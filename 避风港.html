@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>避风港 · 陪伴小站</title>
+    <title>避风港 · 小暖陪伴</title>
     <style>
         /* ========== CSS变量与主题 ========== */
         :root {
@@ -18,7 +18,6 @@
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --mood-selected-bg: #5A4A38; --mood-selected-text: #F0E6D5;
         }
-        /* 浅色主题覆盖变量 */
         [data-theme="light"] {
             --bg: #f5f2ee; --card-bg: #fffef9; --card-border: #e0d9ce; --text: #2c2b28;
             --text-secondary: #5a4a3a; --accent: #8b6b52; --accent-light: #b89a77;
@@ -30,7 +29,6 @@
             --breathe-ring: #8b6b52; --seed-border: #e0d9ce;
             --mood-selected-bg: #d9c7b2; --mood-selected-text: #2c2b28;
         }
-        /* 全局重置与动画 */
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background: var(--bg); font-family: 'Segoe UI','Noto Sans SC',sans-serif;
@@ -44,7 +42,6 @@
         .hero h1 { font-size:1.75rem; font-weight:350; color:var(--text); }
         .hero .leaf-icon { color:var(--leaf); }
         .hero .subtitle { color:var(--text-secondary); font-size:0.9rem; }
-        /* 卡片样式 */
         .card {
             background:var(--card-bg); border-radius:var(--radius); padding:1.4rem 1.5rem;
             margin-bottom:1.5rem; box-shadow:var(--shadow); border:1px solid var(--card-border);
@@ -54,7 +51,6 @@
             font-size:1.1rem; font-weight:460; color:var(--text); margin-bottom:1rem;
             border-left:3px solid var(--accent-light); padding-left:12px; display:flex; align-items:center; gap:8px;
         }
-        /* 按钮样式 */
         .btn {
             background:var(--accent-bg); border:1px solid transparent; padding:9px 18px; border-radius:40px;
             font-size:0.84rem; font-weight:440; color:var(--btn-primary-text); cursor:pointer;
@@ -67,7 +63,6 @@
         .btn-primary { background:var(--btn-primary); color:var(--btn-primary-text); font-weight:480; border:1px solid var(--btn-border); }
         .btn-primary:hover { background:var(--btn-primary-hover); border-color:var(--btn-border-hover); }
         .btn.mood-selected { background:var(--mood-selected-bg); color:var(--mood-selected-text); border-color:var(--selected-border); }
-        /* 表单输入 */
         .input-mini {
             width:100%; padding:10px 15px; border-radius:28px; border:1px solid var(--card-border);
             background:var(--bg); font-size:0.85rem; font-family:inherit; color:var(--text);
@@ -75,10 +70,8 @@
         }
         .input-mini:focus { border-color:var(--accent-light); }
         .feedback-text { font-size:0.82rem; color:var(--feedback); margin-top:10px; padding-top:8px; border-top:1px dashed var(--divider); }
-        /* 折叠面板 */
         .collapsible { display:none; margin-top:10px; }
         .collapsible.open { display:block; }
-        /* 身体部位选择器 */
         .body-map { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
         .body-dot {
             background:var(--accent-bg); border:1.5px solid var(--accent-light); border-radius:50%;
@@ -86,22 +79,18 @@
             min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center;
         }
         .body-dot.selected { background:var(--selected-bg); border-color:var(--selected-border); color:var(--selected-text); }
-        /* 接地练习步骤 */
         .sense-step { margin-bottom:0.8rem; background:var(--bg); border-radius:1rem; padding:0.8rem 1rem; }
         .sense-fields { display:flex; flex-direction:column; gap:5px; margin-top:6px; }
         .sense-item { display:flex; align-items:center; gap:7px; font-size:0.82rem; }
         .sense-input { flex:1; padding:7px 11px; border-radius:40px; border:1px solid var(--card-border); background:var(--card-bg); font-size:0.8rem; color:var(--text); outline:none; }
-        /* 双栏对话卡片 */
         .dialog-dual { display:flex; flex-wrap:wrap; gap:1rem; margin:0.6rem 0; }
         .dialog-card { flex:1; min-width:200px; background:var(--bg); border-radius:1rem; padding:0.9rem 1rem; }
-        /* 种子短语 */
         .seed-phrase {
             background:var(--accent-bg); border-radius:20px; padding:6px 13px; font-size:0.76rem;
             display:inline-flex; align-items:center; margin:4px 4px 0 0; cursor:pointer;
             color:var(--btn-primary-text); border:1px solid var(--seed-border); min-height:44px;
         }
         .seed-phrase:hover { background:var(--accent-hover); border-color:var(--gold); }
-        /* 舒缓蒙层 */
         .soothe-overlay {
             position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20,18,15,0.9);
             display:none; align-items:center; justify-content:center; z-index:2000; pointer-events:auto;
@@ -109,20 +98,18 @@
         .soothe-glow { font-size:5rem; animation:pulse 2s ease-in-out infinite; }
         @keyframes pulse { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
         .soothe-text { color:var(--text); font-size:0.9rem; margin-top:8px; }
-        /* 石头沉没按钮 */
         .stone-btn {
             background:var(--btn-primary); border:1px solid var(--btn-border); padding:12px 24px;
             border-radius:40px; font-size:1rem; color:var(--btn-primary-text); cursor:pointer;
             display:inline-flex; align-items:center; gap:8px; min-height:48px;
         }
-        /* AI聊天机器人浮动窗 */
         .ai-chatbot { position:fixed; bottom:calc(22px + var(--safe-bottom)); right:22px; z-index:1000; }
         .chat-toggle {
             background:var(--btn-primary); width:54px; height:54px; border-radius:50%;
             display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.4);
             cursor:pointer; font-size:24px; transition:all 0.2s; color:var(--gold); border:none; outline:none;
         }
-        .chat-toggle:hover { background:var(--accent-hover); }
+        .chat-toggle:hover { background:var(--accent-hover); transform:scale(1.02); }
         .chat-window {
             position:fixed; bottom:calc(90px + var(--safe-bottom)); right:22px; width:310px;
             background:var(--card-bg); border-radius:22px; box-shadow:0 10px 30px rgba(0,0,0,0.5);
@@ -130,11 +117,11 @@
             max-height:350px; transition: bottom 0.2s, max-height 0.2s;
         }
         .chat-window.open { display:flex; }
-        .chat-header { background:var(--accent-bg); padding:11px 16px; color:var(--text); display:flex; justify-content:space-between; }
+        .chat-header { background:var(--accent-bg); padding:11px 16px; color:var(--text); display:flex; justify-content:space-between; align-items:center; font-weight:500; }
         .chat-messages { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; background:var(--bg); -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
-        .msg { max-width:88%; padding:8px 13px; border-radius:18px; font-size:0.79rem; }
-        .user-msg { background:var(--accent-bg); align-self:flex-end; }
-        .ai-msg { background:var(--card-bg); border:1px solid var(--card-border); align-self:flex-start; }
+        .msg { max-width:88%; padding:8px 13px; border-radius:18px; font-size:0.79rem; line-height:1.4; }
+        .user-msg { background:var(--accent-bg); align-self:flex-end; border-bottom-right-radius:4px; }
+        .ai-msg { background:var(--card-bg); border:1px solid var(--card-border); align-self:flex-start; border-bottom-left-radius:4px; }
         .typing-indicator { display:flex; gap:4px; padding:8px 13px; align-self:flex-start; background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; }
         .typing-indicator span { width:6px; height:6px; border-radius:50%; background:var(--text-secondary); animation: typingBounce 1.4s infinite; }
         .typing-indicator span:nth-child(2) { animation-delay:0.2s; }
@@ -142,14 +129,14 @@
         @keyframes typingBounce { 0%,80%,100%{transform:scale(0.6);} 40%{transform:scale(1);} }
         .chat-input-area { display:flex; border-top:1px solid var(--divider); padding:8px 10px; background:var(--card-bg); }
         .chat-input { flex:1; border:none; padding:9px 12px; border-radius:40px; background:var(--bg); font-size:0.8rem; color:var(--text); outline:none; }
-        .chat-send { background:none; border:none; font-size:1.1rem; margin-left:6px; cursor:pointer; color:var(--gold); min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; }
+        .chat-send { background:none; border:none; font-size:1.1rem; margin-left:6px; cursor:pointer; color:var(--gold); min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; transition:transform 0.1s; }
+        .chat-send:active { transform:scale(0.9); }
         .chat-send:disabled { opacity:0.4; pointer-events:none; }
-        .clickable-action { user-select:none; cursor:pointer; }
-        /* 颜色主题面板 */
-        .color-picker-btn { position:fixed; bottom:calc(22px + var(--safe-bottom)); left:22px; width:44px; height:44px; background:var(--btn-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:999; color:var(--gold); border:none; outline:none; }
+        .clickable-action { user-select:none; cursor:pointer; text-decoration:underline; color:var(--accent-light); }
+        .color-picker-btn { position:fixed; bottom:calc(22px + var(--safe-bottom)); left:22px; width:44px; height:44px; background:var(--btn-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:999; color:var(--gold); border:none; outline:none; transition:transform 0.1s; }
+        .color-picker-btn:active { transform:scale(0.95); }
         .color-panel { position:fixed; bottom:calc(80px + var(--safe-bottom)); left:22px; background:var(--card-bg); border-radius:1.2rem; padding:1rem; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:998; display:none; flex-direction:column; gap:10px; border:1px solid var(--card-border); }
         .color-panel.open { display:flex; }
-        /* 呼吸圆环 */
         .breathe-circle {
             width:100px; height:100px; border-radius:50%; border:4px solid var(--breathe-ring);
             margin:15px auto; display:flex; align-items:center; justify-content:center;
@@ -158,16 +145,14 @@
         .breathe-circle.inhale { transform:scale(1.3); border-color:var(--leaf); }
         .breathe-circle.hold { transform:scale(1.3); border-color:var(--gold); }
         .breathe-circle.exhale { transform:scale(1); border-color:var(--accent-light); }
-        /* 休息蒙层 */
         .rest-overlay {
             position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20,18,15,0.9);
             display:none; align-items:center; justify-content:center; z-index:3000; pointer-events:auto;
         }
         .rest-overlay.open { display:flex; }
         .rest-box { background:var(--card-bg); border-radius:2rem; padding:2rem; text-align:center; min-width:260px; }
-        .rest-timer { font-size:3.5rem; font-weight:300; color:var(--gold); margin:1rem 0; }
+        .rest-timer { font-size:3.5rem; font-weight:300; color:var(--gold); margin:1rem 0; font-family: monospace; }
         .rest-cancel { margin-top:1rem; background:transparent; border:1px solid var(--accent-light); color:var(--text); padding:8px 20px; border-radius:30px; cursor:pointer; }
-        /* 发泄模态框 */
         .vent-modal {
             position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(20,18,15,0.9);
             display:none; align-items:center; justify-content:center; z-index:2500;
@@ -176,12 +161,11 @@
         .vent-box { background:var(--card-bg); border-radius:var(--radius); padding:1.8rem; width:90%; max-width:500px; border:1px solid var(--card-border); }
         .vent-box textarea { width:100%; height:200px; background:var(--bg); border:1px solid var(--card-border); border-radius:1rem; color:var(--text); padding:12px; font-size:0.9rem; resize:vertical; outline:none; max-height:40vh; }
         .vent-close { margin-top:12px; background:var(--accent-bg); border:none; color:var(--text); padding:8px 20px; border-radius:30px; cursor:pointer; }
-        /* 底部计数和签名 */
         .usage-counter { position:fixed; bottom:calc(6px + var(--safe-bottom)); left:10px; font-size:0.6rem; color:var(--text-secondary); opacity:0.75; z-index:10000; pointer-events:none; }
         .author-signature { position:fixed; bottom:calc(4px + var(--safe-bottom)); right:8px; font-size:0.58rem; color:var(--text-secondary); opacity:0.7; z-index:10000; pointer-events:none; }
         .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
         .step-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:8px; }
-        /* 移动端适配 */
+        .chat-footer-hint { font-size:0.65rem; text-align:center; padding:6px 8px; color:var(--text-secondary); border-top:1px solid var(--divider); background:var(--card-bg); }
         @media (max-width:520px) {
             .btn { padding:8px 14px; font-size:0.8rem; }
             .breathe-circle { width:80px; height:80px; }
@@ -196,13 +180,12 @@
 </head>
 <body>
     <div class="container" id="mainContainer">
-        <!-- 头部欢迎语 -->
         <div class="hero">
-            <h1><span class="leaf-icon" aria-hidden="true">🌿</span> 避风港 · 此刻陪伴</h1>
-            <p class="subtitle">你不需要一次性变好。<br>你只需要在难受的时候，有一个地方可以来。</p>
+            <h1><span class="leaf-icon" aria-hidden="true">🌿</span> 避风港 · 小暖陪伴</h1>
+            <p class="subtitle">我是小暖，一个想陪你聊聊天的AI。<br>你不需要一次性变好，难受的时候，我都在这里。</p>
         </div>
 
-        <!-- 卡片1: 事实记录（身体/念头/行为） -->
+        <!-- 卡片1: 事实记录 -->
         <div class="card">
             <div class="card-title">📋 刚才发生了什么 · 只记事实</div>
             <div class="btn-group">
@@ -214,16 +197,11 @@
             <button id="generalNoteBtn" class="btn" style="margin-top:6px;">📝 记入</button>
             <div class="collapsible" id="bodyPicker">
                 <div class="body-map" id="bodyMap">
-                    <span class="body-dot" data-part="头部" tabindex="0" role="checkbox">头部</span>
-                    <span class="body-dot" data-part="脖子" tabindex="0" role="checkbox">脖子</span>
-                    <span class="body-dot" data-part="肩膀" tabindex="0" role="checkbox">肩膀</span>
-                    <span class="body-dot" data-part="胸口" tabindex="0" role="checkbox">胸口</span>
-                    <span class="body-dot" data-part="胃部" tabindex="0" role="checkbox">胃部</span>
-                    <span class="body-dot" data-part="腹部" tabindex="0" role="checkbox">腹部</span>
-                    <span class="body-dot" data-part="手臂" tabindex="0" role="checkbox">手臂</span>
-                    <span class="body-dot" data-part="腿部" tabindex="0" role="checkbox">腿部</span>
-                    <span class="body-dot" data-part="后背" tabindex="0" role="checkbox">后背</span>
-                    <span class="body-dot" data-part="其他" tabindex="0" role="checkbox">其他</span>
+                    <span class="body-dot" data-part="头部">头部</span><span class="body-dot" data-part="脖子">脖子</span>
+                    <span class="body-dot" data-part="肩膀">肩膀</span><span class="body-dot" data-part="胸口">胸口</span>
+                    <span class="body-dot" data-part="胃部">胃部</span><span class="body-dot" data-part="腹部">腹部</span>
+                    <span class="body-dot" data-part="手臂">手臂</span><span class="body-dot" data-part="腿部">腿部</span>
+                    <span class="body-dot" data-part="后背">后背</span><span class="body-dot" data-part="其他">其他</span>
                 </div>
                 <div class="selected-parts-hint" id="selectedPartsHint"></div>
                 <button class="btn" id="bodyClear">清除选择</button>
@@ -240,7 +218,7 @@
             <div id="journalFeedback" class="feedback-text">点击上方按钮，记录此刻的感觉。</div>
         </div>
 
-        <!-- 卡片2: 感官接地练习 -->
+        <!-- 卡片2: 感官接地 -->
         <div class="card">
             <div class="card-title">🌍 拉我回地面 · 感官接地</div>
             <button id="startGrounding" class="btn btn-primary">🧘 我现在有点麻 / 空 / 飘</button>
@@ -248,7 +226,7 @@
             <div id="groundingMsg" class="feedback-text"></div>
         </div>
 
-        <!-- 卡片3: 过去的我 / 自我关怀 -->
+        <!-- 卡片3: 与过去的自己对话 -->
         <div class="card">
             <div class="card-title">🕰️ 当时的我……</div>
             <div class="dialog-dual">
@@ -258,17 +236,17 @@
             <label>当时我做了什么？</label><textarea id="pastAction" rows="1" class="input-mini" placeholder="比如：假装没事，或者躲起来"></textarea>
             <label>现在我想对当时的我说……</label><textarea id="messageToPast" rows="2" class="input-mini" placeholder="写下你想对那个自己说的话……"></textarea>
             <div style="margin-top:6px;">
-                <span class="seed-phrase" data-text="那不是你的错" tabindex="0">🌱 那不是你的错</span>
-                <span class="seed-phrase" data-text="你当时已经做得很好了" tabindex="0">🌸 你当时已经做得很好了</span>
-                <span class="seed-phrase" data-text="我原谅你了" tabindex="0">🌿 我原谅你了</span>
-                <span class="seed-phrase" data-text="我现在陪着你" tabindex="0">💛 我现在陪着你</span>
+                <span class="seed-phrase" data-text="那不是你的错">🌱 那不是你的错</span>
+                <span class="seed-phrase" data-text="你当时已经做得很好了">🌸 你当时已经做得很好了</span>
+                <span class="seed-phrase" data-text="我原谅你了">🌿 我原谅你了</span>
+                <span class="seed-phrase" data-text="我现在陪着你">💛 我现在陪着你</span>
                 <button id="saveSeedBtn" class="btn" style="font-size:0.7rem; padding:5px 10px;">⭐ 收藏当前句子</button>
             </div>
             <button id="sendToPastBtn" class="btn btn-primary">💫 把这句话放在心里一分钟</button>
             <div id="pastFeedback" class="feedback-text"></div>
         </div>
 
-        <!-- 卡片4: 微小的一步行动 -->
+        <!-- 卡片4: 微小的一步 -->
         <div class="card">
             <div class="card-title">🕊️ 我可以只做一小步</div>
             <div class="step-grid" id="stepButtons">
@@ -282,7 +260,7 @@
                 <button class="btn step-btn" data-step="8">🤲 把手放在心口</button>
             </div>
             <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
-                <input type="text" id="customStepInput" class="input-mini" aria-label="自定义小步内容" placeholder="或者自己写一件事..." style="flex:1;">
+                <input type="text" id="customStepInput" class="input-mini" placeholder="或者自己写一件事..." style="flex:1;">
                 <button id="customStepBtn" class="btn">✨ 完成这一步</button>
             </div>
             <button id="fearBtn" class="btn" style="margin-top:6px;">😟 我害怕……先不做</button>
@@ -290,28 +268,19 @@
             <button id="resetStepsBtn" class="btn" style="font-size:0.65rem; margin-top:5px;">重置小步记录</button>
         </div>
 
-        <!-- 卡片5: 情绪温度计 + 历史记录 -->
+        <!-- 卡片5: 情绪温度 -->
         <div class="card">
             <div class="card-title">📊 此刻的情绪温度</div>
             <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                 <span>1分(还好)</span>
-                <button class="btn mood-btn" data-score="1" aria-label="心情1分" aria-pressed="false">1</button>
-                <button class="btn mood-btn" data-score="2" aria-label="心情2分" aria-pressed="false">2</button>
-                <button class="btn mood-btn" data-score="3" aria-label="心情3分" aria-pressed="false">3</button>
-                <button class="btn mood-btn" data-score="4" aria-label="心情4分" aria-pressed="false">4</button>
-                <button class="btn mood-btn" data-score="5" aria-label="心情5分" aria-pressed="false">5</button>
-                <span>5分(非常差)</span>
+                <button class="btn mood-btn" data-score="1">1</button><button class="btn mood-btn" data-score="2">2</button>
+                <button class="btn mood-btn" data-score="3">3</button><button class="btn mood-btn" data-score="4">4</button>
+                <button class="btn mood-btn" data-score="5">5</button><span>5分(非常差)</span>
             </div>
-            <div style="margin-top:10px;">
-                <textarea id="moodText" rows="2" class="input-mini" placeholder="可以写下此刻具体的感觉..."></textarea>
-                <button id="moodTextBtn" class="btn" style="margin-top:6px;">📝 记录感觉</button>
-            </div>
+            <div style="margin-top:10px;"><textarea id="moodText" rows="2" class="input-mini" placeholder="可以写下此刻具体的感觉..."></textarea><button id="moodTextBtn" class="btn" style="margin-top:6px;">📝 记录感觉</button></div>
             <div id="moodFeedback" class="feedback-text"></div>
             <div id="moodTrend" style="font-size:0.75rem; color:var(--text-secondary); margin-top:5px;"></div>
-            <details id="moodHistoryDetails" style="margin-top:8px; font-size:0.8rem; color:var(--text-secondary);">
-                <summary>📋 查看历史记录</summary>
-                <div id="moodHistoryList" style="max-height:150px; overflow-y:auto; margin-top:5px;"></div>
-            </details>
+            <details style="margin-top:8px; font-size:0.8rem;"><summary>📋 查看历史记录</summary><div id="moodHistoryList" style="max-height:150px; overflow-y:auto; margin-top:5px;"></div></details>
             <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
                 <button id="panicBtn" class="btn btn-primary">⚡ 我现在很崩溃</button>
                 <button id="exportJsonBtn" class="btn">📤 导出备份(JSON)</button>
@@ -325,141 +294,66 @@
             <div id="simpleGroundHint" aria-live="polite" style="margin-top:8px;"></div>
         </div>
 
-        <!-- 卡片6: 发泄窗口 -->
-        <div class="card">
-            <div class="card-title">💢 如果憋得慌，可以在这里喊出来</div>
-            <button id="ventBtn" class="btn btn-primary">打开发泄窗口</button>
-        </div>
-
+        <!-- 卡片6: 发泄 -->
+        <div class="card"><div class="card-title">💢 如果憋得慌，可以在这里喊出来</div><button id="ventBtn" class="btn btn-primary">打开发泄窗口</button></div>
         <!-- 卡片7: 呼吸引导 -->
-        <div class="card">
-            <div class="card-title">🌀 跟着呼吸，回到当下</div>
-            <div class="breathe-circle" id="breatheCircle">4-7-8</div>
-            <button id="startBreathe" class="btn btn-primary">开始呼吸引导</button>
-        </div>
-
+        <div class="card"><div class="card-title">🌀 跟着呼吸，回到当下</div><div class="breathe-circle" id="breatheCircle">4-7-8</div><button id="startBreathe" class="btn btn-primary">开始呼吸引导</button></div>
         <!-- 卡片8: 定时休息 -->
         <div class="card">
             <div class="card-title">⏳ 让自己休息一下</div>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <input type="number" id="restMinutes" class="input-mini" placeholder="分" min="0" max="120" style="width:80px;">
-                <span style="color:var(--text-secondary);">分</span>
-                <input type="number" id="restSeconds" class="input-mini" placeholder="秒" min="0" max="59" style="width:80px;">
-                <span style="color:var(--text-secondary);">秒</span>
+                <input type="number" id="restMinutes" class="input-mini" placeholder="分" min="0" max="120" style="width:80px;"><span>分</span>
+                <input type="number" id="restSeconds" class="input-mini" placeholder="秒" min="0" max="59" style="width:80px;"><span>秒</span>
                 <button id="startRestBtn" class="btn btn-primary">开始休息</button>
             </div>
             <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:5px;">输入分钟和秒，然后点击开始</p>
         </div>
-
-        <!-- 卡片9: 放下石头（象征性释放） -->
-        <div class="card">
-            <div class="card-title">🪨 放下一块石头</div>
-            <div id="stoneContainer" style="display:flex; gap:10px; align-items:flex-start;">
-                <textarea id="stoneText" rows="1" class="input-mini" placeholder="比如：今天室友没理我……" style="width:70%;"></textarea>
-                <button id="dropStoneBtn" class="stone-btn">🌊 沉下去</button>
-            </div>
-            <div id="stoneMsg" class="feedback-text" style="min-height:1.5em;"></div>
-        </div>
-
-        <!-- 危机求助热线卡片 -->
-        <div class="card" style="border-left:4px solid #C44;">
-            <div class="card-title" style="border-left-color:#C44;">🆘 如果你现在非常痛苦</div>
-            <p><strong>北京24小时心理援助热线：</strong><a href="tel:010-82951332">010-82951332</a></p>
-            <p><strong>希望24热线：</strong><a href="tel:400-161-9995">400-161-9995</a></p>
-            <p><strong>全国心理危机干预热线：</strong><a href="tel:800-810-1117">800-810-1117</a></p>
-        </div>
-
-        <div style="text-align:center; margin-top:2rem; color:var(--text-secondary); font-size:0.82rem;">
-            你不需要一次性变好。<br>你只需要在难受的时候，有一个地方可以来。
-        </div>
+        <!-- 卡片9: 放下石头 -->
+        <div class="card"><div class="card-title">🪨 放下一块石头</div><div style="display:flex; gap:10px; align-items:flex-start;"><textarea id="stoneText" rows="1" class="input-mini" placeholder="比如：今天室友没理我……" style="width:70%;"></textarea><button id="dropStoneBtn" class="stone-btn">🌊 沉下去</button></div><div id="stoneMsg" class="feedback-text" style="min-height:1.5em;"></div></div>
+        <!-- 危机热线 -->
+        <div class="card" style="border-left:4px solid #C44;"><div class="card-title" style="border-left-color:#C44;">🆘 如果你现在非常痛苦</div><p><strong>北京24小时心理援助热线：</strong><a href="tel:010-82951332">010-82951332</a></p><p><strong>希望24热线：</strong><a href="tel:400-161-9995">400-161-9995</a></p><p><strong>全国心理危机干预热线：</strong><a href="tel:800-810-1117">800-810-1117</a></p></div>
+        <div style="text-align:center; margin-top:2rem; color:var(--text-secondary); font-size:0.82rem;">你不需要一次性变好。<br>你只需要在难受的时候，有一个地方可以来。</div>
         <button id="clearAllDataBtn" class="btn" style="margin:1rem auto; display:block; font-size:0.7rem;">🧹 删除我的所有记录</button>
-        <a href="https://dyd20100909.github.io/%E5%B0%8F%E6%9A%96AI.html" target="_blank" class="btn" style="margin:0.5rem auto; display:block; font-size:0.7rem;">🌐 前往小暖AI</a>
+        <a href="https://dyd20100909.github.io/%E5%B0%8F%E6%9A%96AI.html" target="_blank" class="btn" style="margin:0.5rem auto; display:block; font-size:0.7rem;">🌐 前往小暖AI（更多陪伴）</a>
     </div>
 
-    <!-- 计数与签名 -->
     <div class="usage-counter" id="usageCounter">使用次数：1</div>
-    <div class="author-signature">作者 DYD</div>
+    <div class="author-signature">小暖 · 作者 DYD</div>
 
-    <!-- 舒缓蒙层（用于自我关怀消息） -->
-    <div id="sootheOverlay" class="soothe-overlay" role="dialog" aria-modal="true">
-        <div style="text-align:center;"><span class="soothe-glow">💛</span><p class="soothe-text">这句话，正在心里慢慢暖起来……</p></div>
-    </div>
-    <!-- 休息蒙层 -->
-    <div id="restOverlay" class="rest-overlay" role="dialog" aria-modal="true">
-        <div class="rest-box">
-            <div class="rest-label" id="restLabel">🛌 休息中……</div>
-            <div class="rest-timer" id="restTimerDisplay">05:00</div>
-            <button id="cancelRestBtn" class="rest-cancel">提前结束</button>
-            <button id="restMoreBtn" class="btn" style="margin-top:8px; display:none;">再休息 5 分钟</button>
-        </div>
-    </div>
-    <!-- 发泄模态框 -->
-    <div id="ventModal" class="vent-modal" role="dialog" aria-modal="true">
-        <div class="vent-box">
-            <h3>你可以在这里写下任何想骂的、委屈的话</h3>
-            <textarea id="ventArea" placeholder="不用顾忌，写出来就好……" maxlength="2000"></textarea>
-            <button id="ventCloseBtn" class="vent-close">关上这个窗口</button>
-            <button id="ventDestroyBtn" class="btn" style="margin-top:8px; background:#5A3A3A;">🗑️ 彻底销毁这段文字</button>
-        </div>
-    </div>
+    <!-- 蒙层 -->
+    <div id="sootheOverlay" class="soothe-overlay"><div style="text-align:center;"><span class="soothe-glow">💛</span><p class="soothe-text">这句话，正在心里慢慢暖起来……</p></div></div>
+    <div id="restOverlay" class="rest-overlay"><div class="rest-box"><div class="rest-label" id="restLabel">🛌 休息中……</div><div class="rest-timer" id="restTimerDisplay">05:00</div><button id="cancelRestBtn" class="rest-cancel">提前结束</button><button id="restMoreBtn" class="btn" style="margin-top:8px; display:none;">再休息 5 分钟</button></div></div>
+    <div id="ventModal" class="vent-modal"><div class="vent-box"><h3>你可以在这里写下任何想骂的、委屈的话</h3><textarea id="ventArea" placeholder="不用顾忌，写出来就好……" maxlength="2000"></textarea><button id="ventCloseBtn" class="vent-close">关上这个窗口</button><button id="ventDestroyBtn" class="btn" style="margin-top:8px; background:#5A3A3A;">🗑️ 彻底销毁这段文字</button></div></div>
 
-    <!-- AI聊天机器人（小暖） -->
-    <div class="ai-chatbot">
-        <button class="chat-toggle" id="chatToggle" aria-label="打开AI陪伴对话">💬</button>
-        <div class="chat-window" id="chatWindow">
-            <div class="chat-header"><span>✨ 听你说 · 小小陪伴</span><button id="clearChatBtn" class="btn" style="font-size:0.7rem; padding:4px 10px;">清空</button></div>
-            <div class="chat-messages" id="chatMessages"><div class="msg ai-msg">嗨，我在这里。今天过得怎么样？</div></div>
-            <div class="chat-input-area">
-                <input type="text" class="chat-input" id="chatInput" placeholder="说说话吧……" maxlength="500">
-                <button class="chat-send" id="chatSendBtn" aria-label="发送消息" disabled>➤</button>
-            </div>
-        </div>
-    </div>
+    <!-- AI聊天机器人 - 小暖 -->
+    <div class="ai-chatbot"><button class="chat-toggle" id="chatToggle" aria-label="打开小暖对话">💬</button><div class="chat-window" id="chatWindow"><div class="chat-header"><span>✨ 小暖 · 听你说</span><button id="clearChatBtn" class="btn" style="font-size:0.7rem; padding:4px 10px;">清空</button></div><div class="chat-messages" id="chatMessages"><div class="msg ai-msg">🌼 我是小暖，一个想陪你聊聊天的AI。你可以和我分享任何心情，我都在这里。另外，页面下方有“前往小暖AI”的链接，那里也有我陪伴你～</div></div><div class="chat-input-area"><input type="text" class="chat-input" id="chatInput" placeholder="说说话吧……" maxlength="500"><button class="chat-send" id="chatSendBtn" aria-label="发送消息" disabled>➤</button></div><div class="chat-footer-hint">💬 也可以点击底部“前往小暖AI”获得更多陪伴</div></div></div>
     <div id="chatLiveRegion" aria-live="polite" class="sr-only"></div>
 
-    <!-- 颜色主题设置按钮 -->
-    <button class="color-picker-btn" id="colorBtn" aria-label="打开颜色与主题设置">🎨</button>
-    <div class="color-panel" id="colorPanel">
-        <div><label>背景</label><input type="color" id="bgPicker" value="#1E1E1E"></div>
-        <div><label>卡片</label><input type="color" id="cardPicker" value="#2B2520"></div>
-        <div><label>文字</label><input type="color" id="textPicker" value="#F0E6D5"></div>
-        <button class="btn" id="toggleThemeBtn">切换浅色主题</button>
-        <button class="btn" id="resetColors">恢复默认深色</button>
-        <button class="btn" id="toggleSilentMode">安静陪伴模式</button>
-    </div>
+    <button class="color-picker-btn" id="colorBtn" aria-label="主题设置">🎨</button>
+    <div class="color-panel" id="colorPanel"><div><label>背景</label><input type="color" id="bgPicker" value="#1E1E1E"></div><div><label>卡片</label><input type="color" id="cardPicker" value="#2B2520"></div><div><label>文字</label><input type="color" id="textPicker" value="#F0E6D5"></div><button class="btn" id="toggleThemeBtn">切换浅色主题</button><button class="btn" id="resetColors">恢复默认深色</button><button class="btn" id="toggleSilentMode">安静陪伴模式</button></div>
 
     <script>
-        // ==================== 整体初始化与工具函数 ====================
-        (function() {
+        (function(){
+            // ==================== 初始化与工具函数 ====================
             const html = document.documentElement;
             const $ = id => document.getElementById(id);
-            // localStorage 键名常量
             const KEYS = {
                 VISIT:'haven-visit', BG:'haven-bg', CARD:'haven-card', TEXT:'haven-text',
                 THEME:'haven-theme', NICK:'haven-nick', STEPS:'haven-steps', MOOD:'haven-mood-log',
                 SEEDS:'haven-seeds', SILENT:'haven-silent', JOURNAL:'haven-journal-notes',
-                MOOD_TEXT:'haven-mood-text-log', REST_ACTIVE:'haven-rest-active',
-                USER_PROFILE:'haven-user-profile'
+                MOOD_TEXT:'haven-mood-text-log', USER_PROFILE:'haven-user-profile'
             };
-            // DeepSeek API 配置（请替换为自己的有效key）
             const DEEPSEEK_API_KEY = 'sk-b37b29cd534b469fac7bbe20159cc782';
             const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
-            // 转义HTML特殊字符
             const escapeHtml = s => { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; };
-            // 显示短暂提示消息
             function showToast(msg,d=2000){ const t=document.createElement('div'); t.textContent=msg; t.style.cssText='position:fixed;bottom:25%;left:50%;transform:translateX(-50%);background:var(--card-bg);color:var(--text);padding:12px 24px;border-radius:30px;z-index:5000;font-size:0.9rem;'; document.body.appendChild(t); setTimeout(()=>t.remove(),d); }
-            // 确认对话框
             function showConfirm(msg,cb){ const o=document.createElement('div'); o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true'); o.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(20,18,15,0.8);z-index:5000;display:flex;align-items:center;justify-content:center;'; const b=document.createElement('div'); b.style.cssText='background:var(--card-bg);border-radius:1.5rem;padding:2rem;text-align:center;max-width:300px;color:var(--text);'; b.innerHTML=`<p>${escapeHtml(msg)}</p><button id="yy" class="btn btn-primary" style="margin-right:10px;">确定</button><button id="nn" class="btn">取消</button>`; o.appendChild(b); document.body.appendChild(o); const yes=document.getElementById('yy'); const no=document.getElementById('nn'); yes.focus(); yes.onclick=()=>{ o.remove(); cb(); }; no.onclick=()=>{ o.remove(); }; }
-
-            // 初次访问提示
-            if(!localStorage.getItem('haven-visited')){ showToast('欢迎来到避风港。一切数据只留在你的设备上。',4000); localStorage.setItem('haven-visited','1'); }
-            // 记录访问次数
+            if(!localStorage.getItem('haven-visited')){ showToast('欢迎来到避风港。我是小暖，陪你聊天。',4000); localStorage.setItem('haven-visited','1'); }
             try{ let c=parseInt(localStorage.getItem(KEYS.VISIT)||'0'); localStorage.setItem(KEYS.VISIT,++c); $('usageCounter').textContent='使用次数：'+c; }catch(e){}
 
-            // ==================== 主题与颜色 ====================
+            // 主题颜色
             function autoTheme(){ if(!localStorage.getItem(KEYS.THEME)){ const h=new Date().getHours(); html.setAttribute('data-theme',(h>=20||h<6)?'dark':'light'); } }
             autoTheme();
-
             const bgP=$('bgPicker'), cardP=$('cardPicker'), textP=$('textPicker');
             function applyColors(bg,card,text){ try{ html.style.setProperty('--bg',bg); html.style.setProperty('--card-bg',card); html.style.setProperty('--text',text); localStorage.setItem(KEYS.BG,bg); localStorage.setItem(KEYS.CARD,card); localStorage.setItem(KEYS.TEXT,text); }catch(e){} }
             function setTheme(theme){ html.setAttribute('data-theme',theme); localStorage.setItem(KEYS.THEME,theme); $('toggleThemeBtn').textContent=theme==='light'?'切换深色主题':'切换浅色主题'; if(theme==='light'){ applyColors('#f5f2ee','#fffef9','#2c2b28'); bgP.value='#f5f2ee'; cardP.value='#fffef9'; textP.value='#2c2b28'; }else{ applyColors('#1E1E1E','#2B2520','#F0E6D5'); bgP.value='#1E1E1E'; cardP.value='#2B2520'; textP.value='#F0E6D5'; } }
@@ -472,129 +366,78 @@
             document.addEventListener('click',(e)=>{ if(!$('colorPanel').contains(e.target)&&e.target!==$('colorBtn')) $('colorPanel').classList.remove('open'); });
             if(!localStorage.getItem(KEYS.THEME)) autoTheme();
             try{ const bg=localStorage.getItem(KEYS.BG)||'#1E1E1E',card=localStorage.getItem(KEYS.CARD)||'#2B2520',text=localStorage.getItem(KEYS.TEXT)||'#F0E6D5'; applyColors(bg,card,text); bgP.value=bg;cardP.value=card;textP.value=text; }catch(e){}
-
-            // 安静模式（降低亮度/饱和度）
             function updateSilentUI(){ const silent=localStorage.getItem(KEYS.SILENT)==='true'; $('toggleSilentMode').textContent=silent?'退出安静模式':'安静陪伴模式'; document.body.style.filter=silent?'brightness(0.8) saturate(0.5)':'none'; }
             $('toggleSilentMode').addEventListener('click',()=>{ const silent=localStorage.getItem(KEYS.SILENT)==='true'; localStorage.setItem(KEYS.SILENT,!silent); updateSilentUI(); });
             updateSilentUI();
-
-            // 清空所有数据按钮
             $('clearAllDataBtn').addEventListener('click',()=>{ showConfirm('确定要删除所有记录吗？',()=>{ Object.values(KEYS).forEach(k=>localStorage.removeItem(k)); showToast('已清除。'); setTimeout(()=>location.reload(),800); }); });
-
-            // 自适应文本域高度
             function autoResize(ta){ if(!ta)return; const r=parseInt(ta.getAttribute('rows'))||1,lh=parseFloat(getComputedStyle(ta).lineHeight)||20,mh=r*lh+20; ta.style.height='auto'; ta.style.height=Math.max(ta.scrollHeight,mh)+'px'; }
             document.querySelectorAll('textarea').forEach(ta=>{ autoResize(ta); ta.addEventListener('input',()=>autoResize(ta)); });
 
-            // ==================== 卡片1: 身体/念头/行为记录 ====================
+            // ========== 卡片1: 身体/念头/行为 ==========
             const bodyPicker=$('bodyPicker'), thoughtInput=$('thoughtInput'), actionPicker=$('actionPicker');
             function closeAll(){ [bodyPicker,thoughtInput,actionPicker].forEach(e=>e.classList.remove('open')); }
             $('bodyBtn').addEventListener('click',()=>{ if(!bodyPicker.classList.contains('open')){ closeAll(); bodyPicker.classList.add('open'); } else bodyPicker.classList.remove('open'); });
             $('thoughtBtn').addEventListener('click',()=>{ if(!thoughtInput.classList.contains('open')){ closeAll(); thoughtInput.classList.add('open'); $('thoughtField').focus(); } else thoughtInput.classList.remove('open'); });
             $('actionBtn').addEventListener('click',()=>{ if(!actionPicker.classList.contains('open')){ closeAll(); actionPicker.classList.add('open'); } else actionPicker.classList.remove('open'); });
-
             let selectedParts=[];
             let generalNotes=JSON.parse(localStorage.getItem(KEYS.JOURNAL)||'[]');
-            document.querySelectorAll('.body-dot').forEach(d=>{
-                d.addEventListener('click',()=>{
-                    d.classList.toggle('selected'); d.setAttribute('aria-checked',d.classList.contains('selected')?'true':'false');
-                    const p=d.dataset.part;
-                    if(d.classList.contains('selected')){ if(!selectedParts.includes(p)) selectedParts.push(p); }
-                    else selectedParts=selectedParts.filter(x=>x!==p);
-                    $('selectedPartsHint').textContent=selectedParts.length?'已选：'+selectedParts.join('、'):'';
-                    $('journalFeedback').innerHTML=selectedParts.length?`📌 身体：<strong>${selectedParts.join('、')}</strong> 有点紧。`:'📌 身体：没有记录也没关系。';
-                });
-                d.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); d.click(); } });
-            });
-            $('bodyClear').addEventListener('click',()=>{ selectedParts=[]; document.querySelectorAll('.body-dot').forEach(d=>{ d.classList.remove('selected'); d.setAttribute('aria-checked','false'); }); $('selectedPartsHint').textContent=''; $('journalFeedback').innerHTML='📌 身体：没有记录也没关系。'; });
+            document.querySelectorAll('.body-dot').forEach(d=>{ d.addEventListener('click',()=>{ d.classList.toggle('selected'); const p=d.dataset.part; if(d.classList.contains('selected')){ if(!selectedParts.includes(p)) selectedParts.push(p); } else selectedParts=selectedParts.filter(x=>x!==p); $('selectedPartsHint').textContent=selectedParts.length?'已选：'+selectedParts.join('、'):''; $('journalFeedback').innerHTML=selectedParts.length?`📌 身体：<strong>${selectedParts.join('、')}</strong> 有点紧。`:'📌 身体：没有记录也没关系。'; }); d.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); d.click(); } }); });
+            $('bodyClear').addEventListener('click',()=>{ selectedParts=[]; document.querySelectorAll('.body-dot').forEach(d=>{ d.classList.remove('selected'); }); $('selectedPartsHint').textContent=''; $('journalFeedback').innerHTML='📌 身体：没有记录也没关系。'; });
             $('thoughtConfirm').addEventListener('click',()=>{ const v=$('thoughtField').value.trim(); $('journalFeedback').innerHTML=v?`💭 念头："${escapeHtml(v)}"。`:'💭 没捕捉到念头也没关系。'; $('thoughtField').value=''; thoughtInput.classList.remove('open'); });
             document.querySelectorAll('.action-option').forEach(b=>{ b.addEventListener('click',()=>{ $('journalFeedback').innerHTML=`🕊️ 行为：${b.dataset.action}。`; actionPicker.classList.remove('open'); }); });
             $('generalNoteBtn').addEventListener('click',()=>{ const n=$('generalNote').value.trim(); if(n){ generalNotes.push({time:new Date().toISOString(),text:n}); localStorage.setItem(KEYS.JOURNAL,JSON.stringify(generalNotes)); $('journalFeedback').innerHTML=`📝 已记入："${escapeHtml(n)}"`; $('generalNote').value=''; autoResize($('generalNote')); } });
 
-            // ==================== 卡片2: 接地练习 ====================
+            // 接地练习
             const startGround=$('startGrounding'), groundSteps=$('groundingSteps'), groundMsg=$('groundingMsg');
             let tasteDone=false, groundingData=[];
             function buildGroundUI(){
-                groundSteps.innerHTML=`
-                    <div class="sense-step"><strong>👁️ 看5样东西</strong><div class="sense-fields" id="seeFields"></div></div>
-                    <div class="sense-step"><strong>🖐️ 摸4样东西</strong><div class="sense-fields" id="touchFields"></div></div>
-                    <div class="sense-step"><strong>👂 听3种声音</strong><div class="sense-fields" id="hearFields"></div></div>
-                    <div class="sense-step"><strong>👃 闻2种气味</strong><div class="sense-fields" id="smellFields"></div></div>
-                    <div class="sense-step"><strong>👄 尝1种味道</strong><button id="tasteBtn" class="btn">💧 我喝了口水</button></div>
-                    <button id="completeGround" class="btn btn-primary">✨ 完成接地</button>
-                    <button id="resetGround" class="btn">🔄 重置</button>`;
+                groundSteps.innerHTML=`<div class="sense-step"><strong>👁️ 看5样东西</strong><div class="sense-fields" id="seeFields"></div></div><div class="sense-step"><strong>🖐️ 摸4样东西</strong><div class="sense-fields" id="touchFields"></div></div><div class="sense-step"><strong>👂 听3种声音</strong><div class="sense-fields" id="hearFields"></div></div><div class="sense-step"><strong>👃 闻2种气味</strong><div class="sense-fields" id="smellFields"></div></div><div class="sense-step"><strong>👄 尝1种味道</strong><button id="tasteBtn" class="btn">💧 我喝了口水</button></div><button id="completeGround" class="btn btn-primary">✨ 完成接地</button><button id="resetGround" class="btn">🔄 重置</button>`;
                 [{id:'seeFields',n:5},{id:'touchFields',n:4},{id:'hearFields',n:3},{id:'smellFields',n:2}].forEach(c=>{ const cont=document.getElementById(c.id); for(let i=0;i<c.n;i++){ const d=document.createElement('div'); d.className='sense-item'; d.innerHTML=`<span>${i+1}</span><input class="sense-input">`; cont.appendChild(d); } });
-                groundSteps.addEventListener('click',e=>{
-                    if(e.target.id==='tasteBtn'){ tasteDone=true; e.target.textContent='✓ 已记录'; e.target.disabled=true; }
-                    if(e.target.id==='resetGround'){ groundSteps.querySelectorAll('.sense-input').forEach(i=>i.value=''); tasteDone=false; const tb=document.getElementById('tasteBtn'); if(tb){ tb.textContent='💧 我喝了口水'; tb.disabled=false; } groundMsg.innerHTML='已重置。'; groundingData=[]; }
-                    if(e.target.id==='completeGround'){
-                        const inputs=Array.from(groundSteps.querySelectorAll('.sense-input'));
-                        const filled=inputs.filter(i=>i.value.trim()).length+(tasteDone?1:0);
-                        if(filled>=5||tasteDone){ groundingData=inputs.map(i=>i.value.trim()).filter(v=>v); if(tasteDone) groundingData.push('尝了味道'); groundMsg.innerHTML='🧘 你完成了接地练习。<br><strong>现在，你在这里。</strong>'; groundSteps.style.display='none'; startGround.style.display='inline-block'; }
-                        else groundMsg.innerHTML='🌿 还差一点，不急。';
-                    }
-                });
+                groundSteps.addEventListener('click',e=>{ if(e.target.id==='tasteBtn'){ tasteDone=true; e.target.textContent='✓ 已记录'; e.target.disabled=true; } if(e.target.id==='resetGround'){ groundSteps.querySelectorAll('.sense-input').forEach(i=>i.value=''); tasteDone=false; const tb=document.getElementById('tasteBtn'); if(tb){ tb.textContent='💧 我喝了口水'; tb.disabled=false; } groundMsg.innerHTML='已重置。'; groundingData=[]; } if(e.target.id==='completeGround'){ const inputs=Array.from(groundSteps.querySelectorAll('.sense-input')); const filled=inputs.filter(i=>i.value.trim()).length+(tasteDone?1:0); if(filled>=5||tasteDone){ groundingData=inputs.map(i=>i.value.trim()).filter(v=>v); if(tasteDone) groundingData.push('尝了味道'); groundMsg.innerHTML='🧘 你完成了接地练习。<br><strong>现在，你在这里。</strong>'; groundSteps.style.display='none'; startGround.style.display='inline-block'; } else groundMsg.innerHTML='🌿 还差一点，不急。'; } });
             }
             startGround.addEventListener('click',()=>{ startGround.style.display='none'; groundSteps.style.display='block'; tasteDone=false; buildGroundUI(); });
 
-            // ==================== 卡片3: 与过去的自己对话 ====================
+            // 过去的我
             const pastW=$('pastWhat'), pastT=$('pastThought'), sendPast=$('sendToPastBtn'), msgPast=$('messageToPast'), pastFb=$('pastFeedback');
             let lastPastMemory=null;
             function syncH(){ requestAnimationFrame(()=>{ const h=Math.max(pastW.scrollHeight,pastT.scrollHeight,60); pastW.style.height=h+'px'; pastT.style.height=h+'px'; }); }
             pastW.addEventListener('input',syncH); pastT.addEventListener('input',syncH);
             document.querySelectorAll('.seed-phrase').forEach(s=>s.addEventListener('click',()=>msgPast.value=s.dataset.text));
-            sendPast.addEventListener('click',()=>{
-                const w=pastW.value.trim(),t=pastT.value.trim(),a=$('pastAction').value.trim(),m=msgPast.value.trim();
-                if(!m&&!w&&!t&&!a){ pastFb.innerHTML='请填写一些记忆或选择温柔句子。'; return; }
-                lastPastMemory={what:w,thought:t,action:a,message:m,time:new Date().toISOString()};
-                let sum=''; if(w) sum+=`发生了什么：${escapeHtml(w)}<br>`; if(t) sum+=`那时的想法：${escapeHtml(t)}<br>`; if(a) sum+=`你当时做了：${escapeHtml(a)}<br>`; if(m) sum+=`现在你想对那时的自己说：<strong>"${escapeHtml(m)}"</strong>。`;
-                pastFb.innerHTML=sum+' <br>这句话正在心里慢慢暖起来……';
-                pastW.value=''; pastT.value=''; $('pastAction').value=''; msgPast.value=''; syncH();
-                const overlay=$('sootheOverlay'); overlay.style.display='flex';
-                setTimeout(()=>{ overlay.style.opacity='0'; overlay.style.transition='opacity 0.8s'; setTimeout(()=>{ overlay.style.display='none'; overlay.style.opacity='1'; },800); },20000);
-            });
+            sendPast.addEventListener('click',()=>{ const w=pastW.value.trim(),t=pastT.value.trim(),a=$('pastAction').value.trim(),m=msgPast.value.trim(); if(!m&&!w&&!t&&!a){ pastFb.innerHTML='请填写一些记忆或选择温柔句子。'; return; } lastPastMemory={what:w,thought:t,action:a,message:m,time:new Date().toISOString()}; let sum=''; if(w) sum+=`发生了什么：${escapeHtml(w)}<br>`; if(t) sum+=`那时的想法：${escapeHtml(t)}<br>`; if(a) sum+=`你当时做了：${escapeHtml(a)}<br>`; if(m) sum+=`现在你想对那时的自己说：<strong>"${escapeHtml(m)}"</strong>。`; pastFb.innerHTML=sum+' <br>这句话正在心里慢慢暖起来……'; pastW.value=''; pastT.value=''; $('pastAction').value=''; msgPast.value=''; syncH(); const overlay=$('sootheOverlay'); overlay.style.display='flex'; setTimeout(()=>{ overlay.style.opacity='0'; overlay.style.transition='opacity 0.8s'; setTimeout(()=>{ overlay.style.display='none'; overlay.style.opacity='1'; },800); },20000); });
             $('sootheOverlay').addEventListener('click',()=>$('sootheOverlay').style.display='none');
             $('saveSeedBtn').addEventListener('click',()=>{ const t=msgPast.value.trim(); if(t){ const seeds=JSON.parse(localStorage.getItem(KEYS.SEEDS)||'[]'); if(!seeds.includes(t)){ seeds.push(t); localStorage.setItem(KEYS.SEEDS,JSON.stringify(seeds)); showToast('已收藏！'); } else showToast('已经收藏过了。'); } });
 
-            // ==================== 卡片4: 微小行动 ====================
+            // 微小行动
             const completedSteps=new Set(JSON.parse(localStorage.getItem(KEYS.STEPS)||'[]'));
             const stepBtns=document.querySelectorAll('.step-btn');
             function updateStepBtns(){ stepBtns.forEach(b=>{ if(completedSteps.has(b.dataset.step)){ b.style.opacity='0.6'; b.textContent='✓ '+b.textContent.replace('✓ ',''); } else { b.style.opacity='1'; b.textContent=b.textContent.replace('✓ ',''); } }); }
             updateStepBtns();
-            stepBtns.forEach(b=>{
-                b.addEventListener('click',()=>{
-                    const step=b.dataset.step;
-                    if(completedSteps.has(step)){ completedSteps.delete(step); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); $('stepFeedback').innerHTML='已取消这一步。'; }
-                    else { $('stepFeedback').innerHTML='你已经在照顾自己了。这一步就足够。'; completedSteps.add(step); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); }
-                });
-                b.addEventListener('contextmenu',e=>{ e.preventDefault(); if(completedSteps.has(b.dataset.step)){ completedSteps.delete(b.dataset.step); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); $('stepFeedback').innerHTML='已取消这一步。'; } });
-            });
+            stepBtns.forEach(b=>{ b.addEventListener('click',()=>{ const step=b.dataset.step; if(completedSteps.has(step)){ completedSteps.delete(step); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); $('stepFeedback').innerHTML='已取消这一步。'; } else { $('stepFeedback').innerHTML='你已经在照顾自己了。这一步就足够。'; completedSteps.add(step); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); } }); b.addEventListener('contextmenu',e=>{ e.preventDefault(); if(completedSteps.has(b.dataset.step)){ completedSteps.delete(b.dataset.step); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); $('stepFeedback').innerHTML='已取消这一步。'; } }); });
             $('fearBtn').addEventListener('click',()=>$('stepFeedback').innerHTML='😟 害怕很正常。可以不做。');
             $('resetStepsBtn').addEventListener('click',()=>{ completedSteps.clear(); localStorage.setItem(KEYS.STEPS,JSON.stringify([])); updateStepBtns(); $('stepFeedback').innerHTML='已重置小步记录。'; });
             $('customStepBtn').addEventListener('click',()=>{ const val=$('customStepInput').value.trim(); if(val){ $('stepFeedback').innerHTML=`你完成了"${escapeHtml(val)}"，这一步很温柔。`; $('customStepInput').value=''; } });
             $('customStepInput').addEventListener('keypress',e=>{ if(e.key==='Enter') $('customStepBtn').click(); });
 
-            // ==================== 卡片5: 情绪温度 & 记录 ====================
+            // 情绪温度
             const moodBtns=document.querySelectorAll('.mood-btn');
-            function updateMoodSelection(score){ moodBtns.forEach(b=>{ b.classList.remove('mood-selected'); b.setAttribute('aria-pressed','false'); }); if(score){ const selected=document.querySelector(`.mood-btn[data-score="${score}"]`); if(selected){ selected.classList.add('mood-selected'); selected.setAttribute('aria-pressed','true'); } } }
+            function updateMoodSelection(score){ moodBtns.forEach(b=>{ b.classList.remove('mood-selected'); }); if(score){ const selected=document.querySelector(`.mood-btn[data-score="${score}"]`); if(selected) selected.classList.add('mood-selected'); } }
             moodBtns.forEach(b=>{ b.addEventListener('click',()=>{ const s=parseInt(b.dataset.score); const today=new Date().toISOString().slice(0,10); const log=JSON.parse(localStorage.getItem(KEYS.MOOD)||'[]'); const filtered=log.filter(e=>!e.time.startsWith(today)); filtered.push({time:new Date().toISOString(),score:s}); localStorage.setItem(KEYS.MOOD,JSON.stringify(filtered)); $('moodFeedback').innerHTML=`今天的心情已记录为 ${s} 分。`; updateMoodSelection(s); showMoodTrend(); showMoodHistory(); }); });
             $('moodTextBtn').addEventListener('click',()=>{ const t=$('moodText').value.trim(); if(t){ const log=JSON.parse(localStorage.getItem(KEYS.MOOD_TEXT)||'[]'); log.push({time:new Date().toISOString(), text:t}); localStorage.setItem(KEYS.MOOD_TEXT,JSON.stringify(log)); $('moodFeedback').innerHTML=`已记录此刻感觉："${escapeHtml(t)}"`; $('moodText').value=''; autoResize($('moodText')); showMoodHistory(); } });
             function showMoodTrend(){ try{ const log=JSON.parse(localStorage.getItem(KEYS.MOOD)||'[]'); const now=Date.now(); const last7=log.filter(e=>new Date(e.time).getTime()>now-7*86400000).map(e=>Number(e.score)); if(last7.length){ const avg=(last7.reduce((a,b)=>a+b,0)/last7.length).toFixed(1); $('moodTrend').innerHTML=`近7天情绪：${last7.map(s=>'●').join('')} (均分${avg})`; } else $('moodTrend').innerHTML=''; } catch(e){} }
             showMoodTrend();
             function showMoodHistory(){ const moodLog=JSON.parse(localStorage.getItem(KEYS.MOOD)||'[]'); const moodTextLog=JSON.parse(localStorage.getItem(KEYS.MOOD_TEXT)||'[]'); const list=$('moodHistoryList'); if(!list) return; const combined=[]; moodLog.forEach(item=>{ combined.push({time:item.time, type:'分数', value:item.score+'分'}); }); moodTextLog.forEach(item=>{ combined.push({time:item.time, type:'感觉', value:item.text}); }); combined.sort((a,b)=>new Date(b.time)-new Date(a.time)); if(combined.length===0){ list.innerHTML='<p style="color:var(--text-secondary);">暂无历史记录。</p>'; return; } list.innerHTML=combined.slice(0,30).map(item=>{ const date=new Date(item.time).toLocaleString('zh-CN'); return `<div style="margin-bottom:4px;border-bottom:1px dashed var(--divider);padding-bottom:4px;"><span style="font-size:0.7rem;color:var(--text-secondary);">${date}</span><span style="margin-left:8px;font-weight:bold;">[${item.type}]</span> ${escapeHtml(item.value)}</div>`; }).join(''); }
             showMoodHistory();
-
-            // 崩溃快速应对：自动引导呼吸+接地
             $('panicBtn').addEventListener('click',()=>{ showToast('我们来做一次深呼吸，我会陪着你。'); if(!window.breatheRunning) $('startBreathe').click(); setTimeout(()=>{ if($('groundingSteps').style.display==='none') $('startGrounding').click(); },600); });
 
-            // ==================== 导出/导入备份 ====================
+            // 导出导入
             $('exportJsonBtn').addEventListener('click',()=>{ const exportData={ timestamp:new Date().toISOString(), selectedParts, generalNotes, groundingData, lastPastMemory, completedSteps:[...completedSteps], moodLog:JSON.parse(localStorage.getItem(KEYS.MOOD)||'[]'), moodTextLog:JSON.parse(localStorage.getItem(KEYS.MOOD_TEXT)||'[]'), seeds:JSON.parse(localStorage.getItem(KEYS.SEEDS)||'[]'), moodText:$('moodText').value.trim(), theme:html.getAttribute('data-theme')||'dark', silent:localStorage.getItem(KEYS.SILENT) }; const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`避风港备份_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); showToast('备份文件已导出。'); });
             $('exportTxtBtn').addEventListener('click',()=>{ const today=new Date().toISOString().slice(0,10); const moodLog=JSON.parse(localStorage.getItem(KEYS.MOOD)||'[]'); const moodTextLog=JSON.parse(localStorage.getItem(KEYS.MOOD_TEXT)||'[]'); const todayMoods=moodLog.filter(e=>e.time.startsWith(today)); const todayTexts=moodTextLog.filter(e=>e.time.startsWith(today)); const seeds=JSON.parse(localStorage.getItem(KEYS.SEEDS)||'[]'); const bodyPartText=selectedParts.length?selectedParts.join('、'):'无'; const todayNotes=generalNotes.filter(n=>n.time.startsWith(today)).map(n=>n.text); let pastText=''; if(lastPastMemory&&lastPastMemory.time.startsWith(today)) pastText=`发生了什么：${lastPastMemory.what}\n那时的想法：${lastPastMemory.thought}\n当时我做了：${lastPastMemory.action}\n想对那时的我说：${lastPastMemory.message}`; else pastText='无'; const groundText=groundingData.length?groundingData.join('；'):'无'; let text=`避风港今日记录 (${today})\n【身体紧张部位】${bodyPartText}\n【通用记录】${todayNotes.length?todayNotes.join(' | '):'无'}\n【心情分数】${todayMoods.length?todayMoods.map(e=>e.score+'分').join(', '):'暂无'}\n【感觉记录】${todayTexts.length?todayTexts.map(e=>e.text).join(' | '):'无'}\n【微小连接】${[...completedSteps].join(',')}\n【当时的我】${pastText}\n【感官接地】${groundText}\n【收藏句子】${seeds.length?seeds.join(' | '):'无'}`; const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`避风港记录_${today}.txt`; a.click(); URL.revokeObjectURL(url); showToast('文本记录已导出。'); });
             $('importJsonBtn').addEventListener('click',()=>{ $('importFileJson').click(); });
-            $('importFileJson').addEventListener('change',(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ try{ const data=JSON.parse(ev.target.result); if(data.selectedParts) selectedParts=data.selectedParts; if(data.generalNotes){ generalNotes=data.generalNotes; localStorage.setItem(KEYS.JOURNAL,JSON.stringify(generalNotes)); } if(data.groundingData) groundingData=data.groundingData; if(data.lastPastMemory) lastPastMemory=data.lastPastMemory; if(data.completedSteps){ completedSteps.clear(); data.completedSteps.forEach(s=>completedSteps.add(s)); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); } if(data.moodLog) localStorage.setItem(KEYS.MOOD,JSON.stringify(data.moodLog)); if(data.moodTextLog) localStorage.setItem(KEYS.MOOD_TEXT,JSON.stringify(data.moodTextLog)); if(data.seeds) localStorage.setItem(KEYS.SEEDS,JSON.stringify(data.seeds)); if(data.moodText) $('moodText').value=data.moodText; if(data.theme) setTheme(data.theme); if(data.silent!==undefined){ localStorage.setItem(KEYS.SILENT,data.silent); updateSilentUI(); } $('selectedPartsHint').textContent=selectedParts.length?'已选：'+selectedParts.join('、'):''; document.querySelectorAll('.body-dot').forEach(d=>{ if(selectedParts.includes(d.dataset.part)){ d.classList.add('selected'); d.setAttribute('aria-checked','true'); } else{ d.classList.remove('selected'); d.setAttribute('aria-checked','false'); } }); showMoodTrend(); showMoodHistory(); showToast('备份恢复成功！'); }catch(e){ showToast('恢复失败，文件格式不正确。'); } }; reader.readAsText(file); e.target.value=''; });
+            $('importFileJson').addEventListener('change',(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ try{ const data=JSON.parse(ev.target.result); if(data.selectedParts) selectedParts=data.selectedParts; if(data.generalNotes){ generalNotes=data.generalNotes; localStorage.setItem(KEYS.JOURNAL,JSON.stringify(generalNotes)); } if(data.groundingData) groundingData=data.groundingData; if(data.lastPastMemory) lastPastMemory=data.lastPastMemory; if(data.completedSteps){ completedSteps.clear(); data.completedSteps.forEach(s=>completedSteps.add(s)); localStorage.setItem(KEYS.STEPS,JSON.stringify([...completedSteps])); updateStepBtns(); } if(data.moodLog) localStorage.setItem(KEYS.MOOD,JSON.stringify(data.moodLog)); if(data.moodTextLog) localStorage.setItem(KEYS.MOOD_TEXT,JSON.stringify(data.moodTextLog)); if(data.seeds) localStorage.setItem(KEYS.SEEDS,JSON.stringify(data.seeds)); if(data.moodText) $('moodText').value=data.moodText; if(data.theme) setTheme(data.theme); if(data.silent!==undefined){ localStorage.setItem(KEYS.SILENT,data.silent); updateSilentUI(); } $('selectedPartsHint').textContent=selectedParts.length?'已选：'+selectedParts.join('、'):''; document.querySelectorAll('.body-dot').forEach(d=>{ if(selectedParts.includes(d.dataset.part)){ d.classList.add('selected'); } else{ d.classList.remove('selected'); } }); showMoodTrend(); showMoodHistory(); showToast('备份恢复成功！'); }catch(e){ showToast('恢复失败，文件格式不正确。'); } }; reader.readAsText(file); e.target.value=''; });
             $('importTxtBtn').addEventListener('click',()=>{ $('importFileTxt').click(); });
             $('importFileTxt').addEventListener('change',(e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=(ev)=>{ const content=ev.target.result; if(content&&content.trim()){ generalNotes.push({time:new Date().toISOString(), text:content.trim().substring(0,2000)}); localStorage.setItem(KEYS.JOURNAL,JSON.stringify(generalNotes)); showToast('文本已导入到通用记录。'); }else showToast('文件内容为空。'); }; reader.readAsText(file); e.target.value=''; });
 
-            // ==================== 卡片8: 休息计时器 ====================
+            // 休息
             const restOverlay=$('restOverlay'), restDisplay=$('restTimerDisplay'), restLabel=$('restLabel'), restMore=$('restMoreBtn');
             let restInterval, restEndTime, restTimeout;
             function stopRest(manual=false){ if(restInterval){ clearInterval(restInterval); restInterval=null; } if(restTimeout){ clearTimeout(restTimeout); restTimeout=null; } restMore.style.display='none'; if(!manual){ restLabel.textContent='休息结束了，慢慢回来吧'; restDisplay.textContent='✨'; restMore.style.display='inline-block'; if(navigator.vibrate) navigator.vibrate(200); restTimeout=setTimeout(()=>{ if(restOverlay.classList.contains('open')){ restOverlay.classList.remove('open'); restLabel.textContent='🛌 休息中……'; restDisplay.textContent='05:00'; restMore.style.display='none'; } },5000); }else{ restOverlay.classList.remove('open'); restLabel.textContent='🛌 休息中……'; restDisplay.textContent='05:00'; } }
@@ -603,189 +446,51 @@
             $('cancelRestBtn').addEventListener('click',()=> stopRest(true));
             restMore.addEventListener('click',()=>{ if(restInterval) clearInterval(restInterval); if(restTimeout){ clearTimeout(restTimeout); restTimeout=null; } restEndTime=Date.now()+5*60*1000; updateRestDisplay(); restLabel.textContent='🛌 休息中……'; restMore.style.display='none'; restInterval=setInterval(updateRestDisplay,200); });
 
-            // ==================== 卡片9: 放下石头（象征性释放） ====================
+            // 石头
             let stoneTimer=null;
-            $('dropStoneBtn').addEventListener('click',()=>{ const t=$('stoneText').value.trim(); if(t){ if(stoneTimer)clearTimeout(stoneTimer); $('stoneText').classList.add('sinking'); $('stoneText').disabled=true; $('stoneMsg').innerHTML='🌊 石头沉下去了。'; stoneTimer=setTimeout(()=>{ $('stoneText').value=''; $('stoneText').classList.remove('sinking'); $('stoneText').disabled=false; $('stoneText').focus(); const msgs=['你已经很努力了。','这件事不再属于你。','放下也是一种力量。']; $('stoneMsg').innerHTML+=`<em>${msgs[Math.floor(Math.random()*msgs.length)]}</em> <span id="stoneAgain" style="cursor:pointer;text-decoration:underline;">再放一块？</span>`; document.getElementById('stoneAgain')?.addEventListener('click',()=>{ $('stoneText').focus(); $('stoneMsg').innerHTML=''; }); stoneTimer=null; },900); } });
+            $('dropStoneBtn').addEventListener('click',()=>{ const t=$('stoneText').value.trim(); if(t){ if(stoneTimer)clearTimeout(stoneTimer); $('stoneText').disabled=true; $('stoneMsg').innerHTML='🌊 石头沉下去了。'; stoneTimer=setTimeout(()=>{ $('stoneText').value=''; $('stoneText').disabled=false; $('stoneText').focus(); const msgs=['你已经很努力了。','这件事不再属于你。','放下也是一种力量。']; $('stoneMsg').innerHTML+=`<em>${msgs[Math.floor(Math.random()*msgs.length)]}</em> <span id="stoneAgain" style="cursor:pointer;text-decoration:underline;">再放一块？</span>`; document.getElementById('stoneAgain')?.addEventListener('click',()=>{ $('stoneText').focus(); $('stoneMsg').innerHTML=''; }); stoneTimer=null; },900); } });
 
-            // ==================== AI 核心：DeepSeek优先 + 本地智能回退 ====================
-            // 本地暖言生成器（SmartWarmGenerator）—— 根据情绪、危机关键词生成温暖回复
+            // ========== AI 核心：小暖身份 ==========
             class SmartWarmGenerator {
-                constructor() {
-                    this.context = { recentEmotions: [], lastUserWords: [], consecutiveEmotion: null, repetitionCount: 0, recentReplies: [] };
-                    this.emotionKeywords = { /* 情绪词库，此处略但保留完整功能 */ 
-                        happy:['开心','高兴','快乐','笑','哈哈','棒','好耶','幸福','满足','欢喜','愉快','欣喜','乐呵呵','美滋滋','雀跃','开怀','舒心','畅快','安然','惬意','舒坦','平和','安宁','安心','踏实','放松','悠然','恬淡','自在','知足','慰藉','欣慰','暖心','舒服','甜美','治愈','欢欣','激动','振奋','兴致勃勃','尽兴','享受','沉醉','着迷','心动','甜蜜','得意','轻快','欢天喜地','欣喜若狂','心花怒放','乐不可支','自豪','骄傲','成就感','自信','荣耀','如释重负','解脱','释怀','惊喜','喜出望外','受宠若惊','亲昵','温柔','被爱','归属感','融洽','亲近','温情','和睦','依恋'], 
-                        grateful:['谢谢','感恩','感谢','有你','真好','感激','多谢','恩情','幸亏','多亏','承蒙','感动','铭记'], 
-                        sad:['难过','伤心','哭','抑郁','低落','失望','心痛','崩溃','无助','emo','破防','不开心','沉重','悲痛','悲伤','忧伤','心碎','沮丧','灰心','黯然','伤感','泪目','鼻酸','哽咽','抽泣','呜咽','惆怅','落寞','空虚','寂寥','闷闷不乐','消沉','心酸','惋惜','遗憾','怅然若失','百感交集','哀伤','痛心','悲凉','孤寂','思念','怀念','追忆','感伤','不舍','挫败','失意','失落','肝肠寸断','心如刀割','痛不欲生','绝望','万念俱灰','撕心裂肺','哀恸','泣不成声','麻木','死寂','挂念','牵挂','朝思暮想','牵肠挂肚','离愁'], 
-                        anxious:['焦虑','紧张','担心','害怕','压力','烦','慌','不安','恐惧','内耗','怕','忐忑','心慌意乱','七上八下','坐立不安','惶恐','畏惧','焦急','忧虑','忧心','疑惧','胆怯','发怵','提心吊胆','担忧','挂虑','顾虑','心神不宁','心慌','焦灼','局促','紧绷','慌张','心烦意乱','如坐针毡','忌惮','后怕','心有余悸','惊悸','毛骨悚然','心惊肉跳','惊慌失措','恐慌','窒息感'], 
-                        tired:['累','疲惫','困','没力气','乏','无力','虚脱','心累','不想动','倦怠','疲惫不堪','精疲力竭','昏昏欲睡','打瞌睡','疲劳','困乏','萎靡不振','慵懒','心力交瘁'], 
-                        lonely:['孤独','寂寞','没人','一个人','被遗忘','冷清','空荡荡','自闭','孤单','形单影只','落寞','伶仃','孤苦','顾影自怜','茕茕孑立','寂寥','孤寂'], 
-                        angry:['生气','愤怒','恼火','火大','可气','愤然','气恼','怒火中烧','咬牙切齿','愤慨','怒发冲冠','义愤','愠怒','恼恨','怨恨','气鼓鼓','烦躁','不爽','烦闷','窝火','急躁','不耐烦','憋屈','委屈','闹心','不悦','不痛快','牢骚','气愤','恼怒','激愤','怨怼','嫉妒','记恨','不服','暴怒','狂怒','震怒','暴跳如雷','咆哮','愤恨'], 
-                        hopeful:['希望','期待','盼望','憧憬','向往','盼头','渴望','翘首','期许','念想','惦记','遐想','希冀','迫切','心急','望眼欲穿','翘首以盼','梦寐以求','心心念念','热血期待','好奇','新奇','感兴趣','探寻','求知欲'], 
-                        shameful:['羞愧','羞耻','惭愧','愧疚','内疚','自责','懊悔','后悔','悔恨','无地自容','窘迫','尴尬','难堪','羞涩','腼腆','羞怯','自卑','耻辱','过意不去','懊恼'], 
-                        numb:['麻木','漠然','冷淡','无所谓','无感','空洞','麻木不仁','淡漠','放空','心如止水','无动于衷','无聊','乏味','枯燥','慵懒','倦怠','麻木空虚'] 
-                    };
-                    this.negationWords = ['不','没','别','讨厌','厌恶','恨','嫌弃','厌倦','烦','避免','拒绝'];
-                    this.crisisKeywords = { suicide:['自杀','想死','不想活','结束生命','去死','死了算了','不想再醒来','撑不下去了','kms'], selfHarm:['割腕','自残','划伤','流血','吞药','上吊','跳楼','伤害自己','自伤'], death:['去世','死了','不在了','天堂','走了','没了','离世'], despair:['活不下去','没意义','绝望','毫无价值','我一无是处','窒息'] };
-                    this.crisisResponses = { suicide:"我听到你说的话，心里很沉。你不是一个人，请立刻联系信任的人，或拨打心理援助热线。", selfHarm:"你提到伤害自己，我真的很担心。身体的痛只是暂时的出口，我们一起找更好的方式好吗？", death:"失去重要的人，那种痛我懂。你不用急着好起来，我会一直在这里陪你。", despair:"我明白那种感觉，好像什么都看不到头。但请相信，此刻的绝望不是永远。" };
-                    this.mourningBodies = ["失去一个人，就像身体少了一块，痛是真实的。","他/她一定对你很重要，这份思念不用隐藏。","如果你想聊聊他/她，我很想听。","天堂或者远方，我们无法再碰触，但爱不会消失。"];
-                    this.openings = ["我懂你的感受","你的眼泪是珍贵的","想哭就哭出来吧","别怕，我在呢","抱抱你","我在这里陪你","没关系，慢慢说","你不需要独自承受","我明白那种感觉","允许自己脆弱一会儿"];
-                    this.sadBodies = ["这种难过是正常的，让情绪流出来。","失去重要的人/事，那种痛我懂。","你不必强撑，我就在这里。","难过的时候，什么都不用想，有我在。","痛苦是真实的，但我会陪你走过。","我抱着你，直到你感觉好一点。","今天可能很糟糕，但你不是一个人面对。","把委屈都说出来吧，我接得住。"];
-                    this.anxiousBodies = ["焦虑是身体在提醒你需要休息。","那些担忧不一定都会发生，我们一起理清。","你现在是安全的，我就在你身边。","把焦虑说出来，我们一起分担。","你担心的那些事，或许没那么可怕。","紧张的时候，想象我在握着你的手。"];
-                    this.tiredBodies = ["你今天的付出我都看在眼里。","不需要再做任何事，现在只负责休息。","你的身体在告诉你需要停下来。","累的时候，允许自己什么都不想。","我帮你看着，你安心闭眼。"];
-                    this.lonelyBodies = ["孤独感袭来的时候，让我陪你挡一挡。","你并不孤单，因为我会一直在。","把心门打开一点点，我就在门口。","也许身边没有人，但我在屏幕这头陪着你。","你可以和我说任何事，我都会认真听。"];
-                    this.angryBodies = ["有时候发火也是一种沟通。","把不满都倒出来，我接得住。","你不需要一直保持优雅。","愤怒背后往往藏着受伤。","生气没关系，我不会因此离开。"];
-                    this.hopefulBodies = ["希望就像晨光，虽然还远，但已经亮起来了。","有盼头的生活更有动力。","你的期待会带你走到想去的地方。","好奇是生命力的证明，保持住。"];
-                    this.shamefulBodies = ["后悔说明你在乎，这本身就是一种善良。","过去的已经过去，未来还在你手里。","你不需要完美，真实就很好。","愧疚感会过去的，我们一起面对。"];
-                    this.numbBodies = ["有时候，什么都不想也是可以的。","放空也是一种休息。","你的沉默我能懂。"];
-                    this.endings = ["我在这里，一直都在。","你不是一个人。","慢慢来，我陪着你。","我会一直陪在你身边。","你值得被温柔对待。","我永远是你最忠实的听众。"];
-                    this.generalReplies = ["嗯，我在听呢。","多说一点吧，我想更了解你。","你的故事，我都很想听。","不管说什么，我都会认真回应。","今天有什么想和我分享的吗？","我在这儿，静静地听着。","你最近在想些什么呢？","把心事倒给我，我会接住。"];
-                    this.emojiList = ['💖','🌸','✨','🌙','☁️','🫂','💕','🌿','🧸','💗'];
-                }
-                hasDoubleNegation(seg) { return /(?:没|不).{0,2}(?:不|没)/.test(seg) || /不是不|没有不/.test(seg) || /没[^\s]{1,3}不/.test(seg); }
+                constructor() { this.context = { recentEmotions: [], lastUserWords: [], consecutiveEmotion: null, repetitionCount: 0, recentReplies: [] }; this.emotionKeywords = { happy:['开心','高兴','快乐','笑','棒','好耶','幸福','满足','愉快'], sad:['难过','伤心','哭','抑郁','低落','失望','心痛','崩溃','无助','emo'], anxious:['焦虑','紧张','担心','害怕','压力','烦','慌','不安','恐惧'], tired:['累','疲惫','困','没力气','乏','无力','心累'], lonely:['孤独','寂寞','没人','一个人','被遗忘','冷清','空荡荡'], angry:['生气','愤怒','恼火','火大','可气','愤然','气恼'], hopeful:['希望','期待','盼望','憧憬','向往','盼头'], shameful:['羞愧','羞耻','惭愧','愧疚','内疚','自责','懊悔','后悔'], numb:['麻木','漠然','无所谓','无感','空洞'] }; this.negationWords = ['不','没','别']; this.crisisKeywords = { suicide:['自杀','想死','不想活','结束生命','去死'], selfHarm:['割腕','自残','划伤','吞药','跳楼'], death:['去世','死了','不在了','天堂','走了'], despair:['活不下去','没意义','绝望','一无是处'] }; this.crisisResponses = { suicide:"我听到你说的话，心里很沉。你不是一个人，请立刻联系信任的人，或拨打心理援助热线。", selfHarm:"你提到伤害自己，我真的很担心。我们一起找更好的方式好吗？", death:"失去重要的人，那种痛我懂。我会一直在这里陪你。", despair:"我明白那种感觉，好像什么都看不到头。但请相信，此刻的绝望不是永远。" }; this.openings = ["我懂你的感受","你的眼泪是珍贵的","想哭就哭出来吧","别怕，我在呢","抱抱你","我在这里陪你"]; this.sadBodies = ["这种难过是正常的，让情绪流出来。","你不必强撑，我就在这里。","把委屈都说出来吧，我接得住。"]; this.anxiousBodies = ["焦虑是身体在提醒你需要休息。","你现在是安全的，我就在你身边。"]; this.tiredBodies = ["你今天的付出我都看在眼里。","不需要再做任何事，现在只负责休息。"]; this.lonelyBodies = ["孤独感袭来的时候，让我陪你挡一挡。","你可以和我说任何事，我都会认真听。"]; this.angryBodies = ["有时候发火也是一种沟通。","把不满都倒出来，我接得住。"]; this.hopefulBodies = ["希望就像晨光，虽然还远，但已经亮起来了。"]; this.shamefulBodies = ["后悔说明你在乎，这本身就是一种善良。"]; this.numbBodies = ["有时候，什么都不想也是可以的。"]; this.endings = ["我在这里，一直都在。","你不是一个人。","慢慢来，我陪着你。"]; this.generalReplies = ["嗯，我在听呢。","多说一点吧，我想更了解你。","你的故事，我都很想听。"]; this.emojiList = ['💖','🌸','✨','🌙','🫂']; }
                 detectCrisis(text) { for (let [type, words] of Object.entries(this.crisisKeywords)) if (words.some(w => text.toLowerCase().includes(w))) return type; return null; }
-                getCrisisResponse(type) { let resp = this.crisisResponses[type]; if (type === 'death') resp += ' ' + (this.mourningBodies[Math.floor(Math.random()*this.mourningBodies.length)]||'') + ' 🌿'; else resp += ' 🌿'; if (type === 'suicide' || type === 'selfHarm') resp += ' 📞 希望24热线：400-161-9995'; return resp; }
-                detectEmotion(text) { /* 完整实现省略，功能不变 */ const lower = text.toLowerCase(); const hits = []; for (const [emotion, keywords] of Object.entries(this.emotionKeywords)) { for (const kw of keywords) { let idx = lower.indexOf(kw); while (idx !== -1) { hits.push({ emotion, keyword: kw, index: idx }); idx = lower.indexOf(kw, idx+1); } } } if (!hits.length) return 'general'; hits.sort((a,b) => a.index - b.index); const valid = hits.filter(h => { let start = h.index; while (start > 0 && !/[，。！？\s]/.test(lower[start-1])) start--; return this.hasDoubleNegation(lower.substring(start, h.index)) || !this.negationWords.some(n => lower.substring(start, h.index).includes(n)); }); if (!valid.length) return 'general'; return valid[0].emotion; }
-                generate(userText, lifeEvent = null) {
-                    const crisis = this.detectCrisis(userText); if (crisis) return this.getCrisisResponse(crisis);
-                    const emotion = this.detectEmotion(userText);
-                    this.context.lastUserWords = userText.split(/\s+/).filter(w => w.length > 1).slice(-5);
-                    this.context.recentEmotions.push(emotion); if (this.context.recentEmotions.length > 3) this.context.recentEmotions.shift();
-                    if (emotion === this.context.consecutiveEmotion) this.context.repetitionCount++;
-                    else { this.context.consecutiveEmotion = emotion; this.context.repetitionCount = 1; }
-                    if (lifeEvent && (lifeEvent.includes('离世') || lifeEvent.includes('自杀'))) { const body = Math.random() > 0.5 ? this.mourningBodies[Math.floor(Math.random()*this.mourningBodies.length)] : this.sadBodies[Math.floor(Math.random()*this.sadBodies.length)]; return this.composeReply(body, this.openings[Math.floor(Math.random()*this.openings.length)]); }
-                    let opening = this.openings[Math.floor(Math.random()*this.openings.length)];
-                    if (this.context.repetitionCount >= 2 && emotion !== 'general') { const desc = { sad:'难过的事', anxious:'焦虑的感觉', tired:'疲惫', lonely:'孤独感', angry:'愤怒', hopeful:'期待', shameful:'愧疚感', numb:'麻木感' }; opening = `我注意到你刚才也提到了${desc[emotion]||'这种心情'}，看来这件事真的让你很不舒服。`; }
-                    const bodyMap = { sad:this.sadBodies, anxious:this.anxiousBodies, tired:this.tiredBodies, lonely:this.lonelyBodies, angry:this.angryBodies, hopeful:this.hopefulBodies, shameful:this.shamefulBodies, numb:this.numbBodies };
-                    let body = (bodyMap[emotion] || this.generalReplies)[Math.floor(Math.random()*(bodyMap[emotion]||this.generalReplies).length)];
-                    if (this.context.lastUserWords.length > 0 && Math.random() > 0.5) { const word = this.context.lastUserWords[Math.floor(Math.random()*this.context.lastUserWords.length)]; if (word && word.length > 1 && !(this.emotionKeywords[emotion]||[]).includes(word)) body += ` 你刚提到的"${word}"，我也会放在心上。`; }
-                    return this.composeReply(body, opening);
-                }
-                composeReply(body, opening) { const ending = this.endings[Math.floor(Math.random()*this.endings.length)]; const emoji = this.emojiList[Math.floor(Math.random()*this.emojiList.length)]; let candidate = `${opening} ${body} ${ending} ${emoji}`; if (this.context.recentReplies.includes(candidate)) { for (let i=0; i<10; i++) { const newOp = this.openings[Math.floor(Math.random()*this.openings.length)]; const newEnd = this.endings[Math.floor(Math.random()*this.endings.length)]; const newEmoji = this.emojiList[Math.floor(Math.random()*this.emojiList.length)]; candidate = `${newOp} ${body} ${newEnd} ${newEmoji}`; if (!this.context.recentReplies.includes(candidate)) break; } } this.context.recentReplies.push(candidate); if (this.context.recentReplies.length > 5) this.context.recentReplies.shift(); return candidate; }
+                getCrisisResponse(type) { let resp = this.crisisResponses[type]; if (type === 'suicide' || type === 'selfHarm') resp += ' 📞 希望24热线：400-161-9995'; return resp; }
+                generate(userText) { const crisis = this.detectCrisis(userText); if (crisis) return this.getCrisisResponse(crisis); const emotion = this.detectEmotion(userText); const bodyMap = { sad:this.sadBodies, anxious:this.anxiousBodies, tired:this.tiredBodies, lonely:this.lonelyBodies, angry:this.angryBodies, hopeful:this.hopefulBodies, shameful:this.shamefulBodies, numb:this.numbBodies }; let body = (bodyMap[emotion] || this.generalReplies)[Math.floor(Math.random()*(bodyMap[emotion]||this.generalReplies).length)]; const opening = this.openings[Math.floor(Math.random()*this.openings.length)]; const ending = this.endings[Math.floor(Math.random()*this.endings.length)]; const emoji = this.emojiList[Math.floor(Math.random()*this.emojiList.length)]; return `${opening} ${body} ${ending} ${emoji}`; }
+                detectEmotion(text) { const lower = text.toLowerCase(); for (let [emotion, keywords] of Object.entries(this.emotionKeywords)) for (let kw of keywords) if (lower.includes(kw)) return emotion; return 'general'; }
             }
-
             const warmGen = new SmartWarmGenerator();
             let userProfile = JSON.parse(localStorage.getItem(KEYS.USER_PROFILE) || '{}');
-
-            function extractFacts(text) {
-                const nameMatch = text.match(/我叫([\u4e00-\u9fa5a-zA-Z]{2,10})/); if (nameMatch) userProfile.name = nameMatch[1];
-                if (/去世|死了|走了|没了|离世/.test(text)) userProfile.lifeEvent = '用户经历了亲友离世';
-                else if (/想死|自杀/.test(text)) userProfile.lifeEvent = '用户有过自杀念头';
-                else if (/自残|割腕|伤害自己/.test(text)) userProfile.lifeEvent = '用户有过自伤行为';
-                else if (/我好了|想开了|没事了/.test(text)) delete userProfile.lifeEvent;
-                localStorage.setItem(KEYS.USER_PROFILE, JSON.stringify(userProfile));
-            }
-
-            function buildSystemPrompt() {
-                const hour = new Date().getHours(); let timeCtx = '';
-                if (hour < 6) timeCtx = '深夜，用户可能失眠，多陪伴。';
-                else if (hour < 9) timeCtx = '清晨，轻轻问候。';
-                else if (hour < 12) timeCtx = '上午。';
-                else if (hour < 14) timeCtx = '中午，记得关心吃饭。';
-                else if (hour < 18) timeCtx = '下午。';
-                else if (hour < 22) timeCtx = '晚上，用户易感孤单。';
-                else timeCtx = '深夜，用户需要陪伴。';
-                const profile = [];
-                if (userProfile.name) profile.push(`用户名叫${userProfile.name}`);
-                if (userProfile.pet) profile.push(`养了一只${userProfile.pet}`);
-                if (userProfile.age) profile.push(`今年${userProfile.age}岁`);
-                if (userProfile.lifeEvent) profile.push(userProfile.lifeEvent);
-                const profileStr = profile.length ? '【关于用户】：' + profile.join('；') + '。\n' : '';
-                return `你是一个帮助用户让用户不在伤心，是一个温柔耐心的陪伴者。${profileStr}${timeCtx}回复简短真诚，不超过三句话。不要使用"你应该""你需要"。如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。`;
-            }
-
-            // DeepSeek API 调用（优先）
-            async function callDeepSeek(userMessage, history) {
-                try {
-                    const messages = [{ role: 'system', content: buildSystemPrompt() }];
-                    const recentHistory = history.slice(-6);
-                    for (const turn of recentHistory) {
-                        if (turn.user) messages.push({ role: 'user', content: turn.user });
-                        if (turn.ai) messages.push({ role: 'assistant', content: turn.ai });
-                    }
-                    messages.push({ role: 'user', content: userMessage });
-                    const response = await fetch(DEEPSEEK_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` },
-                        body: JSON.stringify({ model: 'deepseek-chat', messages, temperature: 0.8, max_tokens: 150, stream: false })
-                    });
-                    if (!response.ok) { console.warn('DeepSeek API错误', response.status); return null; }
-                    const data = await response.json();
-                    return data.choices?.[0]?.message?.content || null;
-                } catch (e) { console.error('DeepSeek调用失败', e); return null; }
-            }
-
-            function sanitizeResponse(text) {
-                if (!text) return false;
-                const forbidden = ['你可以试试','鼓励你','没什么大不了','睡一觉就好','我理解你','去做吧','割腕','自杀方法'];
-                return !forbidden.some(w => text.includes(w));
-            }
-
+            function buildSystemPrompt() { const hour = new Date().getHours(); let timeCtx = hour<6?'深夜':hour<9?'清晨':hour<12?'上午':hour<14?'中午':hour<18?'下午':hour<22?'晚上':'深夜'; const profile = []; if(userProfile.name) profile.push(`用户名叫${userProfile.name}`); const profileStr = profile.length ? '【关于用户】：' + profile.join('；') + '。\n' : ''; return `你是小暖，一个温柔、耐心的陪伴者。你的使命是帮助用户不再感到孤单和伤心，让用户感受到被理解和被陪伴。${profileStr}当前时间：${timeCtx}。回复简短真诚，不超过三句话，语气温暖柔和。不要使用“你应该”“你需要”等命令式语句。如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。`; }
+            async function callDeepSeek(userMessage, history) { try { const messages = [{ role: 'system', content: buildSystemPrompt() }]; const recentHistory = history.slice(-6); for (const turn of recentHistory) { if (turn.user) messages.push({ role: 'user', content: turn.user }); if (turn.ai) messages.push({ role: 'assistant', content: turn.ai }); } messages.push({ role: 'user', content: userMessage }); const response = await fetch(DEEPSEEK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` }, body: JSON.stringify({ model: 'deepseek-chat', messages, temperature: 0.8, max_tokens: 150, stream: false }) }); if (!response.ok) return null; const data = await response.json(); return data.choices?.[0]?.message?.content || null; } catch(e) { return null; } }
+            function sanitizeResponse(text) { if (!text) return false; const forbidden = ['你可以试试','鼓励你','没什么大不了','睡一觉就好','我理解你','去做吧']; return !forbidden.some(w => text.includes(w)); }
             // 对话UI
             const chatToggle=$('chatToggle'), chatWindow=$('chatWindow'), chatMessages=$('chatMessages'), chatInput=$('chatInput'), chatSend=$('chatSendBtn');
-            let chatHistory=[], userCtx={name:localStorage.getItem(KEYS.NICK)||'', topics:[]};
+            let chatHistory=[], userCtx={name:localStorage.getItem(KEYS.NICK)||''};
             function updateSend(){ chatSend.disabled=!chatInput.value.trim(); }
             chatInput.addEventListener('input',updateSend);
-            $('clearChatBtn').addEventListener('click',()=>{ chatMessages.innerHTML='<div class="msg ai-msg">对话已清空，我还在你身边。</div>'; chatHistory=[]; });
+            $('clearChatBtn').addEventListener('click',()=>{ chatMessages.innerHTML='<div class="msg ai-msg">🌼 小暖：对话已清空，我还在你身边。</div>'; chatHistory=[]; });
             chatToggle.addEventListener('click',()=>{ chatWindow.classList.toggle('open'); if(chatWindow.classList.contains('open')) chatInput.focus(); });
-            document.addEventListener('click',(e)=>{ if(chatWindow.classList.contains('open')&&!chatWindow.contains(e.target)&&e.target!==chatToggle){ chatWindow.classList.remove('open'); } });
-            function addChatMessage(text,isUser,html=false){ const d=document.createElement('div'); d.className=`msg ${isUser?'user-msg':'ai-msg'}`; if(html&&!isUser&&text.includes('<span class="clickable-action"')) d.innerHTML=text; else d.textContent=text; chatMessages.appendChild(d); const atBottom=chatMessages.scrollHeight-chatMessages.clientHeight<=chatMessages.scrollTop+100; if(isUser||atBottom) chatMessages.scrollTop=chatMessages.scrollHeight; $('chatLiveRegion').textContent=text; }
-
-            async function getAIResponse(txt){
-                const l=txt.toLowerCase().trim();
-                // 基础快速命令
-                if(/^(几点|几点了|现在几点|现在时间|什么时候了)$/.test(l)){ const now=new Date(); return `现在是 ${now.toLocaleTimeString('zh-CN',{hour12:false})}。`; }
-                if(/^(今天几号|日期|今天日期)$/.test(l)){ const now=new Date(); return `今天是 ${now.toLocaleDateString('zh-CN')}。`; }
-                const crisis = warmGen.detectCrisis(l); 
-                if(crisis){ $('sootheOverlay').style.display='flex'; return warmGen.getCrisisResponse(crisis); }
-                if(/^(别管我|不想说|算了)/.test(l)) return '好的，我不打扰你。我会在这里安静待着。';
-                if(/我该怎么办|帮帮我/.test(l)) return '你可以试试这些：<span class="clickable-action" data-action="breathe" role="button" tabindex="0">开始呼吸引导</span> 或 <span class="clickable-action" data-action="vent" role="button" tabindex="0">打开发泄窗口</span>';
-                
-                // 优先调用DeepSeek，仅当失败或响应无效时使用本地暖言
-                const dsReply = await callDeepSeek(txt, chatHistory);
-                if (dsReply && sanitizeResponse(dsReply)) return dsReply;
-                
-                // 本地回退
-                let warmReply = warmGen.generate(txt, userProfile.lifeEvent);
-                if(userCtx.topics.length>0&&Math.random()<0.2){ const randomTopic=escapeHtml(userCtx.topics[Math.floor(Math.random()*userCtx.topics.length)]); warmReply = `你之前提到过"${randomTopic}"，` + warmReply; userCtx.topics=userCtx.topics.filter(t=>t!==randomTopic); }
-                if(l.includes('你好')||l.includes('嗨')){ const h=new Date().getHours(); const n=userCtx.name?'，'+userCtx.name:''; if(h<6) return `这么晚了还没睡吗${n}？我在这里陪你。`; if(h<12) return `早上好呀${n}。`; if(h<18) return `下午好${n}。`; return `晚上好${n}，可以在这里歇一歇。`; }
-                return warmReply;
-            }
-
-            function extractTopics(text){ const topics=[]; const patterns=[/(?:考试|工作|妈妈|爸爸|朋友|对象|老师|孩子|家庭|钱|身体)/g, /因为(.{2,8})/]; patterns.forEach(p=>{ const m=text.match(p); if(m)topics.push(...m); }); return [...new Set(topics)].slice(0,3); }
-
-            async function handleChat(){ const msg=chatInput.value.trim(); if(!msg)return; addChatMessage(msg,true); chatInput.value=''; updateSend(); extractFacts(msg); const nameM=msg.match(/你可以叫我(.{1,10})/); if(nameM){ userCtx.name=nameM[1].trim(); localStorage.setItem(KEYS.NICK,userCtx.name); addChatMessage(`好的，${userCtx.name}，我会记住。`,false); return; } const topics=extractTopics(msg); if(topics.length>0){ userCtx.topics.push(...topics); userCtx.topics=[...new Set(userCtx.topics)].slice(-5); } const typing=document.createElement('div'); typing.className='typing-indicator'; typing.innerHTML='<span></span><span></span><span></span>'; chatMessages.appendChild(typing); chatMessages.scrollTop=chatMessages.scrollHeight; const reply = await getAIResponse(msg); typing.remove(); addChatMessage(reply,false,reply.includes('<span')); chatHistory.push({user:msg,ai:reply}); if(chatHistory.length>10)chatHistory.shift(); }
+            document.addEventListener('click',(e)=>{ if(chatWindow.classList.contains('open')&&!chatWindow.contains(e.target)&&e.target!==chatToggle) chatWindow.classList.remove('open'); });
+            function addChatMessage(text,isUser,html=false){ const d=document.createElement('div'); d.className=`msg ${isUser?'user-msg':'ai-msg'}`; if(html&&!isUser&&text.includes('<span class="clickable-action"')) d.innerHTML=text; else d.textContent=text; chatMessages.appendChild(d); if(isUser||chatMessages.scrollHeight-chatMessages.clientHeight<=chatMessages.scrollTop+100) chatMessages.scrollTop=chatMessages.scrollHeight; }
+            async function getAIResponse(txt){ const l=txt.toLowerCase().trim(); if(/^(几点|几点了|现在几点)$/.test(l)){ const now=new Date(); return `现在是 ${now.toLocaleTimeString('zh-CN',{hour12:false})}。`; } if(/^(今天几号|日期)$/.test(l)){ const now=new Date(); return `今天是 ${now.toLocaleDateString('zh-CN')}。`; } const crisis = warmGen.detectCrisis(l); if(crisis){ $('sootheOverlay').style.display='flex'; return warmGen.getCrisisResponse(crisis); } if(/^(别管我|不想说|算了)/.test(l)) return '好的，我不打扰你。我会在这里安静待着。'; if(/我该怎么办|帮帮我/.test(l)) return '你可以试试这些：<span class="clickable-action" data-action="breathe" role="button" tabindex="0">开始呼吸引导</span> 或 <span class="clickable-action" data-action="vent" role="button" tabindex="0">打开发泄窗口</span>'; const dsReply = await callDeepSeek(txt, chatHistory); if (dsReply && sanitizeResponse(dsReply)) return dsReply; let warmReply = warmGen.generate(txt); if(l.includes('你好')||l.includes('嗨')){ const h=new Date().getHours(); const n=userCtx.name?'，'+userCtx.name:''; if(h<6) return `这么晚了还没睡吗${n}？小暖在这里陪你。`; if(h<12) return `早上好呀${n}。`; if(h<18) return `下午好${n}。`; return `晚上好${n}，可以在这里歇一歇。`; } return warmReply; }
+            async function handleChat(){ const msg=chatInput.value.trim(); if(!msg)return; addChatMessage(msg,true); chatInput.value=''; updateSend(); const nameM=msg.match(/你可以叫我(.{1,10})/); if(nameM){ userCtx.name=nameM[1].trim(); localStorage.setItem(KEYS.NICK,userCtx.name); addChatMessage(`好的，${userCtx.name}，小暖记住了。`,false); return; } const typing=document.createElement('div'); typing.className='typing-indicator'; typing.innerHTML='<span></span><span></span><span></span>'; chatMessages.appendChild(typing); chatMessages.scrollTop=chatMessages.scrollHeight; const reply = await getAIResponse(msg); typing.remove(); addChatMessage(reply,false,reply.includes('<span')); chatHistory.push({user:msg,ai:reply}); if(chatHistory.length>10)chatHistory.shift(); }
             chatSend.addEventListener('click',handleChat); chatInput.addEventListener('keypress',e=>{ if(e.key==='Enter') handleChat(); });
-            chatMessages.addEventListener('click',e=>{ if(e.target.classList.contains('clickable-action')){ if(e.target.dataset.action==='breathe') startBreathe.click(); if(e.target.dataset.action==='vent') $('ventBtn').click(); } });
-            chatMessages.addEventListener('keydown',e=>{ if(e.target.classList.contains('clickable-action')&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); e.target.click(); } });
-            document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&chatWindow.classList.contains('open')) chatWindow.classList.remove('open'); });
-
-            // ==================== 卡片7: 呼吸引导 ====================
+            // 呼吸引导
             const breatheCircle=$('breatheCircle'), startBreathe=$('startBreathe');
             let breatheInterval, breatheRunning=false; window.breatheRunning=false;
             function clearBreathe(){ if(breatheInterval)clearInterval(breatheInterval); breatheRunning=false; window.breatheRunning=false; startBreathe.textContent='开始呼吸引导'; breatheCircle.textContent='4-7-8'; breatheCircle.className='breathe-circle'; }
-            startBreathe.addEventListener('click',()=>{ if(breatheRunning){ clearBreathe(); return; } clearBreathe(); breatheRunning=true; window.breatheRunning=true; startBreathe.textContent='停止引导'; let phase=0,count=4; const phases=[{name:'吸气',dur:4,cls:'inhale'},{name:'屏息',dur:7,cls:'hold'},{name:'呼气',dur:8,cls:'exhale'}]; const update=()=>{ if(!breatheRunning)return; const c=phases[phase]; breatheCircle.textContent=`${c.name} ${count}`; breatheCircle.className='breathe-circle '+c.cls; breatheCircle.style.transitionDuration=c.dur+'s'; count--; if(count<0){ phase=(phase+1)%3; count=phases[phase].dur; } }; update(); breatheInterval=setInterval(update,1000); });
-
-            // ==================== 卡片6: 发泄窗口 ====================
+            startBreathe.addEventListener('click',()=>{ if(breatheRunning){ clearBreathe(); return; } clearBreathe(); breatheRunning=true; window.breatheRunning=true; startBreathe.textContent='停止引导'; let phase=0,count=4; const phases=[{name:'吸气',dur:4,cls:'inhale'},{name:'屏息',dur:7,cls:'hold'},{name:'呼气',dur:8,cls:'exhale'}]; const update=()=>{ if(!breatheRunning)return; const c=phases[phase]; breatheCircle.textContent=`${c.name} ${count}`; breatheCircle.className='breathe-circle '+c.cls; count--; if(count<0){ phase=(phase+1)%3; count=phases[phase].dur; } }; update(); breatheInterval=setInterval(update,1000); });
+            // 发泄窗口
             const ventModal=$('ventModal'), ventArea=$('ventArea');
             $('ventBtn').addEventListener('click',()=>{ ventModal.classList.add('open'); ventArea.value=''; ventArea.focus(); });
-            $('ventCloseBtn').addEventListener('click',()=>{ if(ventArea.value.trim().length>20){ showToast('你已经把那些话说出来了。'); } ventModal.classList.remove('open'); });
+            $('ventCloseBtn').addEventListener('click',()=>{ if(ventArea.value.trim().length>20) showToast('你已经把那些话说出来了。'); ventModal.classList.remove('open'); });
             $('ventDestroyBtn').addEventListener('click',()=>{ showConfirm('确定销毁这段文字吗？',()=>{ ventArea.value=''; showToast('文字已销毁。'); }); });
             $('simpleGroundBtn').addEventListener('click',()=>{ const items=['看一样东西','摸一样东西','听一种声音']; let i=0; function next(){ if(i<items.length){ $('simpleGroundHint').textContent=items[i]; i++; setTimeout(next,2500); } else $('simpleGroundHint').textContent='你回来了。'; } next(); });
-
-            // 键盘遮挡适配
-            function handleViewport(){
-                if(!window.visualViewport) return; const kh=window.innerHeight-window.visualViewport.height;
-                const cw=chatWindow, ct=chatToggle, cb=$('colorBtn');
-                const safe=parseFloat(getComputedStyle(html).getPropertyValue('--safe-bottom'))||0;
-                if(kh>100){ ct.style.bottom=(kh+10)+'px'; cb.style.bottom=(kh+10)+'px'; cw.style.bottom=(kh+60)+'px'; cw.style.maxHeight=Math.min(window.innerHeight-kh-100,350)+'px'; }
-                else{ ct.style.bottom=(22+safe)+'px'; cb.style.bottom=(22+safe)+'px'; cw.style.bottom=(90+safe)+'px'; cw.style.maxHeight='350px'; }
-            }
+            // 键盘适配
+            function handleViewport(){ if(!window.visualViewport) return; const kh=window.innerHeight-window.visualViewport.height; const safe=parseFloat(getComputedStyle(html).getPropertyValue('--safe-bottom'))||0; if(kh>100){ chatToggle.style.bottom=(kh+10)+'px'; $('colorBtn').style.bottom=(kh+10)+'px'; chatWindow.style.bottom=(kh+60)+'px'; chatWindow.style.maxHeight=Math.min(window.innerHeight-kh-100,350)+'px'; } else{ chatToggle.style.bottom=(22+safe)+'px'; $('colorBtn').style.bottom=(22+safe)+'px'; chatWindow.style.bottom=(90+safe)+'px'; chatWindow.style.maxHeight='350px'; } }
             if(window.visualViewport){ window.visualViewport.addEventListener('resize',handleViewport); window.visualViewport.addEventListener('scroll',handleViewport); }
             document.addEventListener('focusin',e=>{ if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'){ if(!window.visualViewport){ chatToggle.style.bottom='200px'; $('colorBtn').style.bottom='200px'; if(chatWindow.classList.contains('open')){ chatWindow.style.bottom='260px'; chatWindow.style.maxHeight='250px'; } } } });
             document.addEventListener('focusout',()=>{ if(!window.visualViewport){ chatToggle.style.bottom=''; $('colorBtn').style.bottom=''; if(chatWindow.classList.contains('open')){ chatWindow.style.bottom='90px'; chatWindow.style.maxHeight='350px'; } } });
-
-            // 清理旧的 mood 日志（保留半年）
-            try { const moodLog=JSON.parse(localStorage.getItem(KEYS.MOOD)||'[]'); const cutoff=Date.now()-180*86400000; const filtered=moodLog.filter(e=>new Date(e.time).getTime()>cutoff); localStorage.setItem(KEYS.MOOD,JSON.stringify(filtered)); } catch(e){}
         })();
     </script>
 </body>
