@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>小暖 · 情绪感知陪伴</title>
+  <title>小暖 · 有温度的陪伴</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -37,7 +37,7 @@
     }
     .header-bg { background: var(--header); border-bottom: 1px solid var(--border); }
     .msg-user { background: var(--msg-user-bg); color: var(--msg-user-text); }
-    .msg-ai { background: var(--msg-ai-bg); color: var(--msg-ai-text); border: 1px solid var(--border); }
+    .msg-ai { background: var(--msg-ai-bg); color: var(--msg-ai-text); border: 1px solid var(--border); line-height: 1.5; min-height: 2.5rem; }
     .input-area { background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); }
     .footer-bg { background: var(--footer); border-top: 1px solid var(--border); }
     .text-secondary { color: var(--secondary); }
@@ -48,6 +48,7 @@
       cursor: pointer; user-select: none; touch-action: manipulation;
     }
     .quick-emotion-btn:active { transform: scale(0.95); }
+    .quick-emotion-btn.activated { background: var(--msg-user-bg); color: #fff; border-color: transparent; }
     .typing-dots span {
       display: inline-block; width: 6px; height: 6px; border-radius: 50%;
       background: var(--secondary); margin: 0 2px; animation: blink 1.4s infinite both;
@@ -74,11 +75,12 @@
     .ai-float-btn.inactive { background: #94a3b8; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .speak-btn {
       position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
-      opacity: 0; transition: opacity 0.2s; color: var(--secondary);
+      opacity: 0.3; transition: opacity 0.2s; color: var(--secondary);
       background: none; border: none; font-size: 0.85rem; cursor: pointer;
       pointer-events: auto; z-index: 5;
     }
     .msg-ai:hover .speak-btn, .speak-btn:focus { opacity: 1; }
+    .speaking .speak-btn { opacity: 1; color: #8b5cf6; }
     .memory-card {
       background: var(--quick-btn-bg); border-radius: 1rem; padding: 0.75rem;
       margin: 0.5rem 0; font-size: 0.8rem;
@@ -88,6 +90,18 @@
       padding: 0.3rem 0; border-bottom: 1px solid var(--border);
     }
     .memory-item:last-child { border-bottom: none; }
+    .weather-card {
+      background: linear-gradient(135deg, #fdf2f8, #eff6ff); border-radius: 1rem; padding: 0.75rem;
+      margin-bottom: 0.75rem; font-size: 0.8rem; text-align: center; color: #475569;
+    }
+    body.dark .weather-card { background: linear-gradient(135deg, #1e293b, #334155); color: #cbd5e1; }
+    .breath-circle {
+      width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(139,92,246,0.3), rgba(139,92,246,0.8));
+      margin: 0.5rem auto; cursor: pointer; transition: all 4s;
+    }
+    .breath-circle.inhale { transform: scale(1.5); }
+    .mute-active { color: #ef4444 !important; animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     ::-webkit-scrollbar { width: 4px; background: transparent; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
@@ -103,6 +117,20 @@
       .msg-user, .msg-ai { max-width: 70% !important; }
       .ai-float-btn { width: 3.6rem; height: 3.6rem; bottom: 5.5rem; right: 1.5rem; }
     }
+    .custom-dialog {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: var(--msg-ai-bg); color: var(--msg-ai-text);
+      border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 100; text-align: center; max-width: 320px; width: 90%;
+    }
+    .custom-dialog-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99;
+    }
+    .custom-dialog button {
+      background: var(--msg-user-bg); color: #fff; border: none; border-radius: 2rem;
+      padding: 0.5rem 1.5rem; margin: 0.5rem; font-size: 0.9rem; cursor: pointer;
+    }
+    .custom-dialog .cancel-btn { background: var(--border); color: var(--msg-ai-text); }
   </style>
 </head>
 <body>
@@ -116,6 +144,7 @@
       <button id="ai-top-entry" style="background:var(--ai-inactive-gradient);color:white;padding:4px 14px;border-radius:9999px;font-size:0.8rem;display:flex;align-items:center;gap:4px;border:none;cursor:pointer;"><i class="fas fa-brain"></i> <span id="ai-top-text">AI</span></button>
       <button id="settings-btn" class="text-gray-500 dark:text-gray-300 p-1" aria-label="设置"><i class="fas fa-cog"></i></button>
       <button id="theme-btn" class="text-gray-500 dark:text-gray-300 p-1" aria-label="切换主题"><i id="theme-icon" class="fas fa-moon"></i></button>
+      <button id="mute-btn" class="text-gray-500 dark:text-gray-300 p-1" aria-label="取消朗读"><i class="fas fa-bell-slash"></i></button>
       <button id="clear-btn" class="text-gray-500 hover:text-red-500 p-1" aria-label="清空对话"><i class="fas fa-trash-alt"></i></button>
     </div>
   </header>
@@ -127,6 +156,8 @@
 
   <main id="messages-container" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3" aria-live="polite" style="overscroll-behavior:contain;"></main>
 
+  <div id="weather-card" class="weather-card hidden"></div>
+
   <div class="px-3 sm:px-4 py-2 flex gap-2 overflow-x-auto" id="quick-emotions">
     <button class="quick-emotion-btn" data-emotion="sad">😢 难过</button>
     <button class="quick-emotion-btn" data-emotion="anxious">😰 焦虑</button>
@@ -136,7 +167,13 @@
     <button class="quick-emotion-btn" data-emotion="grateful">🙏 感恩</button>
   </div>
 
+  <div id="breath-container" class="hidden flex flex-col items-center p-2">
+    <div id="breath-circle" class="breath-circle"></div>
+    <span id="breath-text" class="text-xs text-secondary mt-1">跟着我呼吸吧</span>
+  </div>
+
   <footer class="footer-bg p-2 sm:p-3">
+    <div id="queue-hint" class="text-xs text-secondary text-center hidden mb-1">小暖还在想上一句...</div>
     <div class="flex items-center gap-2">
       <button id="voice-btn" class="text-gray-500 dark:text-gray-300 p-2" aria-label="语音输入"><i class="fas fa-microphone"></i></button>
       <input id="user-input" type="text" placeholder="说点什么吧..." class="input-area flex-1 border rounded-full px-3 py-1.5 sm:px-4 sm:py-2 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" autocomplete="off">
@@ -151,41 +188,189 @@
   <div id="settings-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 w-full max-w-sm shadow-xl">
       <h2 class="text-lg font-bold mb-3">AI 设置</h2>
-      <p class="text-sm text-secondary mb-2">填入 DeepSeek API Key，或使用内置密钥（需密码激活）。</p>
-      <input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 mb-2 dark:bg-gray-700 text-sm">
+      <p class="text-sm text-secondary mb-3">填入 DeepSeek API Key，或使用内置密钥（需密码激活）。</p>
+      <div id="own-key-section" class="flex gap-2 mb-2">
+        <input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm">
+        <button id="save-key-btn" class="bg-pink-500 text-white px-4 py-2 rounded-full text-sm flex-shrink-0">保存</button>
+      </div>
+      <div id="or-section" class="text-center text-sm text-secondary my-2">或</div>
+      <button id="use-builtin-btn" class="w-full bg-purple-400 text-white py-2 rounded-full text-sm mb-2">使用内置密钥</button>
       <div id="password-section" class="mb-2 hidden">
         <input id="password-input" type="password" placeholder="输入使用密码" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm">
         <p class="text-xs text-gray-400 mt-1">密码验证通过后将自动激活内置密钥</p>
-        <button id="activate-key-btn" class="mt-2 bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm">验证并激活</button>
-        <span id="password-error" class="text-red-500 text-xs ml-2 hidden">密码错误</span>
+        <div class="flex gap-2 mt-2">
+          <button id="activate-key-btn" class="bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm flex-1">验证并激活</button>
+          <button id="cancel-builtin-btn" class="bg-gray-300 dark:bg-gray-600 text-white px-4 py-1.5 rounded-full text-sm">返回自备密钥</button>
+        </div>
+        <span id="password-error" class="text-red-500 text-xs mt-1 hidden">密码错误</span>
       </div>
-      <div class="flex gap-2 mt-3">
-        <button id="use-builtin-btn" class="bg-purple-400 text-white px-3 py-1.5 rounded-full text-sm flex-1">使用内置密钥</button>
-        <button id="save-api-key" class="bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm flex-1">保存自备密钥</button>
-        <button id="close-settings" class="bg-gray-300 dark:bg-gray-600 px-4 py-1.5 rounded-full text-sm">取消</button>
-      </div>
-      <p class="text-xs text-gray-400 mt-2">🔒 密钥仅在本地加密存储，不会上传。</p>
+      <button id="close-settings" class="w-full bg-gray-300 dark:bg-gray-600 px-4 py-2 rounded-full text-sm mt-3">关闭</button>
+      <p class="text-xs text-gray-400 mt-2 text-center">🔒 密钥仅在本地加密存储，不会上传。</p>
       <div id="memory-card-container" class="mt-4"></div>
     </div>
   </div>
 
   <script type="module">
-    // ==================== 工具 ====================
     const encrypt = (text) => btoa(String.fromCharCode(...new TextEncoder().encode(text)));
     const decrypt = (encoded) => new TextDecoder().decode(Uint8Array.from(atob(encoded), c => c.charCodeAt(0)));
     const escapeHtml = (str) => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
 
-    // 密钥分片存储 (Base64)
     const _k1 = atob('c2stN2Iw'); const _k2 = atob('Yjk1MzEzYWFh'); const _k3 = atob('NDYxMWI2MzZiZTU3OWRhOTBkYzQ=');
     function _getBuiltinKey() { return _k1 + _k2 + _k3; }
     const _pwA = atob('RFlEMjA='); const _pwB = atob('MTAwOTA5');
     function _getCorrectPassword() { return _pwA + _pwB; }
     const BUILTIN_KEY = _getBuiltinKey(); const CORRECT_PASSWORD = _getCorrectPassword();
 
-    // ==================== 核心引擎 ====================
+    let gentleVoice = null;
+    function findGentleVoice() {
+      const voices = speechSynthesis.getVoices();
+      const preferred = ['Microsoft Xiaoxiao', 'Tingting', 'Sin-ji', 'Google 普通话（中国大陆）'];
+      for (const name of preferred) {
+        const found = voices.find(v => v.name.includes(name) && v.lang.startsWith('zh'));
+        if (found) { gentleVoice = found; return; }
+      }
+      gentleVoice = voices.find(v => v.lang.startsWith('zh') && v.name.toLowerCase().includes('female'))
+        || voices.find(v => v.lang.startsWith('zh')) || null;
+    }
+    speechSynthesis.onvoiceschanged = findGentleVoice;
+    setTimeout(findGentleVoice, 300);
+    let activeBubble = null, isSpeaking = false;
+
+    function speakText(text, bubble) {
+      speechSynthesis.cancel();
+      if (activeBubble) {
+        activeBubble.classList.remove('speaking');
+        activeBubble.style.boxShadow = activeBubble.dataset.origShadow || '';
+        activeBubble = null;
+      }
+      if (bubble) {
+        bubble.dataset.origShadow = bubble.style.boxShadow || '';
+        bubble.style.boxShadow = '0 0 8px rgba(139,92,246,0.5)';
+        bubble.classList.add('speaking');
+        activeBubble = bubble;
+        isSpeaking = true;
+        updateMuteButton();
+      }
+      // 过滤 Emoji 和短括号感情提示
+      let cleanText = text.replace(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]/gu, '');
+      cleanText = cleanText.replace(/（[^）]{1,4}）/g, ''); // 移除长度1-4字的括号内容
+      cleanText = cleanText.replace(/\([^)]{1,4}\)/g, ''); // 英文括号
+      cleanText = cleanText.trim();
+      if (!cleanText) return;
+      const u = new SpeechSynthesisUtterance(cleanText);
+      u.lang = 'zh-CN'; u.rate = 0.85; u.pitch = 1.1;
+      u.volume = document.body.classList.contains('dark') ? 0.6 : 0.9;
+      if (gentleVoice) u.voice = gentleVoice;
+      u.onend = () => stopSpeaking();
+      u.onerror = () => stopSpeaking();
+      setTimeout(() => speechSynthesis.speak(u), 50);
+    }
+
+    function stopSpeaking() {
+      if (activeBubble) {
+        activeBubble.classList.remove('speaking');
+        activeBubble.style.boxShadow = activeBubble.dataset.origShadow || '';
+        activeBubble = null;
+      }
+      isSpeaking = false;
+      updateMuteButton();
+    }
+
+    function updateMuteButton() {
+      const btn = document.getElementById('mute-btn');
+      if (isSpeaking) {
+        btn.classList.add('mute-active');
+        btn.innerHTML = '<i class="fas fa-volume-up"></i>';
+      } else {
+        btn.classList.remove('mute-active');
+        btn.innerHTML = '<i class="fas fa-bell-slash"></i>';
+      }
+    }
+
+    document.getElementById('mute-btn').addEventListener('click', () => {
+      speechSynthesis.cancel();
+      stopSpeaking();
+    });
+
+    let breathInterval = null;
+    function startBreathGuide() {
+      const container = document.getElementById('breath-container');
+      const circle = document.getElementById('breath-circle');
+      const text = document.getElementById('breath-text');
+      container.classList.remove('hidden');
+      let step = 0;
+      const steps = [
+        { text: '吸气……4秒', class: 'inhale', duration: 4000 },
+        { text: '屏息……7秒', class: '', duration: 7000 },
+        { text: '呼气……8秒', class: '', duration: 8000 },
+      ];
+      function next() {
+        clearTimeout(breathInterval);
+        if (!container.classList.contains('hidden')) {
+          const s = steps[step % 3];
+          text.textContent = s.text;
+          circle.className = 'breath-circle ' + s.class;
+          breathInterval = setTimeout(() => { step++; next(); }, s.duration);
+        }
+      }
+      next();
+    }
+    function stopBreathGuide() {
+      clearTimeout(breathInterval);
+      document.getElementById('breath-container').classList.add('hidden');
+    }
+    window.startBreath = () => { stopBreathGuide(); startBreathGuide(); };
+
+    function showWeatherCard() {
+      const card = document.getElementById('weather-card');
+      const hour = new Date().getHours();
+      let timeWord = '上午好';
+      if (hour < 6) timeWord = '夜深了';
+      else if (hour < 9) timeWord = '早上好';
+      else if (hour < 12) timeWord = '上午好';
+      else if (hour < 14) timeWord = '中午好';
+      else if (hour < 18) timeWord = '下午好';
+      else if (hour < 22) timeWord = '晚上好';
+      const yesterdayMood = engine.userProfile?.lastMood;
+      const msg = yesterdayMood
+        ? `${timeWord}。昨天你的心情是“${yesterdayMood}”，今天无论怎样，我都会陪着你。`
+        : `${timeWord}。今天的心情，还在等你告诉我。`;
+      card.textContent = msg;
+      card.classList.remove('hidden');
+      setTimeout(() => card.classList.add('hidden'), 8000);
+    }
+
+    function customConfirm(message, onConfirm) {
+      const bg = document.createElement('div'); bg.className = 'custom-dialog-bg';
+      const dialog = document.createElement('div'); dialog.className = 'custom-dialog';
+      dialog.innerHTML = `<p style="margin-bottom:1rem;">${message}</p>
+        <button class="cancel-btn" id="custom-cancel">再想想</button>
+        <button id="custom-confirm">确定</button>`;
+      bg.appendChild(dialog);
+      document.body.appendChild(bg);
+      document.getElementById('custom-cancel').addEventListener('click', () => bg.remove());
+      document.getElementById('custom-confirm').addEventListener('click', () => { bg.remove(); onConfirm(); });
+    }
+
+    let idleTimer = null;
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        if (!engine.isGenerating && !queue.length) {
+          const msg = "我还在哦。不想说话也没关系，我在这里。";
+          addMessage('assistant', msg);
+          engine.saveToHistory('__system_idle__', msg);
+        }
+      }, 180000);
+    }
+    window.addEventListener('touchstart', resetIdleTimer);
+    window.addEventListener('click', resetIdleTimer);
+    window.addEventListener('keypress', resetIdleTimer);
+    resetIdleTimer();
+
     class CompanionEngine {
       constructor() {
-        this.chatHistory = []; this.maxHistory = 6; this.userProfile = {}; this.apiKey = ''; this.isGenerating = false; this.aiFailCount = 0;
+        this.chatHistory = []; this.maxHistory = 12; this.userProfile = {}; this.apiKey = ''; this.isGenerating = false; this.aiFailCount = 0;
         this.emotionKeywords = {
           happy: ['开心','高兴','快乐','笑','哈哈','棒','好耶','幸福','满足','欢喜','愉快','欣喜','乐呵呵','美滋滋','雀跃','开怀','眉开眼笑','手舞足蹈','舒心','畅快','安然','惬意','舒坦','平和','安宁','安心','踏实','放松','悠然','恬淡','自在','知足','慰藉','欣慰','暖心','舒服','甜美','治愈','欢欣','激动','振奋','兴致勃勃','尽兴','享受','沉醉','着迷','心动','甜蜜','得意','轻快','欢天喜地','欣喜若狂','心花怒放','乐不可支','自豪','骄傲','成就感','扬眉吐气','自信','荣耀','光荣','如释重负','解脱','释怀','惊喜','喜出望外','受宠若惊','意外之喜','亲昵','温柔','被爱','归属感','融洽','亲近','温情','和睦','依恋'],
           grateful: ['谢谢','感恩','感谢','有你','真好','感激','多谢','恩情','戴德','感念','念叨','幸亏','多亏','承蒙','感动','铭记'],
@@ -212,13 +397,13 @@
           suicide: "我听到你说的话，心里很沉。你不是一个人，请立刻联系信任的人，或拨打心理援助热线。",
           selfHarm: "你提到伤害自己，我真的很担心。身体的痛只是暂时的出口，我们一起找更好的方式好吗？",
           death: "失去重要的人，那种痛我懂。你不用急着好起来，我会一直在这里陪你。",
-          despair: "我明白那种感觉，好像什么都看不到头。但请相信，此刻的绝望不是永远。"
+          despair: "我明白那种感觉，好像什么都看不到头。但请相信，此刻的绝望不是永远。",
+          default: "我能感受到你现在很痛苦，请和我说说发生了什么。"
         };
         this.mourningBodies = ["失去一个人，就像身体少了一块，痛是真实的。","他/她一定对你很重要，这份思念不用隐藏。","如果你想聊聊他/她，我很想听。","天堂或者远方，我们无法再碰触，但爱不会消失。"];
         this.templates = this.buildTemplates();
         this.loadLocalData();
       }
-
       loadLocalData() {
         try { this.userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch { this.userProfile = {}; }
         const enc = localStorage.getItem('deepseekApiKeyEnc');
@@ -232,7 +417,6 @@
           const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'user',content:'hi'}], max_tokens:5, stream:false }), signal:ctrl.signal });
           clearTimeout(t); if (!res.ok) return false; const data = await res.json(); return !!data.choices?.[0]?.message?.content; } catch { return false; }
       }
-
       buildTemplates() {
         const hOpen = ["你的快乐感染了我","太棒了","真为你开心","笑容是最好的礼物","听到你开心我也跟着高兴","这份喜悦值得被记住","真好呀","你的幸福就是我的幸福"];
         const hBody = ["谢谢你和我分享你的快乐。","希望这样的时刻多一点。","好的事情总是值得庆祝的。","这一刻的开心是真实的。","你笑起来一定很好看。"];
@@ -281,9 +465,7 @@
           general: { openings: genOpen, bodies: genBody, endings: genEnd, emojis: ['🌸','✨','☁️','💖','🧸','💗','🌿'] }
         };
       }
-
       hasDoubleNegation(seg) { return /(?:没|不).{0,2}(?:不|没)/.test(seg) || /不是不|没有不/.test(seg) || /没[^\s]{1,3}不/.test(seg); }
-
       detectEmotion(text) {
         const lower = text.toLowerCase(); const hits = [];
         for (const [emotion, keywords] of Object.entries(this.emotionKeywords)) {
@@ -301,11 +483,12 @@
           if (hits.some(h => h.emotion==='happy'||h.emotion==='grateful'||h.emotion==='hopeful')) return { emotion:'sad', intensity:1 };
           return { emotion:'general', intensity:0 };
         }
-        const chosen = valid[0]; return { emotion: chosen.emotion, intensity: Math.min(valid.length, 3) };
+        const chosen = valid[0];
+        this.userProfile.lastMood = chosen.emotion;
+        try { localStorage.setItem('userProfile', JSON.stringify(this.userProfile)); } catch {}
+        return { emotion: chosen.emotion, intensity: Math.min(valid.length, 3) };
       }
-
       detectCrisis(text) { const lower = text.toLowerCase(); for (const [type, words] of Object.entries(this.crisisKeywords)) if (words.some(w => lower.includes(w))) return type; return null; }
-
       getCrisisResponse(type) {
         if (!this.userProfile.crisisLog) this.userProfile.crisisLog = {}; const now = Date.now();
         if (!this.userProfile.crisisLog[type]) this.userProfile.crisisLog[type] = [];
@@ -313,7 +496,7 @@
         this.userProfile.crisisLog[type].push({ time: now });
         try { localStorage.setItem('userProfile', JSON.stringify(this.userProfile)); } catch {}
         const count = this.userProfile.crisisLog[type].length;
-        let base = this.crisisResponses[type] || '';
+        let base = this.crisisResponses[type] || this.crisisResponses.default;
         if (type === 'death') base += ' ' + (this.mourningBodies[Math.floor(Math.random()*this.mourningBodies.length)] || '') + ' 🌿';
         else base += ' 🌿';
         if (count >= 3) base += ' 如需立即帮助，请拨打希望24热线：400-161-9995';
@@ -321,7 +504,6 @@
         else base += ' 📞 希望24热线：400-161-9995';
         return base;
       }
-
       extractFacts(text) {
         const nm = text.match(/我叫([\u4e00-\u9fa5a-zA-Z]{2,10})/); if (nm) this.userProfile.name = nm[1];
         const pm = text.match(/我养了?[一只个]*([\u4e00-\u9fa5]+)/); if (pm && pm[1].length <= 5) this.userProfile.pet = pm[1];
@@ -333,7 +515,6 @@
         const argm = text.match(/我和(.+?)吵架了/); if (argm) this.userProfile.recentEvent = { type:'argue', with: argm[1], time: Date.now() };
         try { localStorage.setItem('userProfile', JSON.stringify(this.userProfile)); } catch {}
       }
-
       getProfileHint() {
         const parts = [];
         if (this.userProfile.name) parts.push(`用户名叫${this.userProfile.name}`);
@@ -343,7 +524,6 @@
         if (this.userProfile.recentEvent && (Date.now()-this.userProfile.recentEvent.time < 86400000)) parts.push(`最近和${this.userProfile.recentEvent.with}发生过争吵`);
         return parts.length ? '【关于用户】：' + parts.join('；') + '。\n' : '';
       }
-
       buildSystemPrompt() {
         const hour = new Date().getHours(); let timeCtx = '';
         if (hour < 6) timeCtx = '深夜，用户可能失眠，多陪伴。'; else if (hour < 9) timeCtx = '清晨，轻轻问候。';
@@ -351,7 +531,6 @@
         else if (hour < 18) timeCtx = '下午。'; else if (hour < 22) timeCtx = '晚上，用户易感孤单。'; else timeCtx = '深夜，用户需要陪伴。';
         return `你叫"小暖"，是一个温柔耐心的陪伴者。你正在和一位用户聊天。用户的名字可能未知，除非用户告诉过你（见下方记忆）。如果用户没有告诉你名字，请不要随意称呼用户的名字，不要称用户为"小暖"。当用户表达希望或期待时，请给予积极的肯定和温柔的陪伴。${this.getProfileHint()}${timeCtx}回复简短真诚，不超过三句话。不要使用"你应该""你需要"。如果用户提到自杀、自残，必须表达担心并鼓励寻求专业帮助。`;
       }
-
       generateWarmReply(userText, lifeEvent) {
         const crisis = this.detectCrisis(userText); if (crisis) return this.getCrisisResponse(crisis);
         const { emotion, intensity } = this.detectEmotion(userText);
@@ -369,54 +548,66 @@
         const ending = (pool.endings?.length) ? pool.endings[Math.floor(Math.random()*pool.endings.length)] : '';
         const emoji = (pool.emojis?.length) ? pool.emojis[Math.floor(Math.random()*pool.emojis.length)] : '';
         const words = userText.split(/\s+/).filter(w => w.length>1); let extra = '';
-        if (words.length && Math.random()>0.4) {
+        if (words.length && Math.random()>0.6) {
           const w = words[Math.floor(Math.random()*words.length)];
           if (w && !(this.emotionKeywords[emotion]||[]).includes(w) && w!=='不是') extra = ` 你刚提到的"${escapeHtml(w)}"，我也会放在心上。`;
         }
         const variants = [`${opening} ${body}${extra} ${ending} ${emoji}`, `${body} ${opening} ${ending} ${emoji}`, `${opening} ${emoji} ${body}${extra} ${ending}`];
         return variants[Math.floor(Math.random()*variants.length)];
       }
-
-      async callDeepSeek(userMessage) {
+      async callDeepSeekStream(userMessage, onChunk, onSensitive) {
         if (!this.apiKey || this.aiFailCount >= 2) return null;
         const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 8000);
         try {
           const msgs = [{ role:'system', content: this.buildSystemPrompt() }, ...this.chatHistory.slice(-this.maxHistory), { role:'user', content: userMessage }];
-          const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${this.apiKey}`}, body:JSON.stringify({ model:'deepseek-chat', messages:msgs, temperature:0.8, max_tokens:150, stream:false }), signal:ctrl.signal });
+          const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method:'POST', headers: {'Content-Type':'application/json', 'Authorization':`Bearer ${this.apiKey}`},
+            body: JSON.stringify({ model:'deepseek-chat', messages:msgs, temperature:0.8, max_tokens:300, stream:true }),
+            signal: ctrl.signal
+          });
           if (!res.ok) return { error: res.status===401||res.status===403?'auth':'api_error' };
-          const data = await res.json(); const text = data.choices?.[0]?.message?.content; this.aiFailCount = 0;
-          return (text && text.trim().length > 0) ? { text: text.trim() } : null;
-        } catch (e) { console.warn('DeepSeek failed', e); this.aiFailCount++; return null; } finally { clearTimeout(t); }
-      }
-
-      sanitizeAIResponse(t) { if (!t) return false; const forbidden = ['你可以试试','鼓励你','没什么大不了','睡一觉就好','去做吧','割腕','自杀方法']; return !forbidden.some(w => t.includes(w)); }
-
-      async reply(userText) {
-        if (/不说这个了|换个话题/.test(userText)) { this.chatHistory = []; try { localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory)); } catch {} return { text:'好的，我们换个话题聊聊吧～', role:'assistant' }; }
-        this.extractFacts(userText); const crisis = this.detectCrisis(userText); if (crisis) return { text: this.getCrisisResponse(crisis), role:'assistant' };
-        const hasTime = /几点了|现在几点/.test(userText); const clean = userText.replace(/几点了|现在几点|什么时间|什么时候了|报时/gi,'').trim();
-        if (hasTime && !clean) return { text: `现在是 ${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}${this.getTimeExtra()}`, role:'assistant' };
-        let aiDown = false;
-        if (this.apiKey && this.aiFailCount < 2) {
-          let aiInput = userText; if (hasTime && clean) aiInput = userText + ' （请同时告知时间）';
-          const aiResult = await this.callDeepSeek(aiInput);
-          if (aiResult) {
-            if (aiResult.error === 'auth') { this.setApiKey(''); this.aiFailCount = 0; return { text: '你输入的密钥无法使用，请检查后重新设置。现在已切回本地暖言模式。', role:'assistant', clearKey: true }; }
-            if (aiResult.text && this.sanitizeAIResponse(aiResult.text)) return { text: escapeHtml(aiResult.text), role:'assistant' };
+          if (!res.body) throw new Error('Streaming not supported');
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let fullText = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const dataStr = line.slice(6).trim();
+                if (dataStr === '[DONE]') break;
+                try {
+                  const json = JSON.parse(dataStr);
+                  const content = json.choices?.[0]?.delta?.content || '';
+                  if (content) {
+                    fullText += content;
+                    if (!this.sanitizeAIResponse(fullText)) {
+                      reader.cancel();
+                      if (onSensitive) onSensitive();
+                      return null;
+                    }
+                    onChunk(fullText);
+                  }
+                } catch {}
+              }
+            }
           }
-          if (this.aiFailCount >= 2) aiDown = true;
-        } else if (this.aiFailCount >= 2) { aiDown = true; }
-        await new Promise(r => setTimeout(r, 600 + Math.random()*400));
-        let warm = this.generateWarmReply(clean || userText, this.userProfile.lifeEvent);
-        if (hasTime && clean) warm += ` （现在是${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}哦）`;
-        return { text: warm, role:'assistant', aiDown };
+          this.aiFailCount = 0;
+          return (fullText.trim().length > 0) ? { text: fullText.trim() } : null;
+        } catch (e) { console.warn('DeepSeek stream failed', e); this.aiFailCount++; return null; }
+        finally { clearTimeout(t); }
       }
-
-      getTimeExtra() { const h = new Date().getHours(); if (h<6) return '，又是一个安静的深夜，我陪你。'; if (h<12) return '，上午好，今天有什么打算？'; if (h<18) return '，下午了，记得伸个懒腰。'; return '，晚上好，把心事交给我吧。'; }
-      saveToHistory(user, assistant) { this.chatHistory.push({ role:'user', content:user }, { role:'assistant', content:assistant }); try { localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory)); } catch {} }
+      sanitizeAIResponse(t) { if (!t) return false; const forbidden = ['你可以试试','鼓励你','没什么大不了','睡一觉就好','去做吧','割腕','自杀方法']; return !forbidden.some(w => t.includes(w)); }
+      saveToHistory(user, assistant) {
+        if (user === '__system_idle__') { this.chatHistory.push({ role:'assistant', content:assistant }); return; }
+        this.chatHistory.push({ role:'user', content:user }, { role:'assistant', content:assistant });
+        try { localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory)); } catch {}
+      }
     }
 
-    // ===================== UI 层 =====================
     const engine = new CompanionEngine();
     const el = {
       input: document.getElementById('user-input'), sendBtn: document.getElementById('send-btn'), voiceBtn: document.getElementById('voice-btn'),
@@ -441,11 +632,8 @@
     function addSpeakBtn(bubble) {
       if (bubble.querySelector('.speak-btn')) return;
       const sb = document.createElement('button'); sb.className = 'speak-btn'; sb.innerHTML = '<i class="fas fa-volume-up"></i>';
-      sb.addEventListener('click', e => { e.stopPropagation(); speechSynthesis.cancel();
-        const text = getBubbleText(bubble); if (!text) return;
-        const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; u.rate=0.9;
-        setTimeout(() => speechSynthesis.speak(u), 50);
-      });
+      sb.setAttribute('aria-label', '朗读消息');
+      sb.addEventListener('click', e => { e.stopPropagation(); speakText(getBubbleText(bubble), bubble); });
       bubble.appendChild(sb);
     }
 
@@ -472,20 +660,67 @@
       if (!bubble.querySelector('.speak-btn')) addSpeakBtn(bubble);
     }
 
+    function isTimeQuery(text) { return /几点了|现在几点/.test(text); }
+    function getTimeReply() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+      const hour = now.getHours();
+      let extra = '';
+      if (hour < 6) extra = '，又是一个安静的深夜，我陪你。';
+      else if (hour < 12) extra = '，上午好，今天有什么打算？';
+      else if (hour < 18) extra = '，下午了，记得伸个懒腰。';
+      else extra = '，晚上好，把心事交给我吧。';
+      return `现在是 ${timeStr}${extra}`;
+    }
+
     async function processQueue() {
       processing = true;
       while (queue.length && !clearFlag) {
         const msg = queue.shift(); engine.isGenerating = true; el.sendBtn.disabled = true;
         const bubble = addMessage('assistant', '...'); if (!bubble) continue;
-        let reply; try { reply = await engine.reply(msg); } catch { reply = { text: '抱歉，我好像卡住了，请再说一次吧。' }; }
-        updateMessage(bubble, reply.text); engine.saveToHistory(msg, reply.text);
-        if (reply.clearKey || reply.aiDown) setMode('warm');
+        let finalText = '';
+
+        const clean = msg.replace(/几点了|现在几点|什么时间|什么时候了|报时/gi,'').trim();
+        if (isTimeQuery(msg) && clean.length === 0) {
+          finalText = getTimeReply();
+          updateMessage(bubble, finalText);
+          engine.saveToHistory(msg, finalText);
+          engine.isGenerating = false; el.sendBtn.disabled = false;
+          document.getElementById('queue-hint').classList.toggle('hidden', queue.length === 0);
+          continue;
+        }
+
+        const shouldUseAI = engine.apiKey && engine.aiFailCount < 2;
+        if (shouldUseAI) {
+          let partialText = '';
+          const result = await engine.callDeepSeekStream(msg, (full) => {
+            partialText = full;
+            updateMessage(bubble, partialText);
+          }, () => {});
+          if (result && result.error === 'auth') {
+            engine.setApiKey(''); engine.aiFailCount = 0;
+            finalText = '你输入的密钥无法使用，请检查后重新设置。现在已切回本地暖言模式。';
+            setMode('warm');
+          } else if (result && result.text && engine.sanitizeAIResponse(result.text)) {
+            finalText = escapeHtml(result.text);
+          } else {
+            finalText = engine.generateWarmReply(msg, engine.userProfile.lifeEvent);
+            if (isTimeQuery(msg) && clean.length > 0) finalText += ` （现在是${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}哦）`;
+          }
+          engine.detectEmotion(msg);
+        } else {
+          finalText = engine.generateWarmReply(msg, engine.userProfile.lifeEvent);
+          if (isTimeQuery(msg) && clean.length > 0) finalText += ` （现在是${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}哦）`;
+        }
+        updateMessage(bubble, finalText);
+        engine.saveToHistory(msg, finalText);
         engine.isGenerating = false; el.sendBtn.disabled = false;
+        document.getElementById('queue-hint').classList.toggle('hidden', queue.length === 0);
       }
       processing = false;
     }
 
-    function enqueue(t) { if (!t) return; queue.push(t); if (!processing) processQueue(); }
+    function enqueue(t) { if (!t) return; queue.push(t); document.getElementById('queue-hint').classList.remove('hidden'); if (!processing) processQueue(); }
 
     function loadHistoryAndGreet() {
       const stored = localStorage.getItem('chatHistory'); if (stored) { try { engine.chatHistory = JSON.parse(stored); } catch { engine.chatHistory = []; } }
@@ -494,6 +729,7 @@
         const g = "嗨，我是小暖。我能感知你的喜怒哀乐，放心和我说任何事。"; addMessage('assistant', g);
         engine.chatHistory.push({ role:'assistant', content:g }); try { localStorage.setItem('chatHistory', JSON.stringify(engine.chatHistory)); } catch {}
       }
+      showWeatherCard();
     }
 
     function renderMemoryCards() {
@@ -527,19 +763,48 @@
       } else {
         engine.aiFailCount = 2;
         setMode('warm');
-        el.statusText.textContent = '重试失败，仍使用本地陪伴';
       }
     }
 
     function setupUI() {
-      el.sendBtn.addEventListener('click', () => { const t = el.input.value.trim(); if (t && !engine.isGenerating) { addMessage('user', t); el.input.value = ''; enqueue(t); } });
+      el.sendBtn.addEventListener('click', () => { const t = el.input.value.trim(); if (t && !engine.isGenerating) { addMessage('user', t); el.input.value = ''; enqueue(t); el.input.focus(); } });
       el.input.addEventListener('keypress', e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); el.sendBtn.click(); } });
-      document.querySelectorAll('.quick-emotion-btn').forEach(b => { b.addEventListener('click', () => { const t={sad:'我今天很难过，',anxious:'我有点焦虑，',tired:'我好累，',lonely:'我觉得好孤独，',happy:'我今天挺开心的，',grateful:'真的很感谢你，'}; el.input.value=t[b.dataset.emotion]||''; el.input.focus(); }); });
-      document.getElementById('clear-btn').addEventListener('click', () => {
-        if (confirm('清空所有聊天记录和个人记忆吗？')) { clearFlag = true; engine.chatHistory = []; engine.userProfile = {}; try { localStorage.removeItem('chatHistory'); localStorage.removeItem('userProfile'); } catch {} el.messages.innerHTML = ''; clearFlag = false;
-          const g = "记忆全部清空，我们从新开始吧。"; addMessage('assistant', g); engine.chatHistory.push({ role:'assistant', content:g }); try { localStorage.setItem('chatHistory', JSON.stringify(engine.chatHistory)); } catch {} queue.length = 0; processing = false; engine.isGenerating = false; renderMemoryCards(); }
+      document.querySelectorAll('.quick-emotion-btn').forEach(b => {
+        let holdTimer;
+        b.addEventListener('touchstart', () => {
+          holdTimer = setTimeout(() => {
+            b.dataset.justSent = '1';
+            b.classList.add('activated');
+            if (navigator.vibrate) navigator.vibrate(15);
+            setTimeout(() => b.classList.remove('activated'), 200);
+            const texts = { sad: '我今天很难过，', anxious: '我有点焦虑，', tired: '我好累，', lonely: '我觉得好孤独，', happy: '我今天挺开心的，', grateful: '真的很感谢你，' };
+            const text = texts[b.dataset.emotion] || '';
+            addMessage('user', text);
+            enqueue(text);
+          }, 400);
+        });
+        b.addEventListener('touchend', () => clearTimeout(holdTimer));
+        b.addEventListener('touchmove', () => clearTimeout(holdTimer));
+        b.addEventListener('click', (e) => {
+          if (b.dataset.justSent === '1') { delete b.dataset.justSent; e.preventDefault(); return; }
+          const texts = { sad: '我今天很难过，', anxious: '我有点焦虑，', tired: '我好累，', lonely: '我觉得好孤独，', happy: '我今天挺开心的，', grateful: '真的很感谢你，' };
+          el.input.value = texts[b.dataset.emotion] || ''; el.input.focus();
+        });
       });
-      el.voiceBtn.addEventListener('click', () => { const SR = window.SpeechRecognition||window.webkitSpeechRecognition; if (!SR) return alert('浏览器不支持语音输入'); const rec = new SR(); rec.lang='zh-CN'; rec.interimResults=false; rec.onerror=()=>{ const toast=document.createElement('div'); toast.className='text-xs text-red-500 mt-1'; toast.textContent='麦克风未授权，可手动输入'; el.input.parentNode.appendChild(toast); setTimeout(()=>toast.remove(),3000); }; rec.onresult=e=>{ const v=e.results[0][0].transcript.trim(); if(v){el.input.value=v;el.sendBtn.click();} }; try{rec.start();}catch(e){alert('无法启动语音识别');} });
+      document.getElementById('clear-btn').addEventListener('click', () => {
+        customConfirm('确定要清空我们的聊天记录吗？<br>我会忘记你说过的话，但不会忘记你。', () => {
+          clearFlag = true; engine.chatHistory = []; engine.userProfile = {};
+          try { localStorage.removeItem('chatHistory'); localStorage.removeItem('userProfile'); } catch {}
+          el.messages.innerHTML = ''; clearFlag = false;
+          const g = "记忆全部清空，我们从新开始吧。"; addMessage('assistant', g);
+          engine.chatHistory.push({ role:'assistant', content:g });
+          try { localStorage.setItem('chatHistory', JSON.stringify(engine.chatHistory)); } catch {}
+          queue.length = 0; processing = false; engine.isGenerating = false;
+          renderMemoryCards();
+        });
+      });
+      el.voiceBtn.addEventListener('click', () => { const SR = window.SpeechRecognition||window.webkitSpeechRecognition; if (!SR) return alert('浏览器不支持语音输入'); const rec = new SR(); rec.lang='zh-CN'; rec.interimResults=false; rec.onerror=()=>{ const toast=document.createElement('div'); toast.className='text-xs text-red-500 mt-1'; toast.textContent='麦克风未授权，可手动输入'; el.input.parentNode.appendChild(toast); setTimeout(()=>toast.remove(),3000); }; rec.onresult=e=>{ const v=e.results[0][0].transcript.trim(); if(v){el.input.value=v;el.sendBtn.click();} }; try{rec.start();}catch(e){ const toast=document.createElement('div'); toast.className='text-xs text-red-500 mt-1'; toast.textContent='无法启动语音识别'; el.input.parentNode.appendChild(toast); setTimeout(()=>toast.remove(),3000); } });
+      document.getElementById('mute-btn').addEventListener('click', () => { speechSynthesis.cancel(); stopSpeaking(); });
 
       const themeBtn = document.getElementById('theme-btn'), themeIcon = document.getElementById('theme-icon');
       const applyTheme = d => { document.body.classList.toggle('dark', d); themeIcon.className = d?'fas fa-sun':'fas fa-moon'; localStorage.setItem('darkMode', d?'1':'0'); setMode(engine.apiKey?'deepseek':'warm'); };
@@ -552,15 +817,62 @@
       document.getElementById('settings-btn').addEventListener('click', ()=>{ renderMemoryCards(); refreshUI(); sm.classList.remove('hidden'); });
       const ak = document.getElementById('api-key-input'), ps = document.getElementById('password-section'), pi = document.getElementById('password-input');
       const akb = document.getElementById('activate-key-btn'), pe = document.getElementById('password-error'), ub = document.getElementById('use-builtin-btn');
-      const sb = document.getElementById('save-api-key'), cb = document.getElementById('close-settings');
+      const skb = document.getElementById('save-key-btn'), cb = document.getElementById('close-settings'), cancelBtn = document.getElementById('cancel-builtin-btn');
+      const ownSection = document.getElementById('own-key-section'), orSection = document.getElementById('or-section');
 
-      function refreshUI() { if (engine.apiKey===BUILTIN_KEY) { ak.value=''; ak.placeholder='内置密钥已激活'; } else { ak.value=engine.apiKey; ak.placeholder='sk-xxxxxxxx'; } ps.classList.add('hidden'); pi.value=''; pe.classList.add('hidden'); }
+      function refreshUI() {
+        if (engine.apiKey === BUILTIN_KEY) {
+          ak.value = ''; ak.placeholder = '内置密钥已激活'; ak.disabled = true;
+          ub.textContent = '已激活内置密钥'; ub.disabled = true;
+          ownSection.classList.add('hidden'); orSection.classList.add('hidden');
+          ps.classList.add('hidden');
+        } else {
+          ak.value = engine.apiKey; ak.placeholder = 'sk-xxxxxxxx'; ak.disabled = false;
+          ub.textContent = '使用内置密钥'; ub.disabled = false;
+          ownSection.classList.remove('hidden'); orSection.classList.remove('hidden');
+          ps.classList.add('hidden');
+        }
+        pi.value = ''; pe.classList.add('hidden');
+      }
+
       cb.addEventListener('click', ()=>sm.classList.add('hidden'));
-      ub.addEventListener('click', ()=>{ ps.classList.remove('hidden'); pi.focus(); });
-      akb.addEventListener('click', () => { if (pi.value===CORRECT_PASSWORD) { engine.setApiKey(BUILTIN_KEY); engine.aiFailCount=0; setMode('deepseek'); sm.classList.add('hidden'); ps.classList.add('hidden'); pi.value=''; } else { pe.classList.remove('hidden'); pi.value=''; } });
-      sb.addEventListener('click', async () => { const k = ak.value.trim(); if (!k) { engine.setApiKey(''); setMode('warm'); sm.classList.add('hidden'); return; } const ok = await engine.testApiKey(k); if (ok) { engine.setApiKey(k); engine.aiFailCount=0; setMode('deepseek'); sm.classList.add('hidden'); } else { alert('密钥无效，请检查后重试'); } ak.value=''; });
+      ub.addEventListener('click', () => {
+        ownSection.classList.add('hidden'); orSection.classList.add('hidden'); ub.classList.add('hidden');
+        ps.classList.remove('hidden'); pi.focus();
+      });
+      cancelBtn.addEventListener('click', () => {
+        ps.classList.add('hidden');
+        ownSection.classList.remove('hidden'); orSection.classList.remove('hidden'); ub.classList.remove('hidden');
+      });
+      skb.addEventListener('click', async () => {
+        const k = ak.value.trim();
+        if (!k) {
+          if (engine.apiKey) {
+            customConfirm('确定要清除AI密钥，切换回本地陪伴吗？', () => {
+              engine.setApiKey('');
+              setMode('warm');
+              sm.classList.add('hidden');
+            });
+          } else {
+            sm.classList.add('hidden');
+          }
+          return;
+        }
+        if (k === engine.apiKey) { sm.classList.add('hidden'); return; }
+        const ok = await engine.testApiKey(k);
+        if (ok) { engine.setApiKey(k); engine.aiFailCount=0; setMode('deepseek'); sm.classList.add('hidden'); }
+        else { alert('密钥无效，请检查后重试'); }
+        ak.value = '';
+      });
+      akb.addEventListener('click', () => {
+        if (pi.value === CORRECT_PASSWORD) {
+          engine.setApiKey(BUILTIN_KEY); engine.aiFailCount=0; setMode('deepseek');
+          sm.classList.add('hidden'); ps.classList.add('hidden');
+          ownSection.classList.remove('hidden'); orSection.classList.remove('hidden'); ub.classList.remove('hidden');
+          pi.value='';
+        } else { pe.classList.remove('hidden'); pi.value=''; }
+      });
       setMode(engine.apiKey?'deepseek':'warm');
-
       el.statusText.addEventListener('click', () => { if (engine.aiFailCount >= 2) retryAI(); });
 
       const tt = document.getElementById('time-tag'); const ut = () => { const h=new Date().getHours(); tt.textContent=h<12?'☀️ 上午':h<18?'🌤️ 下午':'🌙 晚上'; }; ut(); setInterval(ut, 60000);
