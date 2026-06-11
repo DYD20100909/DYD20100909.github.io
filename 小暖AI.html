@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="X-Frame-Options" content="DENY">
   <title>小暖 · 有温度的陪伴</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,7 +19,10 @@
       --ai-btn-bg: #8b5cf6; --ai-btn-text: #ffffff;
       --ai-gradient: linear-gradient(135deg, #8b5cf6, #a78bfa);
       --ai-inactive-gradient: linear-gradient(135deg, #9ca3af, #b0b7c3);
+      --send-btn-bg: linear-gradient(135deg, #ec4899, #f472b6);
+      --send-btn-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --btn-transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
     }
     body.dark {
       --bg-from: #0f172a; --bg-to: #1e293b; --header: #0f172a;
@@ -30,6 +34,8 @@
       --ai-btn-bg: #7c3aed; --ai-btn-text: #ffffff;
       --ai-gradient: linear-gradient(135deg, #7c3aed, #a78bfa);
       --ai-inactive-gradient: linear-gradient(135deg, #6b7280, #9ca3af);
+      --send-btn-bg: linear-gradient(135deg, #db2777, #f472b6);
+      --send-btn-shadow: 0 4px 12px rgba(219, 39, 119, 0.5);
     }
     body {
       background: linear-gradient(to bottom, var(--bg-from), var(--bg-to));
@@ -41,59 +47,79 @@
     }
     .header-bg { background: var(--header); border-bottom: 1px solid var(--border); }
     .msg-user { background: var(--msg-user-bg); color: var(--msg-user-text); }
-    .msg-ai { background: var(--msg-ai-bg); color: var(--msg-ai-text); border: 1px solid var(--border); line-height: 1.5; position: relative; }
+    .msg-ai { background: var(--msg-ai-bg); color: var(--msg-ai-text); border: 1px solid var(--border); line-height: 1.6; position: relative; white-space: pre-wrap; }
     .input-area { background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); }
     .footer-bg { background: var(--footer); border-top: 1px solid var(--border); }
     .text-secondary { color: var(--secondary); }
+
     .quick-emotion-btn, .breath-btn {
       background: var(--quick-btn-bg); color: var(--quick-btn-text);
-      border-radius: 9999px; padding: 6px 14px;
-      font-size: 0.75rem;
-      transition: transform 0.1s, background 0.2s;
-      white-space: nowrap; border: 1px solid var(--border);
-      cursor: pointer; touch-action: manipulation;
+      border-radius: 9999px; padding: 8px 16px; font-size: 0.8rem; font-weight: 500;
+      transition: var(--btn-transition); white-space: nowrap; border: 1px solid var(--border);
+      cursor: pointer; touch-action: manipulation; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      display: inline-flex; align-items: center; gap: 4px;
     }
-    .quick-emotion-btn:active, .breath-btn:active { transform: scale(0.96); }
-    .fade-in { animation: fadeInUp 0.2s ease-out; will-change: opacity, transform; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    .copy-tooltip {
-      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #fff;
-      font-size: 0.7rem; padding: 3px 10px; border-radius: 20px;
-      pointer-events: none; opacity: 0; transition: opacity 0.15s; white-space: nowrap; z-index: 10;
+    .quick-emotion-btn:hover, .breath-btn:hover {
+      background: var(--msg-ai-bg); box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-color: var(--ai-btn-bg);
     }
-    .copy-tooltip.show { opacity: 1; }
+    .quick-emotion-btn:active, .breath-btn:active { transform: scale(0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.1) inset; }
+
+    #ai-top-entry {
+      background: var(--ai-inactive-gradient); color: white; padding: 8px 16px; border-radius: 9999px;
+      font-size: 0.8rem; display: flex; align-items: center; gap: 4px; border: none; cursor: pointer;
+      transition: var(--btn-transition); box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #ai-top-entry:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+    #ai-top-entry:active { transform: scale(0.96); }
+
     .ai-float-btn {
       position: fixed; bottom: calc(5rem + var(--safe-bottom)); right: 1rem; z-index: 40;
-      background: var(--ai-btn-bg); color: var(--ai-btn-text);
-      width: 3.2rem; height: 3.2rem; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-      font-size: 1.4rem; cursor: pointer; transition: transform 0.1s, background 0.2s;
+      background: var(--ai-btn-bg); color: var(--ai-btn-text); width: 3.4rem; height: 3.4rem;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5); font-size: 1.5rem; cursor: pointer;
+      transition: transform 0.1s, background 0.2s, box-shadow 0.2s; border: 2px solid rgba(255,255,255,0.2);
     }
+    .ai-float-btn:hover { transform: scale(1.08); box-shadow: 0 12px 28px rgba(139, 92, 246, 0.7); }
     .ai-float-btn:active { transform: scale(0.95); }
-    .ai-float-btn.inactive { background: #94a3b8; box-shadow: none; }
+    .ai-float-btn.inactive { background: #94a3b8; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-color: transparent; }
+
     .speak-btn {
-      position: absolute; right: 8px; bottom: 8px;
-      opacity: 0.75; background: rgba(128,128,128,0.1); border-radius: 50%;
-      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
-      color: var(--secondary); border: none; font-size: 1rem; cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s; touch-action: manipulation;
+      position: absolute; right: 8px; bottom: 8px; opacity: 0.8; background: rgba(128,128,128,0.1);
+      border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+      color: var(--secondary); border: none; font-size: 1.1rem; cursor: pointer;
+      transition: var(--btn-transition); touch-action: manipulation;
     }
+    .speak-btn:hover { opacity: 1; background: rgba(139,92,246,0.15); color: #8b5cf6; transform: scale(1.1); }
     .speak-btn:active { transform: scale(0.92); opacity: 1; }
-    .speaking .speak-btn { opacity: 1; color: #8b5cf6; background: rgba(139,92,246,0.2); }
-    .memory-card { background: var(--quick-btn-bg); border-radius: 1rem; padding: 0.75rem; margin: 0.5rem 0; font-size: 0.8rem; }
-    .memory-item { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
-    .weather-card {
-      background: linear-gradient(135deg, #fdf2f8, #eff6ff); border-radius: 1rem; padding: 0.75rem;
-      margin-bottom: 0.75rem; font-size: 0.8rem; text-align: center; color: #475569;
+    .speaking .speak-btn { opacity: 1; color: #8b5cf6; background: rgba(139,92,246,0.2); box-shadow: 0 0 8px rgba(139,92,246,0.4); }
+
+    #send-btn {
+      background: var(--send-btn-bg); color: white; border-radius: 50%; padding: 12px;
+      box-shadow: var(--send-btn-shadow); border: none; cursor: pointer; transition: var(--btn-transition);
+      font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
     }
-    body.dark .weather-card { background: linear-gradient(135deg, #1e293b, #334155); color: #cbd5e1; }
-    .mute-active { color: #ef4444 !important; animation: pulse 1.2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
-    /* 呼吸模态框 - 完美动画 */
+    #send-btn:hover { transform: scale(1.08); box-shadow: 0 6px 16px rgba(236, 72, 153, 0.6); }
+    #send-btn:active { transform: scale(0.95); box-shadow: 0 2px 6px rgba(0,0,0,0.2) inset; }
+    #send-btn:disabled { opacity: 0.5; box-shadow: none; transform: none; background: #cbd5e1; }
+
+    .icon-btn {
+      background: transparent; border: none; color: var(--secondary); padding: 8px; border-radius: 50%;
+      cursor: pointer; transition: var(--btn-transition); font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+    }
+    .icon-btn:hover { background: rgba(0,0,0,0.05); color: var(--ai-btn-bg); }
+    .icon-btn:active { transform: scale(0.92); }
+    body.dark .icon-btn:hover { background: rgba(255,255,255,0.1); }
+
+    .weather-toast {
+      position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #fdf2f8, #eff6ff); border-radius: 2rem;
+      padding: 0.6rem 1.2rem; font-size: 0.8rem; text-align: center; color: #475569;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 30; opacity: 0; transition: opacity 0.4s;
+      pointer-events: none; white-space: nowrap;
+    }
+    body.dark .weather-toast { background: linear-gradient(135deg, #1e293b, #334155); color: #cbd5e1; }
+    .weather-toast.show { opacity: 1; }
+
     .breath-modal {
       position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
       z-index: 200; display: flex; align-items: center; justify-content: center;
@@ -102,110 +128,185 @@
     .breath-modal.active { visibility: visible; opacity: 1; }
     .breath-card {
       background: var(--msg-ai-bg); border-radius: 2rem; padding: 2rem 1.5rem;
-      text-align: center; box-shadow: 0 25px 40px rgba(0,0,0,0.3);
-      width: 280px; max-width: 85vw;
+      text-align: center; box-shadow: 0 25px 40px rgba(0,0,0,0.3); width: 280px; max-width: 85vw;
     }
     .breath-circle {
-      width: 120px; height: 120px; margin: 0 auto 1.5rem;
-      border-radius: 50%;
+      width: 120px; height: 120px; margin: 0 auto 1.5rem; border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.6), rgba(139,92,246,0.9));
-      box-shadow: 0 0 20px rgba(139,92,246,0.5);
-      transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: transform;
+      box-shadow: 0 0 20px rgba(139,92,246,0.5); will-change: transform; transition: transform 0.3s ease;
     }
-    /* 吸气放大，呼气恢复，屏息保持放大状态 */
-    .breath-circle.inhale { transform: scale(1.5); background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.8), #7c3aed); box-shadow: 0 0 35px rgba(139,92,246,0.8); }
-    .breath-circle.exhale { transform: scale(1); }
-    .breath-text { font-size: 1.2rem; font-weight: 500; margin: 0.75rem 0; color: var(--msg-ai-text); }
-    .breath-close { margin-top: 1rem; background: var(--border); border: none; border-radius: 2rem; padding: 0.6rem 1.4rem; font-size: 0.9rem; cursor: pointer; transition: transform 0.1s; }
+    .breath-circle.inhale {
+      transform: scale(1.5); background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.8), #7c3aed);
+      box-shadow: 0 0 35px rgba(139,92,246,0.8);
+      transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background 4s;
+    }
+    .breath-circle.exhale { transform: scale(1); transition: transform 8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .breath-text { font-size: 1.3rem; font-weight: 500; margin: 0.75rem 0; color: var(--msg-ai-text); }
+    .breath-countdown { font-size: 2.5rem; font-weight: 700; color: #8b5cf6; margin: 0.5rem 0; }
+    .breath-close {
+      margin-top: 1rem; background: var(--border); border: none; border-radius: 2rem;
+      padding: 0.6rem 1.4rem; font-size: 0.9rem; cursor: pointer; transition: var(--btn-transition);
+      color: var(--msg-ai-text);
+    }
+    .breath-close:hover { background: var(--secondary); color: white; }
     .breath-close:active { transform: scale(0.96); }
+
+    .fade-in { animation: fadeInUp 0.25s ease-out; will-change: opacity, transform; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .copy-tooltip {
+      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #fff;
+      font-size: 0.7rem; padding: 3px 10px; border-radius: 20px;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s; white-space: nowrap; z-index: 10;
+    }
+    .copy-tooltip.show { opacity: 1; }
+
+    .memory-card { background: var(--quick-btn-bg); border-radius: 1rem; padding: 0.75rem; margin: 0.5rem 0; font-size: 0.8rem; }
+    .memory-item { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+
+    .mute-active { color: #ef4444 !important; animation: pulse 1.2s infinite; }
+    .voice-active { color: #ef4444 !important; animation: pulse 0.8s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
+
     @media (max-width: 480px) {
-      .ai-float-btn { width: 2.8rem; height: 2.8rem; bottom: calc(4rem + var(--safe-bottom)); right: 0.8rem; }
-      .quick-emotion-btn, .breath-btn { padding: 5px 10px; font-size: 0.7rem; }
+      .ai-float-btn { width: 3rem; height: 3rem; bottom: calc(4rem + var(--safe-bottom)); right: 0.8rem; }
+      .quick-emotion-btn, .breath-btn { padding: 6px 12px; font-size: 0.7rem; }
       .msg-user, .msg-ai { max-width: 90% !important; }
-      .speak-btn { width: 40px; height: 40px; right: 6px; bottom: 6px; font-size: 1.1rem; }
-      footer .flex { gap: 8px; }
-      #voice-btn, #send-btn { padding: 10px; }
+      .speak-btn { width: 44px; height: 44px; right: 6px; bottom: 6px; font-size: 1.2rem; }
+      footer .flex { gap: 6px; }
+      #voice-btn, #send-btn { padding: 14px; }
     }
     footer { padding-bottom: calc(0.5rem + var(--safe-bottom)); }
-    .custom-dialog {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: var(--msg-ai-bg); color: var(--msg-ai-text);
-      border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      z-index: 100; text-align: center; max-width: 320px; width: 90%;
-    }
-    .custom-dialog-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
-    .custom-dialog button { background: var(--msg-user-bg); color: #fff; border: none; border-radius: 2rem; padding: 0.5rem 1.5rem; margin: 0.5rem; cursor: pointer; }
-    .custom-dialog .cancel-btn { background: var(--border); color: var(--msg-ai-text); }
     #messages-container { scroll-behavior: smooth; }
   </style>
 </head>
 <body>
   <header class="header-bg shadow-sm py-3 px-4 flex justify-between items-center">
-    <div class="flex items-center gap-2"><i class="fas fa-heart text-pink-500 text-xl"></i><h1 class="text-lg font-semibold">小暖</h1><span id="time-tag" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full"></span></div>
+    <div class="flex items-center gap-2">
+      <i class="fas fa-heart text-pink-500 text-xl"></i>
+      <h1 class="text-lg font-semibold">小暖</h1>
+      <span id="time-tag" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full"></span>
+    </div>
     <div class="flex items-center gap-1 sm:gap-2">
-      <button id="ai-top-entry" style="background:var(--ai-inactive-gradient);color:white;padding:6px 14px;border-radius:9999px;font-size:0.8rem;display:flex;align-items:center;gap:4px;border:none;cursor:pointer;"><i class="fas fa-brain"></i><span id="ai-top-text">AI</span></button>
-      <button id="settings-btn" class="text-gray-500 dark:text-gray-300 p-2"><i class="fas fa-cog"></i></button>
-      <button id="theme-btn" class="text-gray-500 dark:text-gray-300 p-2"><i id="theme-icon" class="fas fa-moon"></i></button>
-      <button id="mute-btn" class="text-gray-500 dark:text-gray-300 p-2"><i class="fas fa-bell-slash"></i></button>
-      <button id="clear-btn" class="text-gray-500 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+      <button id="ai-top-entry"><i class="fas fa-brain"></i><span id="ai-top-text">AI</span></button>
+      <button id="settings-btn" class="icon-btn"><i class="fas fa-cog"></i></button>
+      <button id="theme-btn" class="icon-btn"><i id="theme-icon" class="fas fa-moon"></i></button>
+      <button id="mute-btn" class="icon-btn"><i class="fas fa-bell-slash"></i></button>
+      <button id="clear-btn" class="icon-btn hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
     </div>
   </header>
+
   <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-3 py-2 text-xs sm:text-sm text-secondary flex items-center gap-2 border-b">
-    <span id="status-emoji">🌸</span><span id="status-text" class="flex-1" style="cursor:pointer;">暖言模式 · 本地陪伴</span><span id="mode-badge" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">本地陪伴</span>
+    <span id="status-emoji">🌸</span>
+    <span id="status-text" class="flex-1" style="cursor:pointer;">暖言模式 · 本地陪伴</span>
+    <span id="mode-badge" class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">本地陪伴</span>
   </div>
+
+  <div id="weather-toast" class="weather-toast"></div>
+
   <main id="messages-container" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3"></main>
-  <div id="weather-card" class="weather-card hidden"></div>
+
   <div class="px-3 sm:px-4 py-2 flex gap-2 overflow-x-auto" id="quick-emotions">
-    <button class="quick-emotion-btn" data-emotion="sad">😢 难过</button><button class="quick-emotion-btn" data-emotion="anxious">😰 焦虑</button><button class="quick-emotion-btn" data-emotion="tired">😴 疲惫</button>
-    <button class="quick-emotion-btn" data-emotion="lonely">🥺 孤独</button><button class="quick-emotion-btn" data-emotion="happy">😊 开心</button><button class="quick-emotion-btn" data-emotion="grateful">🙏 感恩</button>
+    <button class="quick-emotion-btn" data-emotion="sad">😢 难过</button>
+    <button class="quick-emotion-btn" data-emotion="anxious">😰 焦虑</button>
+    <button class="quick-emotion-btn" data-emotion="tired">😴 疲惫</button>
+    <button class="quick-emotion-btn" data-emotion="lonely">🥺 孤独</button>
+    <button class="quick-emotion-btn" data-emotion="happy">😊 开心</button>
+    <button class="quick-emotion-btn" data-emotion="grateful">🙏 感恩</button>
     <button id="breath-btn" class="breath-btn">🌬️ 呼吸</button>
   </div>
-  <div id="breath-modal" class="breath-modal"><div class="breath-card"><div id="breath-circle-modal" class="breath-circle"></div><div id="breath-text-modal" class="breath-text">吸气……</div><button id="breath-close-modal" class="breath-close">关闭</button></div></div>
+
+  <div id="breath-modal" class="breath-modal">
+    <div class="breath-card">
+      <div id="breath-circle-modal" class="breath-circle"></div>
+      <div id="breath-text-modal" class="breath-text">吸气……</div>
+      <div id="breath-countdown" class="breath-countdown">4</div>
+      <button id="breath-close-modal" class="breath-close">关闭</button>
+    </div>
+  </div>
+
   <footer class="footer-bg p-2 sm:p-3">
     <div id="queue-hint" class="text-xs text-secondary text-center hidden mb-1">小暖正在思考...</div>
     <div class="flex items-center gap-2">
-      <button id="voice-btn" class="text-gray-500 dark:text-gray-300 p-3"><i class="fas fa-microphone fa-lg"></i></button>
-      <input id="user-input" type="text" placeholder="说点什么吧..." class="input-area flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" autocomplete="off">
-      <button id="send-btn" class="bg-pink-500 text-white rounded-full p-3 hover:bg-pink-600 transition disabled:opacity-50"><i class="fas fa-paper-plane"></i></button>
+      <button id="voice-btn" class="icon-btn"><i class="fas fa-microphone fa-lg"></i></button>
+      <input id="user-input" type="text" placeholder="说点什么吧..." maxlength="500" class="input-area flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm" autocomplete="off">
+      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
     </div>
   </footer>
+
   <div class="text-center text-xs py-1" style="color:var(--secondary);opacity:0.6;">Designed by DYD</div>
   <div id="ai-float-btn" class="ai-float-btn inactive"><i class="fas fa-brain"></i></div>
-  <div id="settings-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4"><div class="bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 w-full max-w-sm shadow-xl"><h2 class="text-lg font-bold mb-3">AI 设置</h2><p class="text-sm text-secondary mb-3">填入 DeepSeek API Key，或使用内置密钥（需密码激活）。</p><div id="own-key-section" class="flex gap-2 mb-2"><input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm"><button id="save-key-btn" class="bg-pink-500 text-white px-4 py-2 rounded-full text-sm flex-shrink-0">保存</button></div><div id="or-section" class="text-center text-sm text-secondary my-2">或</div><button id="use-builtin-btn" class="w-full bg-purple-400 text-white py-2 rounded-full text-sm mb-2">使用内置密钥</button><div id="password-section" class="mb-2 hidden"><input id="password-input" type="password" placeholder="输入使用密码" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm"><p class="text-xs text-gray-400 mt-1">密码验证通过后将自动激活内置密钥</p><div class="flex gap-2 mt-2"><button id="activate-key-btn" class="bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm flex-1">验证并激活</button><button id="cancel-builtin-btn" class="bg-gray-300 dark:bg-gray-600 text-white px-4 py-1.5 rounded-full text-sm">返回自备密钥</button></div><span id="password-error" class="text-red-500 text-xs mt-1 hidden">密码错误</span></div><button id="close-settings" class="w-full bg-gray-300 dark:bg-gray-600 px-4 py-2 rounded-full text-sm mt-3">关闭</button><p class="text-xs text-gray-400 mt-2 text-center">🔒 密钥仅在本地加密存储，不会上传。</p><div id="memory-card-container" class="mt-4"></div></div></div>
+
+  <div id="settings-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 w-full max-w-sm shadow-xl">
+      <h2 class="text-lg font-bold mb-3">AI 设置</h2>
+      <p class="text-sm text-secondary mb-3">填入 DeepSeek API Key，或使用内置密钥（需密码激活）。</p>
+      <div id="own-key-section" class="flex gap-2 mb-2">
+        <input id="api-key-input" type="password" placeholder="sk-xxxxxxxx" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm">
+        <button id="save-key-btn" class="bg-pink-500 text-white px-4 py-2 rounded-full text-sm flex-shrink-0 hover:bg-pink-600 transition">保存</button>
+      </div>
+      <div id="or-section" class="text-center text-sm text-secondary my-2">或</div>
+      <button id="use-builtin-btn" class="w-full bg-purple-400 text-white py-2 rounded-full text-sm mb-2 hover:bg-purple-500 transition">使用内置密钥</button>
+      <div id="password-section" class="mb-2 hidden">
+        <input id="password-input" type="password" placeholder="输入使用密码" class="w-full border rounded-full px-4 py-2 dark:bg-gray-700 text-sm">
+        <p class="text-xs text-gray-400 mt-1">密码验证通过后将自动激活内置密钥</p>
+        <div class="flex gap-2 mt-2">
+          <button id="activate-key-btn" class="bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm flex-1 hover:bg-purple-600 transition">验证并激活</button>
+          <button id="cancel-builtin-btn" class="bg-gray-300 dark:bg-gray-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-gray-400 transition">返回自备密钥</button>
+        </div>
+        <span id="password-error" class="text-red-500 text-xs mt-1 hidden">密码错误</span>
+      </div>
+      <button id="close-settings" class="w-full bg-gray-300 dark:bg-gray-600 px-4 py-2 rounded-full text-sm mt-3 hover:bg-gray-400 transition">关闭</button>
+      <p class="text-xs text-gray-400 mt-2 text-center">🔒 密钥仅在本地加密存储，不会上传。</p>
+      <div id="memory-card-container" class="mt-4"></div>
+    </div>
+  </div>
+
   <script>
     (function(){
       // ---------- 加密工具 ----------
       const encrypt = (text) => btoa(String.fromCharCode(...new TextEncoder().encode(text)));
       const decrypt = (encoded) => new TextDecoder().decode(Uint8Array.from(atob(encoded), c => c.charCodeAt(0)));
-      const _k1 = atob('c2stN2Iw'); const _k2 = atob('Yjk1MzEzYWFh'); const _k3 = atob('NDYxMWI2MzZiZTU3OWRhOTBkYzQ=');
+
+      // 内置密钥（遵照要求保留）
+      const _k1 = atob('c2stN2Iw');
+      const _k2 = atob('Yjk1MzEzYWFh');
+      const _k3 = atob('NDYxMWI2MzZiZTU3OWRhOTBkYzQ=');
       const BUILTIN_KEY = _k1 + _k2 + _k3;
       const CORRECT_PASSWORD = atob('RFlEMjA=') + atob('MTAwOTA5');
-      
-      // ---------- 语音朗读：预加载 + 即时响应 ----------
+
+      // ---------- 语音朗读 ----------
       let gentleVoice = null;
       let activeBubble = null, isSpeaking = false;
       let voiceReady = false;
-      
+      let voiceLoadAttempts = 0;
+      const MAX_VOICE_ATTEMPTS = 25;
+      const speechSynth = window.speechSynthesis;
+
       function loadVoices() {
-        const voices = speechSynthesis.getVoices();
+        const voices = speechSynth.getVoices();
         if (voices.length === 0) {
-          setTimeout(loadVoices, 100);
+          voiceLoadAttempts++;
+          if (voiceLoadAttempts < MAX_VOICE_ATTEMPTS) { setTimeout(loadVoices, 200); }
+          else { voiceReady = false; }
           return;
         }
+        voiceLoadAttempts = 0;
         gentleVoice = voices.find(v => v.lang.startsWith('zh') && (v.name.includes('Xiaoxiao')||v.name.includes('Tingting')||v.name.includes('Female')||v.name.includes('女'))) 
-                    || voices.find(v => v.lang.startsWith('zh'));
+                      || voices.find(v => v.lang.startsWith('zh'));
         voiceReady = true;
-        console.log('语音引擎就绪', gentleVoice?.name);
       }
-      speechSynthesis.onvoiceschanged = loadVoices;
-      loadVoices(); // 立即预加载
-      
-      // 页面可见时确保语音可用
+      speechSynth.onvoiceschanged = loadVoices;
+      loadVoices();
+
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) { loadVoices(); speechSynthesis.cancel(); }
+        if (!document.hidden) { voiceLoadAttempts = 0; loadVoices(); speechSynth.cancel(); }
       });
-      
+
       function stopSpeaking() {
         if (activeBubble) {
           activeBubble.classList.remove('speaking');
@@ -216,7 +317,7 @@
         const btn = document.getElementById('mute-btn');
         if (btn) { btn.innerHTML = '<i class="fas fa-bell-slash"></i>'; btn.classList.remove('mute-active'); }
       }
-      
+
       function getPureMessageText(bubble) {
         if (!bubble) return '';
         let text = '';
@@ -227,39 +328,37 @@
         }
         return text.trim();
       }
-      
-      // 移除括号内容（支持嵌套），朗读时不读括号内文字
+
       function removeBracketsForSpeech(text) {
         if(!text) return text;
         let result = text, prev;
         do { prev = result; result = result.replace(/（(?:[^（）]|（[^（）]*）)*）|\((?:[^()]|\([^()]*\))*\)/g, ''); } while(result !== prev);
         return result;
       }
-      
-      // 即时朗读函数，无延迟
+
       function speakText(bubble) {
         if (!bubble) return;
-        speechSynthesis.cancel(); // 立即停止任何正在播放的
+        speechSynth.cancel();
         stopSpeaking();
-        
-        bubble.style.boxShadow = '0 0 8px rgba(139,92,246,0.5)';
+
+        bubble.style.boxShadow = '0 0 10px rgba(139,92,246,0.5)';
         bubble.classList.add('speaking');
         activeBubble = bubble;
         isSpeaking = true;
         const muteBtn = document.getElementById('mute-btn');
         if (muteBtn) { muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>'; muteBtn.classList.add('mute-active'); }
-        
+
         let rawText = getPureMessageText(bubble);
         if (!rawText) rawText = bubble.textContent || '';
         let clean = rawText.replace(/[\u{1F300}-\u{1FAFF}]/gu, '');
         clean = removeBracketsForSpeech(clean);
         clean = clean.replace(/\s+/g, ' ').trim();
         if (!clean) { stopSpeaking(); return; }
-        
-        // 确保语音已就绪，否则延迟10ms重试（极短延迟）
+
         const doSpeak = () => {
           if (!voiceReady) {
-            setTimeout(doSpeak, 20);
+            if (voiceLoadAttempts >= MAX_VOICE_ATTEMPTS) { stopSpeaking(); return; }
+            setTimeout(doSpeak, 30);
             return;
           }
           const utterance = new SpeechSynthesisUtterance(clean);
@@ -269,16 +368,17 @@
           utterance.volume = document.body.classList.contains('dark') ? 0.4 : 0.9;
           if (gentleVoice) utterance.voice = gentleVoice;
           utterance.onend = () => stopSpeaking();
-          utterance.onerror = (err) => { console.warn(err); stopSpeaking(); };
-          speechSynthesis.speak(utterance);
+          utterance.onerror = () => { stopSpeaking(); };
+          speechSynth.speak(utterance);
         };
         doSpeak();
       }
-      
-      // ---------- 完整情感引擎 ----------
+
+      // ---------- 情感引擎 ----------
       class CompanionEngine {
         constructor() {
-          this.chatHistory = []; this.maxHistory = 12; this.userProfile = {}; this.apiKey = ''; this.isGenerating = false; this.aiFailCount = 0;
+          this.chatHistory = []; this.maxHistory = 12; this.userProfile = {};
+          this.apiKey = ''; this.isGenerating = false; this.aiFailCount = 0; this.aiPermanentFail = false;
           this.emotionKeywords = {
             happy: ['开心','高兴','快乐','笑','哈哈','棒','好耶','幸福','满足','欢喜','愉快','欣喜','乐呵呵','美滋滋','雀跃','开怀','眉开眼笑','手舞足蹈','舒心','畅快','安然','惬意','舒坦','平和','安宁','安心','踏实','放松','悠然','恬淡','自在','知足','慰藉','欣慰','暖心','舒服','甜美','治愈','欢欣','激动','振奋','兴致勃勃','尽兴','享受','沉醉','着迷','心动','甜蜜','得意','轻快','欢天喜地','欣喜若狂','心花怒放','乐不可支','自豪','骄傲','成就感','扬眉吐气','自信','荣耀','光荣','如释重负','解脱','释怀','惊喜','喜出望外','受宠若惊','意外之喜','亲昵','温柔','被爱','归属感','融洽','亲近','温情','和睦','依恋'],
             grateful: ['谢谢','感恩','感谢','有你','真好','感激','多谢','恩情','戴德','感念','念叨','幸亏','多亏','承蒙','感动','铭记'],
@@ -297,7 +397,6 @@
           this.negationWords = ['不','没','别','讨厌','厌恶','恨','嫌弃','厌倦','烦','避免','拒绝'];
           this.crisisKeywords = { suicide:['自杀','想死','不想活','结束生命','去死','死了算了'], selfHarm:['割腕','自残','划伤','流血','吞药','上吊','跳楼'], death:['去世','死了','不在了','天堂','走了','没了','离世'], despair:['活不下去','没意义','绝望','毫无价值'] };
           this.crisisResponses = { suicide:"我听到你说的话，心里很沉。你不是一个人，请立刻联系信任的人，或拨打心理援助热线。", selfHarm:"你提到伤害自己，我真的很担心。我们一起找更好的方式好吗？", death:"失去重要的人，那种痛我懂。我会一直在这里陪你。", despair:"我明白那种感觉，此刻的绝望不是永远。", default:"我能感受到你现在很痛苦，请和我说说发生了什么。" };
-          this.mourningBodies = ["失去一个人，就像身体少了一块，痛是真实的。","他/她一定对你很重要，这份思念不用隐藏。","如果你想聊聊他/她，我很想听。","天堂或者远方，我们无法再碰触，但爱不会消失。"];
           this.templates = this.buildTemplates();
           this.loadLocalData();
         }
@@ -308,7 +407,7 @@
           const stored = localStorage.getItem('chatHistory');
           if (stored) { try { this.chatHistory = JSON.parse(stored); } catch { this.chatHistory = []; } }
         }
-        setApiKey(key) { this.apiKey = key; if (key) localStorage.setItem('deepseekApiKeyEnc', encrypt(key)); else localStorage.removeItem('deepseekApiKeyEnc'); }
+        setApiKey(key) { this.apiKey = key; if (key) localStorage.setItem('deepseekApiKeyEnc', encrypt(key)); else localStorage.removeItem('deepseekApiKeyEnc'); this.aiPermanentFail = false; this.aiFailCount = 0; }
         async testApiKey(key) { try { const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'user',content:'hi'}], max_tokens:5, stream:false }), signal:AbortSignal.timeout(5000) }); return res.ok; } catch { return false; } }
         buildTemplates() {
           const hOpen = ["你的快乐感染了我","太棒了","真为你开心","笑容是最好的礼物","听到你开心我也跟着高兴","这份喜悦值得被记住","真好呀","你的幸福就是我的幸福"];
@@ -393,7 +492,7 @@
           if (this.userProfile.lifeEvent) parts.push(this.userProfile.lifeEvent);
           return parts.length ? '【关于用户】：' + parts.join('；') + '。\n' : '';
         }
-        buildSystemPrompt() { return `你叫"小暖"，温柔陪伴者。${this.getProfileHint()}回复简短真诚，不超过十句话。不要使用"你应该"。`; }
+        buildSystemPrompt() { return `你叫"小暖"，温柔陪伴者。${this.getProfileHint()}回复简短真诚，不超过三句话。不要使用"你应该"。`; }
         generateWarmReply(userText) {
           const crisis = this.detectCrisis(userText); if (crisis) return this.getCrisisResponse(crisis);
           const emotion = this.detectEmotion(userText);
@@ -404,17 +503,22 @@
           const emoji = pool.emojis[Math.floor(Math.random()*pool.emojis.length)];
           return `${opening} ${body} ${ending} ${emoji}`;
         }
-        async callDeepSeekStream(userMessage, onChunk) {
-          if (!this.apiKey || this.aiFailCount >= 2) return null;
+        async callDeepSeekStream(userMessage, onChunk, abortToken) {
+          if (!this.apiKey || this.aiPermanentFail || this.aiFailCount >= 2) return null;
           try {
             const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
               method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${this.apiKey}`},
               body:JSON.stringify({ model:'deepseek-chat', messages:[{role:'system',content:this.buildSystemPrompt()}, ...this.chatHistory.slice(-this.maxHistory), {role:'user',content:userMessage}], temperature:0.8, max_tokens:200, stream:true })
             });
-            if (!res.ok) return { error: res.status===401||res.status===403 ? 'auth' : 'api_error' };
+            if (!res.ok) {
+              if (res.status === 401 || res.status === 403) { this.aiPermanentFail = true; this.aiFailCount = 2; }
+              await res.text().catch(()=>{});
+              return { error: res.status===401||res.status===403 ? 'auth' : 'api_error' };
+            }
             const reader = res.body.getReader();
             let full = '';
             while(true){
+              if (abortToken && abortToken.aborted) break;
               const {done,value} = await reader.read();
               if(done) break;
               const chunk = new TextDecoder().decode(value);
@@ -434,7 +538,6 @@
             this.aiFailCount = 0;
             return { text: full.trim() };
           } catch(e){
-            console.warn('DeepSeek error', e);
             this.aiFailCount++;
             return { error: 'network' };
           }
@@ -446,24 +549,43 @@
           if(window.requestIdleCallback) requestIdleCallback(() => { try { localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory)); } catch(e){} }, { timeout: 500 });
           else setTimeout(() => { try { localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory)); } catch(e){} }, 100);
         }
+        reset() {
+          this.chatHistory = []; this.userProfile = {}; this.isGenerating = false;
+          this.aiFailCount = 0; this.aiPermanentFail = false;
+          localStorage.removeItem('chatHistory'); localStorage.removeItem('userProfile');
+        }
       }
       const engine = new CompanionEngine();
-      
-      // ---------- UI 元素 ----------
+
+      // ---------- UI 绑定 ----------
       const messagesContainer = document.getElementById('messages-container');
       const userInput = document.getElementById('user-input');
       const sendBtn = document.getElementById('send-btn');
-      const voiceBtn = document.getElementById('voice-btn');
       const clearBtn = document.getElementById('clear-btn');
       const muteBtn = document.getElementById('mute-btn');
       const themeBtn = document.getElementById('theme-btn'); const themeIcon = document.getElementById('theme-icon');
       const statusText = document.getElementById('status-text'); const statusEmoji = document.getElementById('status-emoji'); const modeBadge = document.getElementById('mode-badge');
       const aiFloat = document.getElementById('ai-float-btn'); const aiTopEntry = document.getElementById('ai-top-entry'); const aiTopText = document.getElementById('ai-top-text');
       const breathModal = document.getElementById('breath-modal'); const breathCircle = document.getElementById('breath-circle-modal'); const breathTextEl = document.getElementById('breath-text-modal');
-      let processing = false, clearFlag = false; const queue = [];
-      
+      const breathCountdownEl = document.getElementById('breath-countdown');
+      const weatherToast = document.getElementById('weather-toast');
+      const settingsModal = document.getElementById('settings-modal');
+
+      let processing = false;
+      let currentAbortToken = null;
+      const queue = [];
+
+      // 浮动按钮在设置弹窗打开时隐藏
+      function hideFloatDuringModal(visible) { aiFloat.style.display = visible ? 'none' : ''; }
+      function openSettings() {
+        document.getElementById('password-error').classList.add('hidden');
+        settingsModal.classList.remove('hidden');
+        hideFloatDuringModal(true);
+      }
+      function closeSettings() { settingsModal.classList.add('hidden'); hideFloatDuringModal(false); }
+
       function updateModeUI() {
-        const isAI = !!(engine.apiKey && engine.aiFailCount < 2);
+        const isAI = !!(engine.apiKey && !engine.aiPermanentFail && engine.aiFailCount < 2);
         if(isAI) {
           statusEmoji.textContent = '🧠';
           statusText.innerHTML = 'DeepSeek AI 模式 · 云端大脑 <span style="font-size:0.7rem;">(点击可重试)</span>';
@@ -474,7 +596,8 @@
           aiTopEntry.style.background = 'var(--ai-gradient)';
         } else {
           statusEmoji.textContent = '🌸';
-          if(engine.aiFailCount >= 2 && engine.apiKey) statusText.innerHTML = '网络不太稳，已切回本地陪伴 <span style="font-size:0.7rem;">(点击重试AI)</span>';
+          if(engine.aiPermanentFail) statusText.innerHTML = '密钥无效，已切回本地陪伴 <span style="font-size:0.7rem;">(点击更换密钥)</span>';
+          else if(engine.aiFailCount >= 2 && engine.apiKey) statusText.innerHTML = '网络不太稳，已切回本地陪伴 <span style="font-size:0.7rem;">(点击重试AI)</span>';
           else statusText.innerHTML = '暖言模式 · 本地陪伴 <span style="font-size:0.7rem;">(点击可尝试AI)</span>';
           modeBadge.textContent = '本地陪伴';
           modeBadge.className = 'text-xs bg-pink-100 text-pink-700 dark:bg-pink-800 dark:text-pink-200 rounded-full px-2 py-0.5';
@@ -483,53 +606,109 @@
           aiTopEntry.style.background = 'var(--ai-inactive-gradient)';
         }
       }
-      
-      function addMessage(role, content) {
-        if(clearFlag) return null;
-        const div = document.createElement('div'); div.className = `flex ${role==='user'?'justify-end':'justify-start'} fade-in`;
+
+      // 为气泡创建独立的文本容器，防止更新时覆盖按钮
+      function createMessageBubble(role, content) {
         const bubble = document.createElement('div');
-        bubble.className = role==='user' ? 'msg-user relative rounded-2xl rounded-tr-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm' : 'msg-ai relative rounded-2xl rounded-tl-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm';
-        bubble.textContent = content;
-        const tooltip = document.createElement('div'); tooltip.className = 'copy-tooltip'; tooltip.textContent = '已复制'; bubble.appendChild(tooltip);
-        bubble.addEventListener('contextmenu', async e=>{ e.preventDefault(); await navigator.clipboard.writeText(getPureMessageText(bubble)); tooltip.classList.add('show'); setTimeout(()=>tooltip.classList.remove('show'),800); });
-        if(role === 'assistant') {
-          const sb = document.createElement('button'); sb.className = 'speak-btn'; sb.innerHTML = '<i class="fas fa-volume-up"></i>';
+        bubble.className = role === 'user' 
+          ? 'msg-user relative rounded-2xl rounded-tr-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm'
+          : 'msg-ai relative rounded-2xl rounded-tl-none px-4 py-2 max-w-[85%] sm:max-w-[75%] shadow-sm';
+        
+        const textSpan = document.createElement('span');
+        textSpan.textContent = content;
+        bubble.appendChild(textSpan);
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'copy-tooltip';
+        tooltip.textContent = '已复制';
+        bubble.appendChild(tooltip);
+
+        // 右键/长按复制（使用 textSpan 获取文本）
+        bubble.addEventListener('contextmenu', async e => {
+          e.preventDefault();
+          await navigator.clipboard.writeText(textSpan.textContent || '');
+          tooltip.classList.add('show');
+          setTimeout(() => tooltip.classList.remove('show'), 800);
+        });
+        let longPressTimer;
+        bubble.addEventListener('touchstart', () => {
+          longPressTimer = setTimeout(async () => {
+            await navigator.clipboard.writeText(textSpan.textContent || '');
+            tooltip.classList.add('show');
+            setTimeout(() => tooltip.classList.remove('show'), 800);
+          }, 600);
+        });
+        bubble.addEventListener('touchend', () => clearTimeout(longPressTimer));
+        bubble.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+
+        if (role === 'assistant') {
+          const sb = document.createElement('button');
+          sb.className = 'speak-btn';
+          sb.innerHTML = '<i class="fas fa-volume-up"></i>';
           sb.onclick = (e) => { e.stopPropagation(); speakText(bubble); };
           bubble.appendChild(sb);
         }
+
+        return { bubble, textSpan };
+      }
+
+      function addMessage(role, content) {
+        if (currentAbortToken && currentAbortToken.aborted) return null;
+        const div = document.createElement('div');
+        div.className = `flex ${role==='user'?'justify-end':'justify-start'} fade-in`;
+        
+        const { bubble, textSpan } = createMessageBubble(role, content);
         div.appendChild(bubble);
         messagesContainer.appendChild(div);
-        if(messagesContainer.children.length > 120) messagesContainer.removeChild(messagesContainer.firstChild);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        return bubble;
+
+        if (messagesContainer.children.length > 120) {
+          const removed = messagesContainer.firstChild;
+          if (removed) {
+            messagesContainer.removeChild(removed);
+            if (engine.chatHistory.length > 2) engine.chatHistory = engine.chatHistory.slice(2);
+          }
+        }
+        requestAnimationFrame(() => messagesContainer.scrollTop = messagesContainer.scrollHeight);
+        return { bubble, textSpan };
       }
-      
+
       async function processQueue() {
         processing = true;
-        while(queue.length && !clearFlag) {
+        const token = { aborted: false };
+        currentAbortToken = token;
+        while (queue.length && !token.aborted) {
           const msg = queue.shift();
           engine.isGenerating = true; sendBtn.disabled = true;
-          const bubble = addMessage('assistant', '⋯');
+          const msgObj = addMessage('assistant', '⋯');
+          if (!msgObj) break;
+          const { bubble, textSpan } = msgObj;
           let finalText = '';
-          const useAI = !!(engine.apiKey && engine.aiFailCount < 2);
-          if(useAI) {
+          const useAI = !!(engine.apiKey && !engine.aiPermanentFail && engine.aiFailCount < 2);
+          if (useAI) {
             let partial = '';
-            const result = await engine.callDeepSeekStream(msg, (full) => { partial = full; if(bubble) bubble.textContent = full; });
-            if(result && result.text && result.text.length > 0) {
+            const result = await engine.callDeepSeekStream(msg, (full) => {
+              if (token.aborted) return;
+              partial = full;
+              textSpan.textContent = full; // 只更新文本，不动按钮
+            }, token);
+            if (token.aborted) break;
+            if (result && result.text && result.text.length > 0) {
               finalText = result.text;
               engine.aiFailCount = 0;
             } else {
-              if(engine.apiKey) engine.aiFailCount = Math.min(engine.aiFailCount+1, 2);
+              if (engine.apiKey && !engine.aiPermanentFail) engine.aiFailCount = Math.min(engine.aiFailCount+1, 2);
               finalText = engine.generateWarmReply(msg);
-              const failMsg = engine.aiFailCount >= 2 ? '⚠️ AI 连接失败，已自动切换为本地暖言模式。点击顶部状态栏可重试 AI。' : '⚠️ AI 响应异常，已使用本地回复。';
-              addMessage('assistant', failMsg);
+              const failMsg = engine.aiPermanentFail 
+                ? '⚠️ API 密钥无效，已永久切换为本地暖言模式。请在设置中更换密钥。' 
+                : (engine.aiFailCount >= 2 ? '⚠️ AI 连接失败，已自动切换为本地暖言模式。点击顶部状态栏可重试 AI。' : '⚠️ AI 响应异常，已使用本地回复。');
+              if (!token.aborted) addMessage('assistant', failMsg);
               engine.saveToHistory('__system_fail__', failMsg);
               updateModeUI();
             }
           } else {
             finalText = engine.generateWarmReply(msg);
           }
-          if(bubble) bubble.textContent = finalText;
+          textSpan.textContent = finalText;
           engine.extractFacts(msg);
           engine.saveToHistory(msg, finalText);
           engine.isGenerating = false; sendBtn.disabled = false;
@@ -537,91 +716,249 @@
           updateModeUI();
         }
         processing = false;
+        if (currentAbortToken === token) currentAbortToken = null;
       }
+
       function enqueue(msg) { if(!msg) return; queue.push(msg); document.getElementById('queue-hint').classList.remove('hidden'); if(!processing) processQueue(); }
-      
-      // 呼吸动画：吸气放大(4s) -> 屏息保持放大(7s) -> 呼气缩小(8s) -> 循环
-      let breathTimer = null;
-      function stopBreath() { if(breathTimer) clearTimeout(breathTimer); breathCircle.classList.remove('inhale', 'exhale'); }
+
+      // 呼吸动画（带动态倒计时）
+      let breathTimer = null, countdownInterval = null;
+      function stopBreath() {
+        if (breathTimer) clearTimeout(breathTimer);
+        if (countdownInterval) clearInterval(countdownInterval);
+        breathCircle.classList.remove('inhale', 'exhale');
+        breathCountdownEl.textContent = '';
+      }
       function startBreath() {
         stopBreath();
         let step = 0;
         const phases = [
-          { text: '吸气…… 4秒', classAdd: 'inhale', duration: 4000 },   // 放大
-          { text: '屏息…… 7秒', classAdd: 'inhale', duration: 7000 },   // 保持放大
-          { text: '呼气…… 8秒', classAdd: 'exhale', duration: 8000 }    // 缩小
+          { text: '吸气', classAdd: 'inhale', duration: 4 },
+          { text: '屏息', classAdd: 'inhale', duration: 7 },
+          { text: '呼气', classAdd: 'exhale', duration: 8 }
         ];
+        let secondsLeft = phases[0].duration;
+
+        function updateCountdown() {
+          breathCountdownEl.textContent = secondsLeft;
+        }
+        function runCountdown(duration, callback) {
+          secondsLeft = duration;
+          updateCountdown();
+          countdownInterval = setInterval(() => {
+            secondsLeft--;
+            updateCountdown();
+            if (secondsLeft <= 0) {
+              clearInterval(countdownInterval);
+              callback();
+            }
+          }, 1000);
+        }
+
         function next() {
-          if(!breathModal.classList.contains('active')) return;
+          if (!breathModal.classList.contains('active')) { stopBreath(); return; }
           const p = phases[step % 3];
-          breathTextEl.textContent = p.text;
-          // 先移除所有动画类，再添加当前需要的类
+          breathTextEl.textContent = p.text + '……';
           breathCircle.classList.remove('inhale', 'exhale');
-          if(p.classAdd) breathCircle.classList.add(p.classAdd);
-          breathTimer = setTimeout(() => { step++; next(); }, p.duration);
+          if (p.classAdd) breathCircle.classList.add(p.classAdd);
+          runCountdown(p.duration, () => {
+            step++;
+            next();
+          });
         }
         next();
       }
+
       document.getElementById('breath-btn').onclick = () => { breathModal.classList.add('active'); startBreath(); };
       document.getElementById('breath-close-modal').onclick = () => { breathModal.classList.remove('active'); stopBreath(); };
       breathModal.addEventListener('click', (e) => { if(e.target === breathModal) { breathModal.classList.remove('active'); stopBreath(); } });
-      
-      // 事件绑定
-      sendBtn.onclick = () => { const t=userInput.value.trim(); if(t && !engine.isGenerating) { addMessage('user', t); userInput.value=''; enqueue(t); userInput.focus(); } };
+
+      sendBtn.onclick = () => {
+        const t = userInput.value.trim();
+        if(t && !engine.isGenerating) { addMessage('user', t); userInput.value = ''; enqueue(t); userInput.focus(); }
+      };
       userInput.addEventListener('keypress', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendBtn.click(); } });
-      document.getElementById('quick-emotions').addEventListener('click', (e) => { const btn=e.target.closest('.quick-emotion-btn'); if(!btn) return; const texts={ sad:'我今天很难过，', anxious:'我有点焦虑，', tired:'我好累，', lonely:'我觉得好孤独，', happy:'我今天挺开心的，', grateful:'真的很感谢你，' }; if(texts[btn.dataset.emotion]) { userInput.value=texts[btn.dataset.emotion]; userInput.focus(); } });
-      clearBtn.onclick = () => { if(confirm('清空所有聊天记录？')) { speechSynthesis.cancel(); stopSpeaking(); clearFlag=true; engine.chatHistory=[]; engine.userProfile={}; localStorage.removeItem('chatHistory'); localStorage.removeItem('userProfile'); messagesContainer.innerHTML=''; clearFlag=false; addMessage('assistant', '记忆全部清空，我们从新开始吧。'); engine.saveToHistory('__system_reset__','记忆全部清空，我们从新开始吧。'); queue.length=0; processing=false; engine.isGenerating=false; updateModeUI(); } };
-      muteBtn.onclick = () => { speechSynthesis.cancel(); stopSpeaking(); };
-      voiceBtn.onclick = () => { const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ alert('浏览器不支持语音输入'); return; } const rec=new SR(); rec.lang='zh-CN'; rec.interimResults=false; rec.onerror=()=>{ const toast=document.createElement('div'); toast.className='text-xs text-red-500 mt-1 bg-white/80 p-1 rounded'; toast.textContent='请检查麦克风权限'; userInput.parentNode.appendChild(toast); setTimeout(()=>toast.remove(),2500); }; rec.onresult=e=>{ const v=e.results[0][0].transcript.trim(); if(v){ userInput.value=v; sendBtn.click(); } }; rec.start(); };
-      
-      const applyTheme=(dark)=>{ document.body.classList.toggle('dark',dark); themeIcon.className=dark?'fas fa-sun':'fas fa-moon'; localStorage.setItem('darkMode',dark?'1':'0'); };
-      const storedDark=localStorage.getItem('darkMode'); const sysDark=window.matchMedia('(prefers-color-scheme:dark)').matches; applyTheme(storedDark==='1'||(storedDark===null&&sysDark));
-      themeBtn.onclick=()=>applyTheme(!document.body.classList.contains('dark'));
-      
+
+      document.getElementById('quick-emotions').addEventListener('click', (e) => {
+        const btn = e.target.closest('.quick-emotion-btn'); if(!btn) return;
+        const texts = { sad:'我今天很难过，', anxious:'我有点焦虑，', tired:'我好累，', lonely:'我觉得好孤独，', happy:'我今天挺开心的，', grateful:'真的很感谢你，' };
+        if(texts[btn.dataset.emotion]) { userInput.value = texts[btn.dataset.emotion]; userInput.focus(); }
+      });
+
+      clearBtn.onclick = () => {
+        if(confirm('清空所有聊天记录？')) {
+          speechSynth.cancel(); stopSpeaking();
+          if (currentAbortToken) currentAbortToken.aborted = true;
+          queue.length = 0; processing = false; engine.isGenerating = false; sendBtn.disabled = false;
+          document.getElementById('queue-hint').classList.add('hidden');
+          engine.reset(); messagesContainer.innerHTML = '';
+          addMessage('assistant', '记忆全部清空，我们从新开始吧。');
+          engine.saveToHistory('__system_reset__', '记忆全部清空，我们从新开始吧。');
+          updateModeUI();
+        }
+      };
+
+      muteBtn.onclick = () => { speechSynth.cancel(); stopSpeaking(); };
+
+      let voiceRecognition = null;
+      document.getElementById('voice-btn').onclick = () => {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SR) { alert('浏览器不支持语音输入'); return; }
+        if (voiceRecognition) { voiceRecognition.abort(); voiceRecognition = null; document.getElementById('voice-btn').classList.remove('voice-active'); return; }
+        const rec = new SR(); rec.lang = 'zh-CN'; rec.interimResults = false;
+        document.getElementById('voice-btn').classList.add('voice-active');
+        voiceRecognition = rec;
+        rec.onerror = () => { document.getElementById('voice-btn').classList.remove('voice-active'); voiceRecognition = null; };
+        rec.onresult = e => { document.getElementById('voice-btn').classList.remove('voice-active'); voiceRecognition = null; const v = e.results[0][0].transcript.trim(); if(v) { userInput.value = v; sendBtn.click(); } };
+        rec.onend = () => { document.getElementById('voice-btn').classList.remove('voice-active'); voiceRecognition = null; };
+        rec.start();
+      };
+
+      const applyTheme = (dark) => { document.body.classList.toggle('dark', dark); themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon'; localStorage.setItem('darkMode', dark?'1':'0'); };
+      const storedDark = localStorage.getItem('darkMode');
+      applyTheme(storedDark === '1' || (storedDark === null && window.matchMedia('(prefers-color-scheme:dark)').matches));
+      themeBtn.onclick = () => applyTheme(!document.body.classList.contains('dark'));
+
+      // 重试AI：无论当前状态如何，点击状态栏都尝试恢复AI
       async function retryAI() {
-        if(!engine.apiKey) {
+        if (!engine.apiKey) {
           addMessage('assistant', '请先在设置中配置 API Key 或使用内置密钥。');
           return;
         }
-        statusText.textContent = '正在尝试重新连接 AI ...';
+        statusText.textContent = '正在测试 AI 连接...';
         const valid = await engine.testApiKey(engine.apiKey);
-        if(valid) {
+        if (valid) {
+          engine.aiPermanentFail = false;
           engine.aiFailCount = 0;
           updateModeUI();
-          addMessage('assistant', '✅ AI 连接恢复！现在使用云端大脑模式。');
+          addMessage('assistant', '✅ AI 连接正常！已切换至云端大脑模式。');
         } else {
           engine.aiFailCount = 2;
+          engine.aiPermanentFail = false; // 让用户有机会更换密钥
           updateModeUI();
-          addMessage('assistant', '❌ AI 连接仍然失败，请检查密钥或网络，将继续使用本地陪伴。');
+          addMessage('assistant', '❌ 连接失败，请检查网络或密钥是否正确。将继续使用本地陪伴。');
         }
       }
-      statusText.addEventListener('click', () => { if(engine.aiFailCount >= 2 || (engine.apiKey && !(engine.aiFailCount<2))) retryAI(); });
-      
-      const settingsModal = document.getElementById('settings-modal'); const closeSettings = document.getElementById('close-settings'); const saveKeyBtn = document.getElementById('save-key-btn'); const apiKeyInput = document.getElementById('api-key-input'); const useBuiltin = document.getElementById('use-builtin-btn'); const activateKey = document.getElementById('activate-key-btn'); const passwordInput = document.getElementById('password-input'); const passwordSection = document.getElementById('password-section'); const passwordError = document.getElementById('password-error'); const cancelBuiltin = document.getElementById('cancel-builtin-btn'); const ownKeySection = document.getElementById('own-key-section'); const orSection = document.getElementById('or-section');
-      aiFloat.onclick = () => settingsModal.classList.remove('hidden'); aiTopEntry.onclick = () => settingsModal.classList.remove('hidden'); document.getElementById('settings-btn').onclick = () => { renderMemoryCards(); settingsModal.classList.remove('hidden'); };
-      closeSettings.onclick = () => settingsModal.classList.add('hidden');
-      useBuiltin.onclick = () => { ownKeySection.classList.add('hidden'); orSection.classList.add('hidden'); useBuiltin.classList.add('hidden'); passwordSection.classList.remove('hidden'); };
-      cancelBuiltin.onclick = () => { passwordSection.classList.add('hidden'); ownKeySection.classList.remove('hidden'); orSection.classList.remove('hidden'); useBuiltin.classList.remove('hidden'); };
-      saveKeyBtn.onclick = async () => { const key = apiKeyInput.value.trim(); if(!key) { if(engine.apiKey) { if(confirm('清除AI密钥，切换回本地模式？')) { engine.setApiKey(''); engine.aiFailCount=0; updateModeUI(); settingsModal.classList.add('hidden'); } } else settingsModal.classList.add('hidden'); return; } const ok = await engine.testApiKey(key); if(ok) { engine.setApiKey(key); engine.aiFailCount=0; updateModeUI(); settingsModal.classList.add('hidden'); } else alert('密钥无效'); apiKeyInput.value=''; };
-      activateKey.onclick = () => { if(passwordInput.value === CORRECT_PASSWORD) { engine.setApiKey(BUILTIN_KEY); engine.aiFailCount=0; updateModeUI(); settingsModal.classList.add('hidden'); passwordSection.classList.add('hidden'); ownKeySection.classList.remove('hidden'); orSection.classList.remove('hidden'); useBuiltin.classList.remove('hidden'); passwordInput.value=''; } else { passwordError.classList.remove('hidden'); passwordInput.value=''; } };
-      function renderMemoryCards() { const container = document.getElementById('memory-card-container'); if(!container) return; container.innerHTML = ''; const profile = engine.userProfile; if(Object.keys(profile).length===0) { container.innerHTML = '<p class="text-xs text-gray-400">暂无记忆</p>'; return; } const card = document.createElement('div'); card.className = 'memory-card'; const items = []; if(profile.name) items.push({ label:'名字', value:profile.name, key:'name' }); if(profile.pet) items.push({ label:'宠物', value:profile.pet, key:'pet' }); if(profile.age) items.push({ label:'年龄', value:profile.age, key:'age' }); if(profile.lifeEvent) items.push({ label:'经历', value:profile.lifeEvent, key:'lifeEvent' }); items.forEach(item => { const row = document.createElement('div'); row.className = 'memory-item'; const span = document.createElement('span'); span.textContent = `${item.label}: ${item.value}`; const btn = document.createElement('button'); btn.textContent = '✕'; btn.className = 'text-xs text-red-400'; btn.onclick = () => { delete engine.userProfile[item.key]; localStorage.setItem('userProfile', JSON.stringify(engine.userProfile)); renderMemoryCards(); }; row.appendChild(span); row.appendChild(btn); card.appendChild(row); }); container.appendChild(card); }
-      
+      statusText.addEventListener('click', retryAI);
+
+      document.getElementById('close-settings').onclick = closeSettings;
+      aiFloat.onclick = openSettings;
+      aiTopEntry.onclick = openSettings;
+      document.getElementById('settings-btn').onclick = () => { renderMemoryCards(); openSettings(); };
+
+      document.getElementById('use-builtin-btn').onclick = () => {
+        document.getElementById('own-key-section').classList.add('hidden');
+        document.getElementById('or-section').classList.add('hidden');
+        document.getElementById('use-builtin-btn').classList.add('hidden');
+        document.getElementById('password-section').classList.remove('hidden');
+        document.getElementById('password-error').classList.add('hidden');
+      };
+      document.getElementById('cancel-builtin-btn').onclick = () => {
+        document.getElementById('password-section').classList.add('hidden');
+        document.getElementById('own-key-section').classList.remove('hidden');
+        document.getElementById('or-section').classList.remove('hidden');
+        document.getElementById('use-builtin-btn').classList.remove('hidden');
+        document.getElementById('password-error').classList.add('hidden');
+      };
+
+      document.getElementById('save-key-btn').onclick = async () => {
+        const key = document.getElementById('api-key-input').value.trim();
+        if(!key) { if(engine.apiKey && confirm('清除AI密钥？')) { engine.setApiKey(''); updateModeUI(); closeSettings(); } else closeSettings(); return; }
+        const ok = await engine.testApiKey(key);
+        if(ok) { engine.setApiKey(key); updateModeUI(); closeSettings(); } else alert('密钥无效');
+        document.getElementById('api-key-input').value = '';
+      };
+
+      document.getElementById('activate-key-btn').onclick = () => {
+        if(document.getElementById('password-input').value === CORRECT_PASSWORD) {
+          engine.setApiKey(BUILTIN_KEY); updateModeUI(); closeSettings();
+          document.getElementById('password-section').classList.add('hidden');
+          document.getElementById('own-key-section').classList.remove('hidden');
+          document.getElementById('or-section').classList.remove('hidden');
+          document.getElementById('use-builtin-btn').classList.remove('hidden');
+          document.getElementById('password-input').value = '';
+        } else {
+          document.getElementById('password-error').classList.remove('hidden');
+          document.getElementById('password-input').value = '';
+        }
+      };
+
+      function renderMemoryCards() {
+        const container = document.getElementById('memory-card-container'); if(!container) return;
+        container.innerHTML = ''; const profile = engine.userProfile;
+        if(Object.keys(profile).length===0) { container.innerHTML = '<p class="text-xs text-gray-400">暂无记忆</p>'; return; }
+        const card = document.createElement('div'); card.className = 'memory-card';
+        const items = [];
+        if(profile.name) items.push({ label:'名字', value:profile.name, key:'name' });
+        if(profile.pet) items.push({ label:'宠物', value:profile.pet, key:'pet' });
+        if(profile.age) items.push({ label:'年龄', value:profile.age, key:'age' });
+        if(profile.lifeEvent) items.push({ label:'经历', value:profile.lifeEvent, key:'lifeEvent' });
+        items.forEach(item => {
+          const row = document.createElement('div'); row.className = 'memory-item';
+          const span = document.createElement('span'); span.textContent = `${item.label}: ${item.value}`;
+          const btn = document.createElement('button'); btn.textContent = '✕'; btn.className = 'text-xs text-red-400';
+          btn.onclick = () => { delete engine.userProfile[item.key]; localStorage.setItem('userProfile', JSON.stringify(engine.userProfile)); renderMemoryCards(); };
+          row.appendChild(span); row.appendChild(btn); card.appendChild(row);
+        });
+        container.appendChild(card);
+      }
+
+      function showWeatherToast() {
+        const hour = new Date().getHours();
+        let timeWord = hour<6?'夜深了':hour<9?'早上好':hour<12?'上午好':hour<14?'中午好':hour<18?'下午好':'晚上好';
+        weatherToast.textContent = `${timeWord}。今天的心情，还在等你告诉我。`;
+        weatherToast.classList.add('show');
+        setTimeout(() => weatherToast.classList.remove('show'), 6000);
+      }
+
       function loadHistory() {
         const stored = localStorage.getItem('chatHistory');
         if(stored) try { engine.chatHistory = JSON.parse(stored); } catch(e){}
         if(engine.chatHistory.length) engine.chatHistory.forEach(m => addMessage(m.role, m.content));
         else addMessage('assistant', '嗨，我是小暖。我能感知你的喜怒哀乐，放心和我说任何事。');
-        const card=document.getElementById('weather-card'); const hour=new Date().getHours(); let timeWord= hour<6?'夜深了':hour<9?'早上好':hour<12?'上午好':hour<14?'中午好':hour<18?'下午好':'晚上好'; card.textContent=`${timeWord}。今天的心情，还在等你告诉我。`; card.classList.remove('hidden'); setTimeout(()=>card.classList.add('hidden'),6000);
-        updateModeUI();
+        showWeatherToast(); updateModeUI();
       }
       loadHistory();
-      
-      let idleTimer; function resetIdleTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(() => { if(!processing && !queue.length && !engine.isGenerating) { const msg = "我还在哦。不想说话也没关系，我在这里。"; addMessage('assistant', msg); engine.saveToHistory('__system_idle__', msg); } }, 180000); }
-      window.addEventListener('touchstart', resetIdleTimer, { passive: true }); window.addEventListener('click', resetIdleTimer); resetIdleTimer();
-      const updateTimeTag = () => { const h=new Date().getHours(); document.getElementById('time-tag').textContent=h<12?'☀️ 上午':h<18?'🌤️ 下午':'🌙 晚上'; }; updateTimeTag(); setInterval(updateTimeTag,60000);
-      
-      let resizeTimer; if(window.visualViewport) window.visualViewport.addEventListener('resize', () => { if(resizeTimer) return; resizeTimer = setTimeout(() => { const kh = window.innerHeight - window.visualViewport.height; messagesContainer.style.paddingBottom = Math.max(0, kh) + 'px'; messagesContainer.scrollTop = messagesContainer.scrollHeight; resizeTimer = null; }, 100); });
-      window.addEventListener('beforeunload', () => { speechSynthesis.cancel(); stopSpeaking(); clearTimeout(idleTimer); stopBreath(); });
+
+      let idleTimer;
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+          if(!processing && !queue.length && !engine.isGenerating && !currentAbortToken) {
+            const msg = "我还在哦。不想说话也没关系，我在这里。";
+            addMessage('assistant', msg);
+            engine.saveToHistory('__system_idle__', msg);
+          }
+          resetIdleTimer();
+        }, 180000);
+      }
+      window.addEventListener('touchstart', resetIdleTimer, { passive: true });
+      window.addEventListener('click', resetIdleTimer);
+      resetIdleTimer();
+
+      const updateTimeTag = () => {
+        const h = new Date().getHours();
+        document.getElementById('time-tag').textContent = h<12?'☀️ 上午':h<18?'🌤️ 下午':'🌙 晚上';
+      };
+      updateTimeTag(); setInterval(updateTimeTag, 60000);
+
+      if(window.visualViewport) {
+        let resizeTimer;
+        window.visualViewport.addEventListener('resize', () => {
+          if(resizeTimer) clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            const kh = window.innerHeight - window.visualViewport.height;
+            messagesContainer.style.paddingBottom = Math.max(0, kh) + 'px';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            resizeTimer = null;
+          }, 100);
+        });
+      }
+
+      window.addEventListener('beforeunload', () => {
+        speechSynth.cancel(); stopSpeaking(); clearTimeout(idleTimer); stopBreath();
+        if (currentAbortToken) currentAbortToken.aborted = true;
+      });
     })();
   </script>
 </body>
