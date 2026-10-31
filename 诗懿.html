@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="我们的时间记录" />
+<meta property="og:title" content="我们的时间记录" />
+<meta property="og:description" content="一段关于时间的记录" />
+<title>我们的时间记录</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #e88ea0;
+  --accent-light: #f8c8d2;
+  --bg-main: #0b0810;
+  --bg-card: rgba(25, 18, 34, 0.72);
+  --text-main: #f4edf2;
+  --text-sub: #c9b8c6;
+  --text-fade: #9b8697;
+  --border: rgba(232, 142, 160, 0.22);
+  --shadow: 0 14px 40px rgba(0,0,0,0.35);
+
+  --timing-cover-out: 800ms;
+  --timing-fade: 200ms;
+  --timing-spin: 400ms;
+  --timing-roll: 600ms;
+  --delay-step: 0.05s;
+  --max-enter: 1.4s;
+}
+* { box-sizing: border-box; margin:0; padding:0; }
+html,body {
+  height: 100dvh;
+  min-height: 100vh;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", serif;
+  color: var(--text-main);
+  background: var(--bg-main);
+  overflow: hidden;
+}
+body {
+  position: relative;
+  overflow-y: auto;
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+/* 装饰层 */
+.deco-layer {
+  position: fixed; inset:0; z-index: 0; pointer-events:none;
+  aria-hidden: true;
+}
+.aurora {
+  position: absolute; inset: -30%;
+  background: radial-gradient(ellipse at 20% 20%, rgba(232,142,160,0.18), transparent 45%),
+  radial-gradient(ellipse at 80% 70%, rgba(160,142,232,0.12), transparent 45%);
+  opacity: 0.7;
+}
+.stars {
+  position: absolute; inset:0;
+  box-shadow:
+  12% 22% 0 1px #fff, 34% 61% 0 1px rgba(255,255,255,0.7), 56% 14% 0 1px rgba(255,255,255,0.8),
+  78% 44% 0 1px rgba(255,255,255,0.6), 22% 78% 0 1px rgba(255,255,255,0.5), 88% 22% 0 1px rgba(255,255,255,0.7),
+  44% 33% 0 1px #fff, 66% 88% 0 1px rgba(255,255,255,0.6), 11% 55% 0 1px rgba(255,255,255,0.8),
+  92% 66% 0 1px rgba(255,255,255,0.5), 33% 88% 0 1px rgba(255,255,255,0.7), 72% 12% 0 1px #fff;
+}
+.bokeh {
+  position: absolute; inset:0;
+}
+.bokeh-dot {
+  position:absolute; border-radius:50%; background: rgba(232,142,160,0.35);
+  animation: breathe 4s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { transform: scale(0.8); opacity:0.25; }
+  50% { transform: scale(1.15); opacity:0.55; }
+}
+.heartmap {
+  position:absolute; inset:0;
+}
+.heart-dot {
+  position:absolute; width:3px; height:3px; background: rgba(232,142,160,0.45); border-radius:50%;
+}
+.floaters {
+  position:absolute; inset:0;
+}
+.float-item {
+  position:absolute; color: rgba(248,200,210,0.45); font-size: 14px;
+  animation: floatUp 26s linear forwards;
+}
+@keyframes floatUp {
+  from { transform: translateY(100vh) rotate(0deg); opacity:0; }
+  10% { opacity:1; }
+  90% { opacity:1; }
+  to { transform: translateY(-120px) rotate(360deg); opacity:0; }
+}
+/* 封面 */
+.cover {
+  position: fixed; inset:0; z-index: 99;
+  background: var(--bg-main);
+  display: grid; place-items:center;
+  transition: opacity var(--timing-cover-out) ease, transform var(--timing-cover-out) ease;
+  cursor: pointer;
+}
+.cover.hidden { opacity:0; pointer-events:none; transform: scale(0.96); }
+.cover-inner { text-align:center; }
+.cover h1 { font-size: clamp(28px, 8vw, 44px); font-weight:400; margin-bottom:14px; }
+.cover-sub { color: var(--text-fade); margin-bottom: 24px; }
+.cover-hint { color: var(--accent-light); font-size:14px; }
+/* 主内容 */
+main {
+  position: relative; z-index:1;
+  max-width: 720px;
+  margin: 0 auto;
+  outline: none;
+}
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: clamp(20px, 5vw, 38px);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  opacity:0; transform: translateY(12px);
+  animation: cardEnter 0.7s ease forwards;
+  animation-delay: calc(var(--i) * var(--delay-step));
+}
+@keyframes cardEnter {
+  to { opacity:1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { animation:none; opacity:1; transform:none; }
+  .deco-layer { display:none; }
+  .cover { transition:none; }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .card { background: rgba(25,18,34,0.92); }
+}
+.badge {
+  display: inline-flex; align-items:center; gap:6px;
+  color: var(--accent-light); font-size:14px; margin-bottom:12px;
+}
+.badge .dot {
+  width:7px; height:7px; border-radius:50%; background:var(--accent);
+  box-shadow: 0 0 0 rgba(232,142,160,0.6);
+  animation: badgePulse 2.2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,142,160,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(232,142,160,0); }
+}
+.days-wrap {
+  margin-bottom:14px;
+}
+.days-label {
+  color: var(--text-sub); font-size:15px; margin-bottom:6px;
+}
+.days-num {
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(64px,16vw,96px);
+  font-weight: 500;
+  color: var(--text-main);
+  min-width: 180px;
+  display: inline-block;
+}
+.time-row {
+  display:flex; gap:12px; flex-wrap:wrap; margin:18px 0;
+}
+.time-item {
+  flex:1 1 70px; text-align:center;
+  background: rgba(255,255,255,0.04);
+  border-radius:12px; padding:10px 6px;
+}
+.time-val {
+  font-variant-numeric: tabular-nums; font-size:22px; margin-bottom:4px;
+}
+.time-label {
+  font-size:12px; color: var(--text-fade);
+}
+.progress-wrap {
+  margin:20px 0;
+}
+.progress-label {
+  display:flex; justify-content:space-between; font-size:14px; color:var(--text-sub); margin-bottom:8px;
+}
+.progress-bar {
+  width:100%; height:6px; background: rgba(255,255,255,0.08); border-radius:999px; overflow:hidden;
+  position:relative;
+}
+.progress-fill {
+  height:100%; width:0%; background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: inherit; transition: width 0.6s ease;
+}
+.progress-dot {
+  position:absolute; top:50%; transform:translate(-50%,-50%);
+  width:10px; height:10px; border-radius:50%; background:var(--accent);
+  box-shadow: 0 0 0 rgba(232,142,160,0.7);
+  animation: dotPulse 2.4s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,142,160,0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(232,142,160,0); }
+}
+.poem-card {
+  min-height: 114px;
+  margin:24px 0;
+  display:flex; flex-direction:column; justify-content:center;
+}
+.poem-text { font-size:18px; line-height:1.7; margin-bottom:8px; opacity:0; transition:opacity var(--timing-fade) ease; }
+.poem-text.active { opacity:1; }
+.poem-from { font-size:13px; color:var(--text-fade); opacity:0; transition:opacity var(--timing-fade) ease; }
+.poem-from.active { opacity:1; }
+.btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+button {
+  min-height: 46px; min-width: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  background: rgba(232,142,160,0.08);
+  color: var(--accent-light);
+  border-radius: 12px;
+  font: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+button:hover { background: rgba(232,142,160,0.16); }
+button:active { transform: scale(0.97); box-shadow: 0 0 0 4px rgba(232,142,160,0.18); }
+button:disabled { opacity:0.4; pointer-events:none; }
+.btn-spin { transition: transform var(--timing-spin) ease; }
+.btn-spin.spinning { transform: rotate(360deg); }
+.journey { margin:26px 0; }
+.journey-title { color:var(--text-sub); margin-bottom:12px; }
+.journey-wrap { overflow-x:auto; scrollbar-width:none; padding-bottom:6px; }
+.journey-wrap::-webkit-scrollbar { display:none; }
+.j-items { display:flex; gap:12px; }
+.j-item {
+  flex:1 1 0; min-width:0;
+  background: rgba(255,255,255,0.04);
+  border-radius:14px; padding:14px 10px; text-align:center;
+  cursor:pointer; transition:0.2s;
+}
+.j-item:hover { background: rgba(232,142,160,0.1); }
+.j-name { font-size:14px; margin-bottom:4px; }
+.j-date { font-size:13px; color:var(--text-fade); line-height:1.3; }
+/* 心情打卡 */
+.mood-wrap { margin-top:20px; }
+.mood-title { color:var(--text-sub); margin-bottom:10px; }
+.mood-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+.mood-btn { padding:8px 12px; min-height: 40px; }
+.mood-heat { display:flex; gap:3px; margin-top:12px; flex-wrap:wrap; }
+.mood-cell { width:12px; height:12px; border-radius:3px; background:rgba(255,255,255,0.06); }
+/* 信件 */
+.mail-wrap { margin-top:20px; }
+.mail-item { padding:12px; border:1px solid var(--border); border-radius:12px; margin-top:10px; }
+.mail-meta { font-size:12px; color:var(--text-fade); margin-bottom:6px; }
+/* Dialog */
+dialog {
+  border: none; background: var(--bg-card); color: var(--text-main);
+  border-radius:18px; padding: 24px;
+  max-width: 90vw; width: 520px;
+  backdrop-filter: blur(14px);
+}
+dialog::backdrop { background: rgba(0,0,0,0.65); }
+.memory-img { width:100%; border-radius:12px; margin:12px 0; }
+/* 回到顶部 */
+.back-today {
+  position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); right: max(16px, env(safe-area-inset-right));
+  z-index:10;
+}
+/* 焦点 */
+:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+/* 签名 */
+.signature { margin-top:24px; color:var(--text-fade); font-size:14px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="deco-layer" aria-hidden="true">
+  <div class="aurora"></div>
+  <div class="stars"></div>
+  <div class="bokeh"></div>
+  <div class="heartmap"></div>
+  <div class="floaters"></div>
+</div>
+
+<div class="cover" id="cover" role="button" tabindex="0">
+  <div class="cover-inner">
+    <h1 id="coverTitle">我们的时间记录</h1>
+    <div class="cover-sub" id="coverSub">一段关于时间的记录</div>
+    <div class="cover-hint">点击 / 轻触 展开</div>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+  <section class="card" style="--i:0">
+    <div class="badge">
+      <span class="dot"></span>
+      <span id="badgeText">✦ 重逢</span>
+    </div>
+    <div class="days-wrap">
+      <div class="days-label" id="daysLabel">重逢第</div>
+      <div class="days-num" id="daysNum" aria-live="polite">0</div>
+    </div>
+    <div class="time-row">
+      <div class="time-item"><div class="time-val" id="h">00</div><div class="time-label">时</div></div>
+      <div class="time-item"><div class="time-val" id="m">00</div><div class="time-label">分</div></div>
+      <div class="time-item"><div class="time-val" id="s">00</div><div class="time-label">秒</div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progressLabel">距离下一个纪念日</span>
+        <span id="progressTip">--</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-dot" id="progressDot"></div>
+      </div>
+    </div>
+    <div class="poem-card">
+      <div class="poem-text" id="poemText"></div>
+      <div class="poem-from" id="poemFrom"></div>
+    </div>
+    <div class="btn-row">
+      <button id="btnPoem" class="btn-spin" aria-label="换一句诗句">换一句</button>
+      <button id="btnMail">时光信箱</button>
+      <button id="btnReview">年度回顾</button>
+    </div>
+  </section>
+
+  <section class="card" style="--i:1">
+    <div class="journey-title">我们的旅程</div>
+    <div class="journey-wrap">
+      <div class="j-items" id="journeyList"></div>
+    </div>
+    <div class="signature" id="signature"></div>
+  </section>
+
+  <section class="card" style="--i:2">
+    <div class="mood-wrap">
+      <div class="mood-title">今日心情打卡</div>
+      <div class="mood-buttons" id="moodBtns"></div>
+      <div class="mood-heat" id="moodHeat"></div>
+    </div>
+  </section>
+
+  <section class="card" style="--i:3">
+    <div class="mail-wrap">
+      <div class="mail-title">信件</div>
+      <div id="mailList"></div>
+      <button id="btnWriteMail">写一封信给未来</button>
+    </div>
+  </section>
+</main>
+
+<button class="back-today" id="btnBackToday">回到今天</button>
+
+<dialog id="memoDialog">
+  <h3 id="memoTitle"></h3>
+  <img class="memory-img" id="memoImg" alt="">
+  <p id="memoText"></p>
+  <button id="closeMemo">关闭</button>
+</dialog>
+<dialog id="mailDialog">
+  <h3>写一封时光信</h3>
+  <p>选择送达日期：</p>
+  <input type="date" id="mailDate">
+  <textarea id="mailText" rows="6" placeholder="写下想留给那天的话..."></textarea>
+  <div style="display:flex;gap:10px;margin-top:12px;">
+    <button id="saveMail">保存信件</button>
+    <button id="closeMail">取消</button>
+  </div>
+</dialog>
+
+<script>
+(()=>{
+  const CONFIG = {
+    NAMES: { zh: { me: "DYD", you: "WSY" } },
+    TIMELINE: {
+      firstMet: "2021-05-20T00:00:00+08:00",
+      encounter: "2023-08-23T00:00:00+08:00",
+      togetherStart: "2023-09-01T00:00:00+08:00",
+      apart: "2024-02-10T00:00:00+08:00",
+      reunion: "2025-07-12T00:00:00+08:00"
+    },
+    ANNIV_MDS: [
+      { offset: 0, name: "重逢纪念日" },
+      { offset: 365, name: "重逢一周年" }
+    ],
+    MILES: [
+      {d:520, tip:"我爱你"},
+      {d:1314, tip:"一生一世"}
+    ],
+    SWEETS: {
+      apart: ["我会等","风会替我向你问好"],
+      reunited: ["绕过一圈，还是走回你身边","今天也好好在一起"]
+    },
+    POEMS: [
+      {text:"相思相见知何日？此时此夜难为情。", from:"李白", tag:["相思"]},
+      {text:"众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。", from:"辛弃疾", tag:["重逢"]},
+      {text:"与君初相识，犹如故人归。", from:"佚名", tag:["初见"]}
+    ],
+    POEM_SEED: 0
+  };
+  const PHASE = {
+    BEFORE: "before",
+    ENCOUNTERED: "encountered",
+    TOGETHER: "together",
+    APART: "apart",
+    REUNITED: "reunited"
+  };
+  const TIMING = {
+    COVER_OUT: 800,
+    FADE: 200,
+    SPIN: 400,
+    ROLL: 600,
+    DELAY_STEP: 0.05,
+    TICK_INTERVAL: 1000,
+    PROGRESS_INTERVAL: 60000
+  };
+  const EL = {
+    cover: document.getElementById("cover"),
+    main: document.getElementById("main"),
+    badgeText: document.getElementById("badgeText"),
+    daysLabel: document.getElementById("daysLabel"),
+    daysNum: document.getElementById("daysNum"),
+    h: document.getElementById("h"),
+    m: document.getElementById("m"),
+    s: document.getElementById("s"),
+    progressLabel: document.getElementById("progressLabel"),
+    progressTip: document.getElementById("progressTip"),
+    progressFill: document.getElementById("progressFill"),
+    progressDot: document.getElementById("progressDot"),
+    poemText: document.getElementById("poemText"),
+    poemFrom: document.getElementById("poemFrom"),
+    btnPoem: document.getElementById("btnPoem"),
+    journeyList: document.getElementById("journeyList"),
+    signature: document.getElementById("signature"),
+    moodBtns: document.getElementById("moodBtns"),
+    moodHeat: document.getElementById("moodHeat"),
+    mailList: document.getElementById("mailList"),
+    btnMail: document.getElementById("btnMail"),
+    btnWriteMail: document.getElementById("btnWriteMail"),
+    btnReview: document.getElementById("btnReview"),
+    btnBackToday: document.getElementById("btnBackToday"),
+    memoDialog: document.getElementById("memoDialog"),
+    memoTitle: document.getElementById("memoTitle"),
+    memoImg: document.getElementById("memoImg"),
+    memoText: document.getElementById("memoText"),
+    closeMemo: document.getElementById("closeMemo"),
+    mailDialog: document.getElementById("mailDialog"),
+    mailDate: document.getElementById("mailDate"),
+    mailText: document.getElementById("mailText"),
+    saveMail: document.getElementById("saveMail"),
+    closeMail: document.getElementById("closeMail"),
+    floaters: document.querySelector(".floaters"),
+    heartmap: document.querySelector(".heartmap"),
+    bokeh: document.querySelector(".bokeh")
+  };
+  const MEMORIES = {
+    firstMet: { title:"初识", img:"", text:"故事的开端。" },
+    encounter: { title:"相遇", img:"", text:"正式认识你的那天。" },
+    togetherStart: { title:"在一起", img:"", text:"我们决定牵手。" },
+    apart: { title:"暂别", img:"", text:"一段需要等待的日子。" },
+    reunion: { title:"重逢", img:"", text:"绕了一圈，回到彼此身边。" }
+  };
+  const MOODS = {
+    miss: { label:"想你", color:"#e88ea0" },
+    happy: { label:"开心", color:"#a0e8b4" },
+    calm: { label:"平静", color:"#94b8e8" },
+    busy: { label:"忙碌", color:"#d4b888" },
+    sad: { label:"难过", color:"#9488b8" }
+  };
+  const Timers = { list:[], add(fn, ms) { const t = setInterval(fn,ms); this.list.push(t); return t; }, once(fn,ms) { const t = setTimeout(fn,ms); this.list.push(t); return t; }, clearAll() { this.list.forEach(t=>clearInterval(t),clearTimeout(t)); this.list=[]; } };
+  const Storage = {
+    get(key) { try { return JSON.parse(localStorage.getItem(key)) } catch { return null } },
+    set(key,val) { localStorage.setItem(key, JSON.stringify(val)); },
+    mailbox() { return this.get("mailbox") || []; },
+    saveMailbox(arr) { this.set("mailbox", arr); },
+    mood() { return this.get("mood") || {}; },
+    saveMood(obj) { this.set("mood", obj); }
+  };
+  const Engine = {
+    tz: "Asia/Shanghai",
+    now() { return new Date() },
+    parseISO(s) { return new Date(s) },
+    dayDiff(a,b) {
+      const utcA = Date.UTC(a.getFullYear(),a.getMonth(),a.getDate());
+      const utcB = Date.UTC(b.getFullYear(),b.getMonth(),b.getDate());
+      return Math.floor((utcB - utcA) / (1000*60*60*24));
+    },
+    getPhase(now, tl) {
+      const dMet = this.parseISO(tl.firstMet);
+      const dEnc = this.parseISO(tl.encounter);
+      const dTog = this.parseISO(tl.togetherStart);
+      const dApart = this.parseISO(tl.apart);
+      const dReu = this.parseISO(tl.reunion);
+      if(now < dEnc) return {phase:PHASE.BEFORE, base:dMet};
+      if(now < dTog) return {phase:PHASE.ENCOUNTERED, base:dEnc};
+      if(now < dApart) return {phase:PHASE.TOGETHER, base:dTog};
+      if(now < dReu) return {phase:PHASE.APART, base:dApart};
+      return {phase:PHASE.REUNITED, base:dReu};
+    },
+    nextAnniv(now, base, annivList) {
+      const baseTs = base.getTime();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      let min = null;
+      for(const a of annivList) {
+        const d = new Date(baseTs + a.offset * 86400000);
+        if(d >= today) {
+          if(!min || d < min) min = d;
+        } else {
+          const ny = new Date(d);
+          ny.setFullYear(ny.getFullYear()+1);
+          if(ny >= today && (!min || ny < min)) min = ny;
+        }
+      }
+      return min;
+    },
+    isToday(a,b) {
+      return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    },
+    getMoodKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+  };
+  const View = {
+    last: {h:null,m:null,s:null,phase:null},
+    rollNum(el, target) {
+      const curr = Number(el.textContent || 0);
+      if(curr === target) return;
+      el.textContent = target;
+    },
+    renderPhase(state) {
+      const {phase, days, base, nextAnniv, pct} = state;
+      let badge, label, sig;
+      if(phase === PHASE.BEFORE) { badge = "故事还没开始"; label = "距离相遇"; sig = "故事还没开始"; }
+      else if(phase === PHASE.ENCOUNTERED) { badge = "✦ 认识你"; label = "认识你"; sig = "初见的心动"; }
+      else if(phase === PHASE.TOGETHER) { badge = "✦ 在一起"; label = "在一起"; sig = "那段日子，每一天都算数"; }
+      else if(phase === PHASE.APART) { badge = `✦ 暂别第 ${days} 天`; label = "暂别"; sig = "我会等"; }
+      else if(phase === PHASE.REUNITED) { badge = "✦ 重逢"; label = "重逢第"; sig = "绕过一圈，还是走回你身边"; }
+      EL.badgeText.textContent = badge;
+      EL.daysLabel.textContent = label;
+      this.rollNum(EL.daysNum, days);
+      EL.signature.textContent = sig;
+      EL.progressFill.style.width = `${pct}%`;
+      if(nextAnniv) EL.progressTip.textContent = nextAnniv.toLocaleDateString();
+      else EL.progressTip.textContent = "--";
+      this.renderJourney();
+      this.renderMood();
+      this.renderMail();
+    },
+    renderTime(now) {
+      const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+      if(this.last.h !== h) { EL.h.textContent = String(h).padStart(2,"0"); this.last.h = h; }
+      if(this.last.m !== m) { EL.m.textContent = String(m).padStart(2,"0"); this.last.m = m; }
+      if(this.last.s !== s) { EL.s.textContent = String(s).padStart(2,"0"); this.last.s = s; }
+    },
+    renderPoem(p) {
+      EL.poemText.classList.remove("active"); EL.poemFrom.classList.remove("active");
+      Timers.once(()=>{
+        EL.poemText.textContent = p.text; EL.poemFrom.textContent = p.from;
+        EL.poemText.classList.add("active"); EL.poemFrom.classList.add("active");
+      }, TIMING.FADE);
+    },
+    renderJourney() {
+      EL.journeyList.innerHTML = "";
+      const list = [
+        {key:"firstMet", name:"初识", date:CONFIG.TIMELINE.firstMet},
+        {key:"encounter", name:"相遇", date:CONFIG.TIMELINE.encounter},
+        {key:"togetherStart", name:"在一起", date:CONFIG.TIMELINE.togetherStart},
+        {key:"apart", name:"暂别", date:CONFIG.TIMELINE.apart},
+        {key:"reunion", name:"重逢", date:CONFIG.TIMELINE.reunion}
+      ];
+      list.forEach(item=>{
+        const d = new Date(item.date);
+        const div = document.createElement("div");
+        div.className = "j-item";
+        div.dataset.key = item.key;
+        div.innerHTML = `<div class="j-name">${item.name}</div><div class="j-date">${d.getFullYear()}<br>${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}</div>`;
+        div.onclick = ()=>{
+          const m = MEMORIES[item.key];
+          EL.memoTitle.textContent = m.title;
+          EL.memoImg.src = m.img;
+          EL.memoText.textContent = m.text;
+          EL.memoDialog.showModal();
+        };
+        EL.journeyList.appendChild(div);
+      })
+    },
+    renderMood() {
+      EL.moodBtns.innerHTML = "";
+      EL.moodHeat.innerHTML = "";
+      const moodKey = Engine.getMoodKey();
+      const allMood = Storage.mood();
+      Object.entries(MOODS).forEach(([k,v])=>{
+        const b = document.createElement("button");
+        b.className = "mood-btn";
+        b.textContent = v.label;
+        b.onclick = ()=>{
+          allMood[moodKey] = k;
+          Storage.saveMood(allMood);
+          this.renderMood();
+        };
+        EL.moodBtns.appendChild(b);
+      })
+      const days = 30;
+      const today = new Date();
+      for(let i=days-1;i>=0;i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+        const cell = document.createElement("div");
+        cell.className = "mood-cell";
+        if(allMood[k]) cell.style.background = MOODS[allMood[k]].color;
+        EL.moodHeat.appendChild(cell);
+      }
+    },
+    renderMail() {
+      EL.mailList.innerHTML = "";
+      const mailbox = Storage.mailbox();
+      const now = Engine.now();
+      mailbox.forEach(mail=>{
+        const delivered = new Date(mail.deliverAt) <= now;
+        const div = document.createElement("div");
+        div.className = "mail-item";
+        div.innerHTML = `<div class="mail-meta">写给 ${mail.deliverAt} | ${delivered ? "✅ 已到" : "🕒 未到"}</div><div>${mail.text}</div>`;
+        EL.mailList.appendChild(div);
+      })
+    },
+    makeBokeh(count=12) {
+      for(let i=0;i<count;i++){
+        const d = document.createElement("div");
+        d.className = "bokeh-dot";
+        const sz = 4 + Math.random()*14;
+        d.style.width = sz+"px"; d.style.height = sz+"px";
+        d.style.left = Math.random()*100+"%"; d.style.top = Math.random()*100+"%";
+        const dur = 2 + Math.random()*4;
+        d.style.animationDuration = dur+"s";
+        d.style.animationDelay = -dur*Math.random()+"s";
+        EL.bokeh.appendChild(d);
+      }
+    },
+    makeHeart(count=80) {
+      const pts = [];
+      for(let t=0;t<2*Math.PI;t+=0.08) {
+        const x = 16 * Math.pow(Math.sin(t),3);
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+        pts.push({x,y});
+      }
+      const cx = window.innerWidth/2, cy = window.innerHeight/2 + 100;
+      const s = 6;
+      pts.forEach(p=>{
+        const dot = document.createElement("div");
+        dot.className = "heart-dot";
+        dot.style.left = (cx + p.x*s)+"px";
+        dot.style.top = (cy - p.y*s)+"px";
+        EL.heartmap.appendChild(dot);
+      })
+    }
+  };
+  const App = {
+    state: { phase:null, days:0, nextAnniv:null, pct:0 },
+    poemIdx:0,
+    coverOpen:false,
+    init() {
+      this.assert();
+      View.makeBokeh(); View.makeHeart();
+      this.bindEvents();
+      this.tick();
+      Timers.add(()=>this.tick(), TIMING.TICK_INTERVAL);
+      Timers.add(()=>this.updateProgress(), TIMING.PROGRESS_INTERVAL);
+      document.addEventListener("visibilitychange", ()=>{
+        if(document.hidden) Timers.clearAll();
+        else { this.tick(); Timers.add(()=>this.tick(), TIMING.TICK_INTERVAL); }
+      })
+      window.addEventListener("pagehide", ()=>Timers.clearAll());
+    },
+    assert() {
+      const tl = CONFIG.TIMELINE;
+      const order = [tl.firstMet, tl.encounter, tl.togetherStart, tl.apart, tl.reunion].map(x=>new Date(x).getTime());
+      for(let i=1;i<order.length;i++) {
+        if(order[i] <= order[i-1]) { console.warn("TIMELINE 日期顺序错误"); break; }
+      }
+      if(!CONFIG.POEMS.length) console.warn("POEMS 为空");
+    },
+    tick() {
+      const now = Engine.now();
+      View.renderTime(now);
+      const res = Engine.getPhase(now, CONFIG.TIMELINE);
+      const days = Engine.dayDiff(res.base, now);
+      const nextAnniv = Engine.nextAnniv(now, res.base, CONFIG.ANNIV_MDS);
+      let pct = 0;
+      if(nextAnniv) {
+        const baseTs = res.base.getTime();
+        const span = nextAnniv.getTime() - baseTs;
+        const spent = now.getTime() - baseTs;
+        pct = Math.min(100, Math.max(0, spent / span * 100));
+      }
+      const newState = { phase:res.phase, days, nextAnniv, pct };
+      if(this.state.phase !== newState.phase) {
+        this.state = newState;
+        View.renderPhase(this.state);
+      }
+      this.state = newState;
+    },
+    updateProgress() {
+      if(this.state.nextAnniv) {
+        const baseTs = Engine.parseISO(CONFIG.TIMELINE.reunion).getTime();
+        const span = this.state.nextAnniv.getTime() - baseTs;
+        const spent = Engine.now().getTime() - baseTs;
+        this.state.pct = Math.min(100, Math.max(0, spent / span * 100));
+        EL.progressFill.style.width = `${this.state.pct}%`;
+      }
+    },
+    bindEvents() {
+      EL.cover.addEventListener("click", ()=>this.openCover());
+      EL.cover.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" ") { e.preventDefault(); this.openCover(); } });
+      EL.btnPoem.onclick = ()=>this.nextPoem();
+      EL.closeMemo.onclick = ()=>EL.memoDialog.close();
+      EL.btnWriteMail.onclick = ()=>EL.mailDialog.showModal();
+      EL.closeMail.onclick = ()=>EL.mailDialog.close();
+      EL.saveMail.onclick = ()=>{
+        const deliverAt = EL.mailDate.value;
+        const text = EL.mailText.value.trim();
+        if(!deliverAt || !text) return alert("请填写日期和内容");
+        const mailbox = Storage.mailbox();
+        mailbox.push({id:Date.now(), createdAt:Engine.now().toISOString(), deliverAt:deliverAt+"T00:00:00+08:00", text, read:false});
+        Storage.saveMailbox(mailbox);
+        View.renderMail();
+        EL.mailDialog.close();
+        EL.mailText.value = "";
+      };
+      EL.btnBackToday.onclick = ()=>EL.main.scrollIntoView({behavior:"smooth"});
+      EL.btnReview.onclick = ()=>alert("年度回顾：我们一起走过了很多日子，继续往前走。");
+    },
+    openCover() {
+      if(this.coverOpen) return;
+      this.coverOpen = true;
+      EL.cover.classList.add("hidden");
+      Timers.once(()=>EL.main.focus(), TIMING.COVER_OUT);
+      this.nextPoem();
+    },
+    nextPoem() {
+      EL.btnPoem.disabled = true;
+      EL.btnPoem.classList.add("spinning");
+      this.poemIdx = (this.poemIdx + 1) % CONFIG.POEMS.length;
+      View.renderPoem(CONFIG.POEMS[this.poemIdx]);
+      Timers.once(()=>{
+        EL.btnPoem.classList.remove("spinning");
+        EL.btnPoem.disabled = false;
+      }, TIMING.SPIN);
+    }
+  };
+  App.init();
+})();
+</script>
+</body>
+</html>
